@@ -2,7 +2,7 @@ module.exports = function(grunt) {
   "use strict";
 
   var vendorFiles = [
-    
+    "lib/webgl-debug.js",
   ];
 
   var srcFiles = [
