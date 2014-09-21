@@ -4,6 +4,16 @@ Zia.ClearOptions = {
   ColorBuffer: 2
 };
 
+Zia.PrimitiveType = {
+  PointList: 0,
+  LineList: 1,
+  LineStrip: 2,
+  LineLoop: 3,
+  TriangleList: 4,
+  TriangleStrip: 5,
+  TriangleFan: 6
+};
+
 Zia.GraphicsDevice = function (canvas, debug) {
   this._canvas = canvas;
   this._gl = canvas.getContext('webgl', {
@@ -42,6 +52,39 @@ Zia.GraphicsDevice.prototype = {
     }
 
     this._gl.clear(clearMask);
+  },
+
+  setIndexBuffer: function(indexBuffer) {
+    this._indexBuffer = indexBuffer;
+  },
+
+  setVertexBuffer: function(vertexBuffer) {
+    this._vertexBuffer = vertexBuffer;
+  },
+
+  drawIndexedPrimitives: function(primitiveType, startIndex, indexCount) {
+    var gl = this._gl;
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._vertexBuffer);
+
+    gl.drawElements(
+      this._getMode(primitiveType),
+      indexCount,
+      gl.UNSIGNED_SHORT,
+      startIndex * 4);
+  },
+
+  _getMode: function(primitiveType) {
+    switch (primitiveType) {
+      case Zia.PrimitiveType.PointList:     return this._gl.POINTS;
+      case Zia.PrimitiveType.LineList:      return this._gl.LINES;
+      case Zia.PrimitiveType.LineStrip:     return this._gl.LINE_STRIP;
+      case Zia.PrimitiveType.LineLoop:      return this._gl.LINE_LOOP;
+      case Zia.PrimitiveType.TriangleList:  return this._gl.TRIANGLES;
+      case Zia.PrimitiveType.TriangleStrip: return this._gl.TRIANGLE_STRIP;
+      case Zia.PrimitiveType.TriangleFan:   return this._gl.TRIANGLE_FAN;
+    }
   }
 
 };
