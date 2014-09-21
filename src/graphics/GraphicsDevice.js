@@ -16,22 +16,34 @@ Zia.PrimitiveType = {
 
 Zia.GraphicsDevice = function (canvas, debug) {
   this._canvas = canvas;
-  this._gl = canvas.getContext('webgl', {
+  var gl = this._gl = canvas.getContext('webgl', {
     antialias: true
   });
 
   if (debug) {
-    this._gl = Zia.DebugUtil.makeDebugContext(this._gl);
+    gl = this._gl = Zia.DebugUtil.makeDebugContext(gl);
   }
 
   // TODO: Move this to somewhere else.
-  this._gl.enable(this._gl.DEPTH_TEST);
-  this._gl.depthFunc(this._gl.LESS);
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LESS);
 
   // TODO: Handle WebContextLost event.
+  
+  var viewport = this._viewport = new Zia.Viewport(
+    0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+
+  viewport.onChange(function () {
+    gl.viewport(viewport._x, viewport._y, viewport._width, viewport._height);
+    gl.depthRange(viewport._minDepth, viewport._maxDepth);
+  });
 };
 
 Zia.GraphicsDevice.prototype = {
+
+  get viewport() {
+    return this._viewport;
+  },
   
   clear: function(clearOptions, color, depth, stencil) {
     var clearMask = 0;
