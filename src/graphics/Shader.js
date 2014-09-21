@@ -23,14 +23,14 @@ Zia.Shader.prototype = {
 
 
 Zia.FragmentShader = function (graphicsDevice, source) {
-  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.FRAGMENT_SHADER);
+  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.FRAGMENT_SHADER, source);
 };
 
 Zia.FragmentShader.prototype = Object.create(Zia.Shader.prototype);
 
 
 Zia.VertexShader = function (graphicsDevice, source) {
-  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.VERTEX_SHADER);
+  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.VERTEX_SHADER, source);
 };
 
 Zia.VertexShader.prototype = Object.create(Zia.Shader.prototype);

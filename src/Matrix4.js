@@ -345,14 +345,7 @@ Zia.Matrix4.prototype = {
 
   }(),
 
-  multiply: function ( m, n ) {
-
-    if ( n !== undefined ) {
-
-      console.warn( 'Zia.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
-      return this.multiplyMatrices( m, n );
-
-    }
+  multiply: function ( m) {
 
     return this.multiplyMatrices( this, m );
 
@@ -475,14 +468,6 @@ Zia.Matrix4.prototype = {
     };
 
   }(),
-
-  rotateAxis: function ( v ) {
-
-    console.warn( 'Zia.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
-
-    v.transformDirection( this );
-
-  },
 
   crossVector: function ( vector ) {
 
@@ -665,36 +650,6 @@ Zia.Matrix4.prototype = {
     this.multiplyScalar( 1 / det );
 
     return this;
-
-  },
-
-  translate: function ( v ) {
-
-    console.warn( 'Zia.Matrix4: .translate() has been removed.' );
-
-  },
-
-  rotateX: function ( angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateX() has been removed.' );
-
-  },
-
-  rotateY: function ( angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateY() has been removed.' );
-
-  },
-
-  rotateZ: function ( angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateZ() has been removed.' );
-
-  },
-
-  rotateByAxis: function ( axis, angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateByAxis() has been removed.' );
 
   },
 

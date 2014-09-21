@@ -1,12 +1,12 @@
 Zia.IndexBuffer = function (graphicsDevice) {
-  this._graphicsDevice = graphicsDevice;
-  this._buffer = gl.createBuffer();
+  this._gl = graphicsDevice._gl;
+  this._buffer = this._gl.createBuffer();
 };
 
 Zia.IndexBuffer.prototype = {
 
   setData: function(data) {
-    var gl = this._graphicsDevice._gl;
+    var gl = this._gl;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._buffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
   },

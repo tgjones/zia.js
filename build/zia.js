@@ -1685,7 +1685,14 @@ Zia.Math = {
 
   clamp: function (x, a, b) {
     return ( x < a ) ? a : ( ( x > b ) ? b : x );
-  }
+  },
+
+  degToRad: function () {
+    var degreeToRadiansFactor = Math.PI / 180;
+    return function (degrees) {
+      return degrees * degreeToRadiansFactor;
+    };
+  }(),
 
 };
 
@@ -3713,7 +3720,7 @@ Zia.GraphicsDevice = function (canvas, debug) {
 
   // TODO: Move this to somewhere else.
   gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LESS);
+  gl.depthFunc(gl.LEQUAL);
 
   // TODO: Handle WebContextLost event.
   
@@ -3757,24 +3764,61 @@ Zia.GraphicsDevice.prototype = {
     this._indexBuffer = indexBuffer;
   },
 
-  setVertexBuffer: function(vertexBuffer) {
-    this._vertexBuffer = vertexBuffer;
+  setVertexBuffers: function (vertexBuffers) {
+    this._vertexBuffers = vertexBuffers;
   },
 
-  drawIndexedPrimitives: function(primitiveType, startIndex, indexCount) {
+  setProgram: function (program) {
+    this._currentProgram = program;
+  },
+
+  drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
     var gl = this._gl;
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._vertexBuffer);
+    var enabledAttributeLocations = [];
+    for (var i = 0; i < this._currentProgram._attributes.length; i++) {
+      var attribute = this._currentProgram._attributes[i];
+      var vertexBuffer = this._findVertexBuffer(attribute.name);
+      if (vertexBuffer) {
+        enabledAttributeLocations.push(attribute.location);
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer.buffer._buffer);
+        gl.vertexAttribPointer(attribute.location,
+          vertexBuffer.element.numComponents,
+          gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(attribute.location);
+      }
+    }
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer._buffer);
 
     gl.drawElements(
       this._getMode(primitiveType),
       indexCount,
       gl.UNSIGNED_SHORT,
       startIndex * 4);
+
+    for (var i = 0; i < enabledAttributeLocations.length; i++) {
+      gl.disableVertexAttribArray(enabledAttributeLocations[i]);
+    }
   },
 
-  _getMode: function(primitiveType) {
+  _findVertexBuffer: function (attributeName) {
+    for (var i = 0; i < this._vertexBuffers.length; i++) {
+      var vertexBuffer = this._vertexBuffers[i];
+      for (var j = 0; j < vertexBuffer._vertexDeclaration.elements.length; j++) {
+        var element = vertexBuffer._vertexDeclaration.elements[j];
+        if (element.attributeName === attributeName) {
+          return {
+            buffer: vertexBuffer,
+            element: element
+          };
+        }
+      }
+    }
+    return null;
+  },
+
+  _getMode: function (primitiveType) {
     switch (primitiveType) {
       case Zia.PrimitiveType.PointList:     return this._gl.POINTS;
       case Zia.PrimitiveType.LineList:      return this._gl.LINES;
@@ -3789,14 +3833,14 @@ Zia.GraphicsDevice.prototype = {
 };
 
 Zia.IndexBuffer = function (graphicsDevice) {
-  this._graphicsDevice = graphicsDevice;
-  this._buffer = gl.createBuffer();
+  this._gl = graphicsDevice._gl;
+  this._buffer = this._gl.createBuffer();
 };
 
 Zia.IndexBuffer.prototype = {
 
   setData: function(data) {
-    var gl = this._graphicsDevice._gl;
+    var gl = this._gl;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._buffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
   },
@@ -3969,14 +4013,14 @@ Zia.Shader.prototype = {
 
 
 Zia.FragmentShader = function (graphicsDevice, source) {
-  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.FRAGMENT_SHADER);
+  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.FRAGMENT_SHADER, source);
 };
 
 Zia.FragmentShader.prototype = Object.create(Zia.Shader.prototype);
 
 
 Zia.VertexShader = function (graphicsDevice, source) {
-  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.VERTEX_SHADER);
+  Zia.Shader.call(this, graphicsDevice, graphicsDevice._gl.VERTEX_SHADER, source);
 };
 
 Zia.VertexShader.prototype = Object.create(Zia.Shader.prototype);
@@ -4051,23 +4095,34 @@ Zia.Texture.prototype = {
 
 };
 
-Zia.VertexBuffer = function (graphicsDevice) {
-  this._graphicsDevice = graphicsDevice;
-  this._buffer = gl.createBuffer();
+Zia.VertexBuffer = function (graphicsDevice, vertexDeclaration) {
+  this._gl = graphicsDevice._gl;
+  this._buffer = this._gl.createBuffer();
+
+  this._vertexDeclaration = vertexDeclaration;
 };
 
 Zia.VertexBuffer.prototype = {
 
-  setData: function(data) {
-    var gl = this._graphicsDevice._gl;
+  setData: function (data) {
+    var gl = this._gl;
     gl.bindBuffer(gl.ARRAY_BUFFER, this._buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
   },
 
-  destroy: function() {
+  destroy: function () {
     this._gl.deleteBuffer(this._buffer);
   }
 
+};
+
+Zia.VertexElement = function (attributeName, numComponents) {
+  this.attributeName = attributeName;
+  this.numComponents = numComponents;
+};
+
+Zia.VertexDeclaration = function (elements) {
+  this.elements = elements;
 };
 
 Zia.Viewport = function(x, y, width, height, minDepth, maxDepth) {

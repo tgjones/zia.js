@@ -26,7 +26,7 @@ Zia.GraphicsDevice = function (canvas, debug) {
 
   // TODO: Move this to somewhere else.
   gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LESS);
+  gl.depthFunc(gl.LEQUAL);
 
   // TODO: Handle WebContextLost event.
   
@@ -70,24 +70,61 @@ Zia.GraphicsDevice.prototype = {
     this._indexBuffer = indexBuffer;
   },
 
-  setVertexBuffer: function(vertexBuffer) {
-    this._vertexBuffer = vertexBuffer;
+  setVertexBuffers: function (vertexBuffers) {
+    this._vertexBuffers = vertexBuffers;
   },
 
-  drawIndexedPrimitives: function(primitiveType, startIndex, indexCount) {
+  setProgram: function (program) {
+    this._currentProgram = program;
+  },
+
+  drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
     var gl = this._gl;
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._vertexBuffer);
+    var enabledAttributeLocations = [];
+    for (var i = 0; i < this._currentProgram._attributes.length; i++) {
+      var attribute = this._currentProgram._attributes[i];
+      var vertexBuffer = this._findVertexBuffer(attribute.name);
+      if (vertexBuffer) {
+        enabledAttributeLocations.push(attribute.location);
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer.buffer._buffer);
+        gl.vertexAttribPointer(attribute.location,
+          vertexBuffer.element.numComponents,
+          gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(attribute.location);
+      }
+    }
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer._buffer);
 
     gl.drawElements(
       this._getMode(primitiveType),
       indexCount,
       gl.UNSIGNED_SHORT,
       startIndex * 4);
+
+    for (var i = 0; i < enabledAttributeLocations.length; i++) {
+      gl.disableVertexAttribArray(enabledAttributeLocations[i]);
+    }
   },
 
-  _getMode: function(primitiveType) {
+  _findVertexBuffer: function (attributeName) {
+    for (var i = 0; i < this._vertexBuffers.length; i++) {
+      var vertexBuffer = this._vertexBuffers[i];
+      for (var j = 0; j < vertexBuffer._vertexDeclaration.elements.length; j++) {
+        var element = vertexBuffer._vertexDeclaration.elements[j];
+        if (element.attributeName === attributeName) {
+          return {
+            buffer: vertexBuffer,
+            element: element
+          };
+        }
+      }
+    }
+    return null;
+  },
+
+  _getMode: function (primitiveType) {
     switch (primitiveType) {
       case Zia.PrimitiveType.PointList:     return this._gl.POINTS;
       case Zia.PrimitiveType.LineList:      return this._gl.LINES;

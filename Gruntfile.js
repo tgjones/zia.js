@@ -73,6 +73,13 @@ module.exports = function(grunt) {
       ci: {
         singleRun: true
       }
+    },
+
+    connect: {
+      examples: {
+        port: 8080,
+        base: '.'
+      }
     }
   });
 
@@ -80,6 +87,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-jasmine");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-karma");
+  grunt.loadNpmTasks('grunt-connect');
 
   grunt.registerTask("default", [
     "karma:unit:start",  

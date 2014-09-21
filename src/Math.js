@@ -72,6 +72,13 @@ Zia.Math = {
 
   clamp: function (x, a, b) {
     return ( x < a ) ? a : ( ( x > b ) ? b : x );
-  }
+  },
+
+  degToRad: function () {
+    var degreeToRadiansFactor = Math.PI / 180;
+    return function (degrees) {
+      return degrees * degreeToRadiansFactor;
+    };
+  }(),
 
 };
