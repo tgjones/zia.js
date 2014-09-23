@@ -37,6 +37,9 @@ Zia.GraphicsDevice = function (canvas, debug) {
     gl.viewport(viewport._x, viewport._y, viewport._width, viewport._height);
     gl.depthRange(viewport._minDepth, viewport._maxDepth);
   });
+
+  this.rasterizerState = new Zia.RasterizerState();
+  this.depthStencilState = new Zia.DepthStencilState();
 };
 
 Zia.GraphicsDevice.prototype = {
@@ -44,6 +47,24 @@ Zia.GraphicsDevice.prototype = {
   get viewport() {
     return this._viewport;
   },
+
+  get rasterizerState() {
+    return this._rasterizerState;
+  },
+
+  set rasterizerState(value) {
+    this._rasterizerState = value;
+    this._rasterizerState._apply(this._gl);
+  }
+
+  get depthStencilState() {
+    return this._depthStencilState;
+  },
+
+  set depthStencilState(value) {
+    this._depthStencilState = value;
+    this._depthStencilState._apply(this._gl);
+  }
   
   clear: function(clearOptions, color, depth, stencil) {
     var clearMask = 0;
