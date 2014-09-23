@@ -2043,14 +2043,7 @@ Zia.Matrix4.prototype = {
 
   }(),
 
-  multiply: function ( m, n ) {
-
-    if ( n !== undefined ) {
-
-      console.warn( 'Zia.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
-      return this.multiplyMatrices( m, n );
-
-    }
+  multiply: function ( m) {
 
     return this.multiplyMatrices( this, m );
 
@@ -2173,14 +2166,6 @@ Zia.Matrix4.prototype = {
     };
 
   }(),
-
-  rotateAxis: function ( v ) {
-
-    console.warn( 'Zia.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
-
-    v.transformDirection( this );
-
-  },
 
   crossVector: function ( vector ) {
 
@@ -2363,36 +2348,6 @@ Zia.Matrix4.prototype = {
     this.multiplyScalar( 1 / det );
 
     return this;
-
-  },
-
-  translate: function ( v ) {
-
-    console.warn( 'Zia.Matrix4: .translate() has been removed.' );
-
-  },
-
-  rotateX: function ( angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateX() has been removed.' );
-
-  },
-
-  rotateY: function ( angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateY() has been removed.' );
-
-  },
-
-  rotateZ: function ( angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateZ() has been removed.' );
-
-  },
-
-  rotateByAxis: function ( axis, angle ) {
-
-    console.warn( 'Zia.Matrix4: .rotateByAxis() has been removed.' );
 
   },
 
@@ -3692,6 +3647,51 @@ Zia.Vector4.prototype = {
 
 };
 
+Zia.Comparison = {
+  Never: 0,
+  Always: 1,
+  Less: 2,
+  Equal: 3,
+  LessEqual: 4,
+  Greater: 5,
+  GreaterEqual: 6,
+  NotEqual: 7
+};
+
+Zia.DepthStencilState = function () {
+  this.isDepthEnabled = true;
+  this.depthFunction = Zia.Comparison.Less;
+};
+
+(function () {
+  function mapComparison(comparison, gl) {
+    switch (comparison) {
+      case Zia.Comparison.Never :        return gl.NEVER;
+      case Zia.Comparison.Always :       return gl.ALWAYS;
+      case Zia.Comparison.Less :         return gl.LESS;
+      case Zia.Comparison.Equal :        return gl.EQUAL;
+      case Zia.Comparison.LessEqual :    return gl.LEQUAL;
+      case Zia.Comparison.Greater :      return gl.GREATER;
+      case Zia.Comparison.GreaterEqual : return gl.GEQUAL;
+      case Zia.Comparison.NotEqual :     return gl.NOTEQUAL;
+    }
+  }
+
+  Zia.DepthStencilState.prototype = {
+
+    _apply: function (gl) {
+      if (this.isDepthEnabled) {
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(mapComparison(this.depthFunction, gl));
+      }
+      else {
+        gl.disable(gl.DEPTH_TEST);
+      }
+
+    }
+  };
+})();
+
 Zia.ClearOptions = {
   DepthBuffer: 0,
   StencilBuffer: 1,
@@ -3731,12 +3731,33 @@ Zia.GraphicsDevice = function (canvas, debug) {
     gl.viewport(viewport._x, viewport._y, viewport._width, viewport._height);
     gl.depthRange(viewport._minDepth, viewport._maxDepth);
   });
+
+  this.rasterizerState = new Zia.RasterizerState();
+  this.depthStencilState = new Zia.DepthStencilState();
 };
 
 Zia.GraphicsDevice.prototype = {
 
   get viewport() {
     return this._viewport;
+  },
+
+  get rasterizerState() {
+    return this._rasterizerState;
+  },
+
+  set rasterizerState(value) {
+    this._rasterizerState = value;
+    this._rasterizerState._apply(this._gl);
+  },
+
+  get depthStencilState() {
+    return this._depthStencilState;
+  },
+
+  set depthStencilState(value) {
+    this._depthStencilState = value;
+    this._depthStencilState._apply(this._gl);
   },
   
   clear: function(clearOptions, color, depth, stencil) {
@@ -3784,7 +3805,9 @@ Zia.GraphicsDevice.prototype = {
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer.buffer._buffer);
         gl.vertexAttribPointer(attribute.location,
           vertexBuffer.element.numComponents,
-          gl.FLOAT, false, 0, 0);
+          gl.FLOAT, false,
+          vertexBuffer.buffer._vertexDeclaration.stride,
+          vertexBuffer.element.offset);
         gl.enableVertexAttribArray(attribute.location);
       }
     }
@@ -3988,6 +4011,54 @@ Zia.Program.prototype = {
 
 };
 
+Zia.CullMode = {
+  Back: 0,
+  Front: 1,
+  FrontAndBack: 2,
+  None: 3
+};
+
+Zia.RasterizerState = function () {
+  this.cullMode = Zia.CullMode.Back;
+  this.isFrontClockwise = false;
+  this.isPolygonOffsetEnabled = false;
+  this.polygonOffsetFactor = 0.0;
+  this.polygonOffsetUnits = 0.0;
+};
+
+Zia.RasterizerState.prototype = {
+
+  _apply: function (gl) {
+    switch (this.cullMode) {
+      case Zia.CullMode.Back :
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+        break;
+      case Zia.CullMode.Front :
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.FRONT);
+        break;
+      case Zia.CullMode.FrontAndBack :
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.FRONT_AND_BACK);
+        break;
+      case Zia.CullMode.None :
+        gl.disable(gl.CULL_FACE);
+        break;
+    }
+
+    gl.frontFace(this.isFrontClockwise ? gl.CW : gl.CCW);
+
+    if (this.isPolygonOffsetEnabled) {
+      gl.enable(gl.POLYGON_OFFSET_FILL);
+      gl.polygonOffset(this.polygonOffsetFactor, this.polygonOffsetUnits);
+    } else {
+      gl.disable(gl.POLYGON_OFFSET_FILL);
+    }
+  }
+
+};
+
 Zia.Shader = function (graphicsDevice, type, source) {
   var gl = this._gl = graphicsDevice._gl;
 
@@ -4116,13 +4187,17 @@ Zia.VertexBuffer.prototype = {
 
 };
 
-Zia.VertexElement = function (attributeName, numComponents) {
+Zia.VertexElement = function (attributeName, numComponents, offset) {
   this.attributeName = attributeName;
   this.numComponents = numComponents;
+  this.offset = (offset !== undefined) ? offset : 0;
 };
 
 Zia.VertexDeclaration = function (elements) {
   this.elements = elements;
+  this.stride = 4 * elements
+    .map(function (v) { return v.numComponents; })
+    .reduce(function (p, c) { return p + c; }, 0);
 };
 
 Zia.Viewport = function(x, y, width, height, minDepth, maxDepth) {
@@ -4223,6 +4298,63 @@ Zia.Viewport.prototype = {
     func();
     this._onChangeCallback = temp;
   },
+};
+
+Zia.BoxPrimitive = {
+  vertexDeclaration: new Zia.VertexDeclaration(
+    [
+      new Zia.VertexElement("aVertexPosition", 3, 0),
+      new Zia.VertexElement("aTextureCoord", 2, 3 * 4)
+    ]),
+
+  vertices: new Float32Array(
+    [
+      // Front face
+      -1.0, -1.0,  1.0,   0.0,  0.0,
+       1.0, -1.0,  1.0,   1.0,  0.0,
+       1.0,  1.0,  1.0,   1.0,  1.0,
+      -1.0,  1.0,  1.0,   0.0,  1.0,
+      
+      // Back face
+      -1.0, -1.0, -1.0,   0.0,  0.0,
+      -1.0,  1.0, -1.0,   1.0,  0.0,
+       1.0,  1.0, -1.0,   1.0,  1.0,
+       1.0, -1.0, -1.0,   0.0,  1.0,
+      
+      // Top face
+      -1.0,  1.0, -1.0,   0.0,  0.0,
+      -1.0,  1.0,  1.0,   1.0,  0.0,
+       1.0,  1.0,  1.0,   1.0,  1.0,
+       1.0,  1.0, -1.0,   0.0,  1.0,
+      
+      // Bottom face
+      -1.0, -1.0, -1.0,   0.0,  0.0,
+       1.0, -1.0, -1.0,   1.0,  0.0,
+       1.0, -1.0,  1.0,   1.0,  1.0,
+      -1.0, -1.0,  1.0,   0.0,  1.0,
+      
+      // Right face
+       1.0, -1.0, -1.0,   0.0,  0.0,
+       1.0,  1.0, -1.0,   1.0,  0.0,
+       1.0,  1.0,  1.0,   1.0,  1.0,
+       1.0, -1.0,  1.0,   0.0,  1.0,
+      
+      // Left face
+      -1.0, -1.0, -1.0,   0.0,  0.0,
+      -1.0, -1.0,  1.0,   1.0,  0.0,
+      -1.0,  1.0,  1.0,   1.0,  1.0,
+      -1.0,  1.0, -1.0,   0.0,  1.0
+    ]),
+
+  indices: new Uint16Array(
+    [
+      0,  1,  2,      0,  2,  3,    // front
+      4,  5,  6,      4,  6,  7,    // back
+      8,  9,  10,     8,  10, 11,   // top
+      12, 13, 14,     12, 14, 15,   // bottom
+      16, 17, 18,     16, 18, 19,   // right
+      20, 21, 22,     20, 22, 23    // left
+    ])
 };
 
 (function () {

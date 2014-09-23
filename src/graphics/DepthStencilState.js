@@ -39,5 +39,6 @@ Zia.DepthStencilState = function () {
         gl.disable(gl.DEPTH_TEST);
       }
 
-    };
+    }
+  };
 })();

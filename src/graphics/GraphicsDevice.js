@@ -55,7 +55,7 @@ Zia.GraphicsDevice.prototype = {
   set rasterizerState(value) {
     this._rasterizerState = value;
     this._rasterizerState._apply(this._gl);
-  }
+  },
 
   get depthStencilState() {
     return this._depthStencilState;
@@ -64,7 +64,7 @@ Zia.GraphicsDevice.prototype = {
   set depthStencilState(value) {
     this._depthStencilState = value;
     this._depthStencilState._apply(this._gl);
-  }
+  },
   
   clear: function(clearOptions, color, depth, stencil) {
     var clearMask = 0;
@@ -111,7 +111,9 @@ Zia.GraphicsDevice.prototype = {
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer.buffer._buffer);
         gl.vertexAttribPointer(attribute.location,
           vertexBuffer.element.numComponents,
-          gl.FLOAT, false, 0, 0);
+          gl.FLOAT, false,
+          vertexBuffer.buffer._vertexDeclaration.stride,
+          vertexBuffer.element.offset);
         gl.enableVertexAttribArray(attribute.location);
       }
     }
