@@ -3796,6 +3796,21 @@ Zia.GraphicsDevice.prototype = {
   drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
     var gl = this._gl;
 
+    var enabledAttributeLocations = this._bindVertexAttributes(gl);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer._buffer);
+
+    gl.drawElements(
+      this._getMode(primitiveType),
+      indexCount,
+      gl.UNSIGNED_SHORT,
+      startIndex * 4);
+
+    for (var i = 0; i < enabledAttributeLocations.length; i++) {
+      gl.disableVertexAttribArray(enabledAttributeLocations[i]);
+    }
+  },
+
+  _bindVertexAttributes: function (gl) {
     var enabledAttributeLocations = [];
     for (var i = 0; i < this._currentProgram._attributes.length; i++) {
       var attribute = this._currentProgram._attributes[i];
@@ -3811,18 +3826,7 @@ Zia.GraphicsDevice.prototype = {
         gl.enableVertexAttribArray(attribute.location);
       }
     }
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer._buffer);
-
-    gl.drawElements(
-      this._getMode(primitiveType),
-      indexCount,
-      gl.UNSIGNED_SHORT,
-      startIndex * 4);
-
-    for (var i = 0; i < enabledAttributeLocations.length; i++) {
-      gl.disableVertexAttribArray(enabledAttributeLocations[i]);
-    }
+    return enabledAttributeLocations;
   },
 
   _findVertexBuffer: function (attributeName) {

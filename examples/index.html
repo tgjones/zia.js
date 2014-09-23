@@ -46,19 +46,6 @@
 
     <script>
 
-      function createVertexBuffer(graphicsDevice) {
-        var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
-          Zia.BoxPrimitive.vertexDeclaration);
-        vertexBuffer.setData(Zia.BoxPrimitive.vertices);
-        return vertexBuffer;
-      }
-
-      function createIndexBuffer(graphicsDevice) {
-        var indexBuffer = new Zia.IndexBuffer(graphicsDevice);
-        indexBuffer.setData(Zia.BoxPrimitive.indices);
-        return indexBuffer;
-      }
-
       document.addEventListener('DOMContentLoaded', function () {
         
         var canvas = document.getElementById('mainCanvas');
@@ -71,9 +58,12 @@
 
         var texture = Zia.Texture.createFromImagePath(graphicsDevice, 'textures/UV_Grid_Sm.jpg');
 
-        var vertexBuffer = createVertexBuffer(graphicsDevice);
+        var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
+          Zia.BoxPrimitive.vertexDeclaration);
+        vertexBuffer.setData(Zia.BoxPrimitive.vertices);
 
-        var indexBuffer = createIndexBuffer(graphicsDevice);
+        var indexBuffer = new Zia.IndexBuffer(graphicsDevice);
+        indexBuffer.setData(Zia.BoxPrimitive.indices);
 
         var projectionMatrix = new Zia.Matrix4().makePerspective(45, 800/600, 0.1, 100);
         var viewMatrix = new Zia.Matrix4().makeTranslation(0, 0, -6);
