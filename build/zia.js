@@ -1,5 +1,14 @@
 var Zia = {};
 
+Object.prototype.reverseMerge = function (source) {
+  for (var key in source) {
+    if (source.hasOwnProperty(key) && !(key in this)) {
+      this[key] = source[key];
+    }
+  }
+  return this;
+};
+
 /**
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
@@ -3647,6 +3656,227 @@ Zia.Vector4.prototype = {
 
 };
 
+(function() {
+
+  // From http://bocoup.com/weblog/counting-uniforms-in-webgl/
+  function getProgramInfo(gl, program) {
+    var result = {
+      attributes: [],
+      uniforms: []
+    };
+    var activeUniforms   = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    var activeAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+
+    function toSimpleObject(activeInfo, location) {
+      return {
+        location: location,
+        name: activeInfo.name,
+        size: activeInfo.size,
+        type: activeInfo.type
+      };
+    }
+    
+    // Loop through active uniforms
+    for (var i = 0; i < activeUniforms; i++) {
+      var uniform = gl.getActiveUniform(program, i);
+      result.uniforms.push(toSimpleObject(uniform,
+        gl.getUniformLocation(program, uniform.name)));
+    }
+    
+    // Loop through active attributes
+    for (var i = 0; i < activeAttributes; i++) {
+      var attribute = gl.getActiveAttrib(program, i);
+      result.attributes.push(toSimpleObject(attribute,
+        gl.getAttribLocation(program, attribute.name)));
+    }
+    
+    return result;
+  }
+
+  Zia.Program = function (graphicsDevice, vertexShader, fragmentShader) {
+    var gl = this._gl = graphicsDevice._gl;
+
+    var program = gl.createProgram();
+
+    gl.attachShader(program, vertexShader._shader);
+    gl.attachShader(program, fragmentShader._shader);
+    gl.linkProgram(program);
+
+    var linked = gl.getProgramParameter(program, gl.LINK_STATUS);
+    if (!linked) {
+      var error = gl.getProgramInfoLog(program);
+      gl.deleteProgram(program);
+      throw new Error('Failed to link program: ' + error);
+    }
+
+    this._program = program;
+
+    var programInfo = getProgramInfo(this._gl, this._program);
+    this._attributes = programInfo.attributes;
+    this._uniforms = programInfo.uniforms;
+
+    this._uniformsByName = {};
+    for (var i = 0; i < this._uniforms.length; i++) {
+      var uniform = this._uniforms[i];
+      this._uniformsByName[uniform.name] = uniform;
+    }
+  };
+
+})();
+
+Zia.Program.prototype = {
+
+  begin: function() {
+    this._gl.useProgram(this._program);
+  },
+
+  end: function() {
+    this._gl.useProgram(null);
+  },
+
+  // TODO: Apply apply method, and change setUniform to automatically call useProgram if necessary.
+
+  setUniform: (function () {
+    var temp = new Zia.Vector4();
+
+    return function (name, value) {
+      if (value instanceof Zia.Color4) {
+        temp.set(value.r, value.g, value.b, value.a);
+        value = temp;
+      }
+
+      var uniform = this._uniformsByName[name];
+
+      if (uniform === undefined) {
+        return;
+      }
+
+      var gl = this._gl;
+      switch (uniform.type) {
+        case gl.FLOAT :
+          gl.uniform1f(uniform.location, value);
+          break;
+        case gl.FLOAT_VEC2 :
+          gl.uniform2f(uniform.location, value._x, value._y);
+          break;
+        case gl.FLOAT_VEC3 :
+          gl.uniform3f(uniform.location, value._x, value._y, value._z);
+          break;
+        case gl.FLOAT_VEC4 :
+          gl.uniform4f(uniform.location, value.x, value.y, value.z, value.w);
+          break;
+        case gl.FLOAT_MAT3 :
+          gl.uniformMatrix3fv(uniform.location, false, value.elements);
+          break;
+        case gl.FLOAT_MAT4 :
+          gl.uniformMatrix4fv(uniform.location, false, value.elements);
+          break;
+        case gl.SAMPLER_2D :
+          if (value !== null && value._ready === true) {
+            gl.activeTexture(gl.TEXTURE0); // TODO
+            gl.bindTexture(gl.TEXTURE_2D, value._texture);
+            gl.uniform1i(uniform.location, 0); // TODO
+          }
+          break;
+        default :
+          throw "Not implemented for type: " + uniform.type;
+      }
+    }
+  })(),
+
+  destroy: function() {
+    var attachedShaders = this._gl.getAttachedShaders(this._program);
+    for (var i = 0; i < attachedShaders.length; i++) {
+      this._gl.detachShader(this._program, attachedShaders[i]);
+    }
+
+    this._gl.deleteProgram(this._program);
+  }
+
+};
+
+(function () {
+  function buildVertexShader(options) {
+    var result = [];
+
+    // TODO: Add uMVPMatrix for combined model-view-projection matrix.
+
+    result.push("attribute vec3 aVertexPosition;");
+    result.push("attribute vec2 aTextureCoord;");
+
+    result.push("uniform mat4 uMMatrix;");
+    result.push("uniform mat4 uVMatrix;");
+    result.push("uniform mat4 uPMatrix;");
+
+    if (options.textureEnabled) {
+      result.push("varying highp vec2 vTextureCoord;");
+    }
+
+    result.push("void main(void) {");
+    result.push("  gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);");
+    if (options.textureEnabled) {
+      result.push("  vTextureCoord = aTextureCoord;");
+    }
+    result.push("}");
+    
+    return result.join('\n');
+  }
+
+  function buildFragmentShader(options) {
+    var result = [];
+
+    if (options.textureEnabled) {
+      result.push("varying highp vec2 vTextureCoord;");
+      result.push("uniform sampler2D uSampler;");
+    }
+
+    result.push("void main(void) {");
+
+    if (options.textureEnabled) {
+      result.push("  gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));");
+    }
+
+    result.push("}");
+
+    return result.join('\n');
+  }
+
+  Zia.BasicProgram = function (graphicsDevice, options) {
+    options = (options || {}).reverseMerge({
+      textureEnabled: false
+    });
+
+    var vertexShader = new Zia.VertexShader(graphicsDevice, buildVertexShader(options));
+    var fragmentShader = new Zia.FragmentShader(graphicsDevice, buildFragmentShader(options));
+
+    Zia.Program.call(this, graphicsDevice, vertexShader, fragmentShader);
+  };
+})();
+
+Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
+  model: {
+    get: function() { throw "Not implemented"; },
+    set: function(v) { this.setUniform('uMMatrix', v); }
+  },
+
+  view: {
+    get: function() { throw "Not implemented"; },
+    set: function(v) { this.setUniform('uVMatrix', v); }
+  },
+
+  projection: {
+    get: function() { throw "Not implemented"; },
+    set: function(v) { this.setUniform('uPMatrix', v); }
+  },
+
+  texture: {
+    get: function() { throw "Not implemented"; },
+    set: function(v) { this.setUniform('uSampler', v); }
+  },
+});
+
+// projection, view, model
+
 Zia.Comparison = {
   Never: 0,
   Always: 1,
@@ -3874,143 +4104,6 @@ Zia.IndexBuffer.prototype = {
 
   destroy: function() {
     this._gl.deleteBuffer(this._buffer);
-  }
-
-};
-
-(function() {
-
-  // From http://bocoup.com/weblog/counting-uniforms-in-webgl/
-  function getProgramInfo(gl, program) {
-    var result = {
-      attributes: [],
-      uniforms: []
-    };
-    var activeUniforms   = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-    var activeAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
-
-    function toSimpleObject(activeInfo, location) {
-      return {
-        location: location,
-        name: activeInfo.name,
-        size: activeInfo.size,
-        type: activeInfo.type
-      };
-    }
-    
-    // Loop through active uniforms
-    for (var i = 0; i < activeUniforms; i++) {
-      var uniform = gl.getActiveUniform(program, i);
-      result.uniforms.push(toSimpleObject(uniform,
-        gl.getUniformLocation(program, uniform.name)));
-    }
-    
-    // Loop through active attributes
-    for (var i = 0; i < activeAttributes; i++) {
-      var attribute = gl.getActiveAttrib(program, i);
-      result.attributes.push(toSimpleObject(attribute,
-        gl.getAttribLocation(program, attribute.name)));
-    }
-    
-    return result;
-  }
-
-  Zia.Program = function(graphicsDevice, vertexShader, fragmentShader) {
-    var gl = this._gl = graphicsDevice._gl;
-
-    var program = gl.createProgram();
-
-    gl.attachShader(program, vertexShader._shader);
-    gl.attachShader(program, fragmentShader._shader);
-    gl.linkProgram(program);
-
-    var linked = gl.getProgramParameter(program, gl.LINK_STATUS);
-    if (!linked) {
-      var error = gl.getProgramInfoLog(program);
-      gl.deleteProgram(program);
-      throw new Error('Failed to link program: ' + error);
-    }
-
-    this._program = program;
-
-    var programInfo = getProgramInfo(this._gl, this._program);
-    this._attributes = programInfo.attributes;
-    this._uniforms = programInfo.uniforms;
-
-    this._uniformsByName = {};
-    for (var i = 0; i < this._uniforms.length; i++) {
-      var uniform = this._uniforms[i];
-      this._uniformsByName[uniform.name] = uniform;
-    }
-  };
-
-})();
-
-Zia.Program.prototype = {
-
-  begin: function() {
-    this._gl.useProgram(this._program);
-  },
-
-  end: function() {
-    this._gl.useProgram(null);
-  },
-
-  setUniform: (function () {
-    var temp = new Zia.Vector4();
-
-    return function (name, value) {
-      if (value instanceof Zia.Color4) {
-        temp.set(value.r, value.g, value.b, value.a);
-        value = temp;
-      }
-
-      var uniform = this._uniformsByName[name];
-
-      if (uniform === undefined) {
-        return;
-      }
-
-      var gl = this._gl;
-      switch (uniform.type) {
-        case gl.FLOAT :
-          gl.uniform1f(uniform.location, value);
-          break;
-        case gl.FLOAT_VEC2 :
-          gl.uniform2f(uniform.location, value._x, value._y);
-          break;
-        case gl.FLOAT_VEC3 :
-          gl.uniform3f(uniform.location, value._x, value._y, value._z);
-          break;
-        case gl.FLOAT_VEC4 :
-          gl.uniform4f(uniform.location, value.x, value.y, value.z, value.w);
-          break;
-        case gl.FLOAT_MAT3 :
-          gl.uniformMatrix3fv(uniform.location, false, value.elements);
-          break;
-        case gl.FLOAT_MAT4 :
-          gl.uniformMatrix4fv(uniform.location, false, value.elements);
-          break;
-        case gl.SAMPLER_2D :
-          if (value !== null && value._ready === true) {
-            gl.activeTexture(gl.TEXTURE0); // TODO
-            gl.bindTexture(gl.TEXTURE_2D, value._texture);
-            gl.uniform1i(uniform.location, 0); // TODO
-          }
-          break;
-        default :
-          throw "Not implemented for type: " + uniform.type;
-      }
-    }
-  })(),
-
-  destroy: function() {
-    var attachedShaders = this._gl.getAttachedShaders(this._program);
-    for (var i = 0; i < attachedShaders.length; i++) {
-      this._gl.detachShader(this._program, attachedShaders[i]);
-    }
-
-    this._gl.deleteProgram(this._program);
   }
 
 };

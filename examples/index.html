@@ -52,9 +52,11 @@
         
         var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
-        var vertexShader = new Zia.VertexShader(graphicsDevice, document.getElementById('shader-vs').textContent);
-        var fragmentShader = new Zia.FragmentShader(graphicsDevice, document.getElementById('shader-fs').textContent);
-        var program = new Zia.Program(graphicsDevice, vertexShader, fragmentShader);
+        // var vertexShader = new Zia.VertexShader(graphicsDevice, document.getElementById('shader-vs').textContent);
+        // var fragmentShader = new Zia.FragmentShader(graphicsDevice, document.getElementById('shader-fs').textContent);
+        var program = new Zia.BasicProgram(graphicsDevice, {
+          textureEnabled: true
+        });
 
         var texture = Zia.Texture.createFromImagePath(graphicsDevice, 'textures/UV_Grid_Sm.jpg');
 
@@ -73,24 +75,24 @@
         var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();
         var modelViewMatrix = new Zia.Matrix4();
 
+        graphicsDevice.setIndexBuffer(indexBuffer);
+        graphicsDevice.setVertexBuffers([vertexBuffer]);
+        graphicsDevice.setProgram(program);
+
         function drawScene() {
           graphicsDevice.clear(
             Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
             new Zia.Color4(0, 0, 0, 1), 1);
 
-          graphicsDevice.setIndexBuffer(indexBuffer);
-          graphicsDevice.setVertexBuffers([vertexBuffer]);
-          graphicsDevice.setProgram(program);
+          modelMatrix.makeRotationAxis(rotationAxis, cubeRotation);
+          modelViewMatrix.multiplyMatrices(viewMatrix, modelMatrix);
 
           program.begin();
 
-          modelMatrix.makeRotationAxis(rotationAxis, cubeRotation);
-
-          modelViewMatrix.multiplyMatrices(viewMatrix, modelMatrix);
-
-          program.setUniform('uSampler', texture);
-          program.setUniform('uMVMatrix', modelViewMatrix);
-          program.setUniform('uPMatrix', projectionMatrix);
+          program.texture = texture;
+          program.model = modelMatrix;
+          program.view = viewMatrix;
+          program.projection = projectionMatrix;
 
           graphicsDevice.drawIndexedPrimitives(
             Zia.PrimitiveType.TriangleList,
