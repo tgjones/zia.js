@@ -15,6 +15,9 @@ Zia.PrimitiveType = {
 };
 
 Zia.GraphicsDevice = function (canvas, debug) {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
   this._canvas = canvas;
   var gl = this._gl = canvas.getContext('webgl', {
     antialias: true
@@ -31,7 +34,7 @@ Zia.GraphicsDevice = function (canvas, debug) {
   // TODO: Handle WebContextLost event.
   
   var viewport = this._viewport = new Zia.Viewport(
-    0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+    0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
   viewport.onChange(function () {
     gl.viewport(viewport._x, viewport._y, viewport._width, viewport._height);
@@ -114,6 +117,25 @@ Zia.GraphicsDevice.prototype = {
     for (var i = 0; i < enabledAttributeLocations.length; i++) {
       gl.disableVertexAttribArray(enabledAttributeLocations[i]);
     }
+  },
+
+  resize: function () {
+    var canvas = this._canvas;
+
+    var width = canvas.clientWidth;
+    var height = canvas.clientHeight;
+
+    if (canvas.width != width || canvas.height != height) {
+       canvas.width = width;
+       canvas.height = height;
+
+      this.viewport.set(0, 0,
+        this._gl.drawingBufferWidth,
+        this._gl.drawingBufferHeight);
+
+       return true;
+    }
+    return false;
   },
 
   _bindVertexAttributes: function (gl) {

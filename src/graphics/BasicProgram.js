@@ -45,7 +45,7 @@
   }
 
   Zia.BasicProgram = function (graphicsDevice, options) {
-    options = (options || {}).reverseMerge({
+    options = Zia.ObjectUtil.reverseMerge(options || {}, {
       textureEnabled: false
     });
 

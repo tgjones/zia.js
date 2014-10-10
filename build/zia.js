@@ -1,14 +1,5 @@
 var Zia = {};
 
-Object.prototype.reverseMerge = function (source) {
-  for (var key in source) {
-    if (source.hasOwnProperty(key) && !(key in this)) {
-      this[key] = source[key];
-    }
-  }
-  return this;
-};
-
 /**
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
@@ -3842,7 +3833,7 @@ Zia.Program.prototype = {
   }
 
   Zia.BasicProgram = function (graphicsDevice, options) {
-    options = (options || {}).reverseMerge({
+    options = Zia.ObjectUtil.reverseMerge(options || {}, {
       textureEnabled: false
     });
 
@@ -3939,6 +3930,9 @@ Zia.PrimitiveType = {
 };
 
 Zia.GraphicsDevice = function (canvas, debug) {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
   this._canvas = canvas;
   var gl = this._gl = canvas.getContext('webgl', {
     antialias: true
@@ -3955,7 +3949,7 @@ Zia.GraphicsDevice = function (canvas, debug) {
   // TODO: Handle WebContextLost event.
   
   var viewport = this._viewport = new Zia.Viewport(
-    0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+    0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
   viewport.onChange(function () {
     gl.viewport(viewport._x, viewport._y, viewport._width, viewport._height);
@@ -4038,6 +4032,25 @@ Zia.GraphicsDevice.prototype = {
     for (var i = 0; i < enabledAttributeLocations.length; i++) {
       gl.disableVertexAttribArray(enabledAttributeLocations[i]);
     }
+  },
+
+  resize: function () {
+    var canvas = this._canvas;
+
+    var width = canvas.clientWidth;
+    var height = canvas.clientHeight;
+
+    if (canvas.width != width || canvas.height != height) {
+       canvas.width = width;
+       canvas.height = height;
+
+      this.viewport.set(0, 0,
+        this._gl.drawingBufferWidth,
+        this._gl.drawingBufferHeight);
+
+       return true;
+    }
+    return false;
   },
 
   _bindVertexAttributes: function (gl) {
@@ -4479,5 +4492,16 @@ Zia.BoxPrimitive = {
 Zia.EnumUtil = {
   hasFlag: function (value, flag) {
     return (value & flag) === flag;
+  }
+};
+
+Zia.ObjectUtil = {
+  reverseMerge: function (object, source) {
+    for (var key in source) {
+      if (source.hasOwnProperty(key) && !(key in object)) {
+        object[key] = source[key];
+      }
+    }
+    return object;
   }
 };

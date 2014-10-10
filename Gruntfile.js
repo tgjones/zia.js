@@ -23,6 +23,24 @@ module.exports = function(grunt) {
   ];
 
   grunt.initConfig({
+    assemble: {
+      dist: {
+        options: {
+          flatten: false,
+          assets: 'dist/site/assets',
+          data: ['site/data/*.json'],
+          helpers: ['site/helpers/*.js'],
+          partials: ['site/includes/**/*.html'],
+          layoutdir: 'site/layouts',
+          layout: 'default.html'
+        },
+        expand: true,
+        cwd: 'site/pages',
+        src: '**/*.{html,md}',
+        dest: 'dist/site/'
+      }
+    },
+
     concat: {
       options: {
         separator: "\n\n"
@@ -30,6 +48,15 @@ module.exports = function(grunt) {
       dist: {
         src: srcFiles,
         dest: 'build/zia.js'
+      }
+    },
+
+    copy: {
+      dist: {
+        files: [
+          {expand:true, cwd: 'site/assets/', src: ['**/*'], dest: 'dist/site/assets/', filter:'isFile'},
+          {expand:true, cwd: 'build/', src: ['*.js'], dest: 'dist/site/assets/js', filter: 'isFile'}
+        ]
       }
     },
 
@@ -79,16 +106,18 @@ module.exports = function(grunt) {
     connect: {
       examples: {
         port: 8080,
-        base: '.'
+        base: 'dist/site/'
       }
     }
   });
 
+  grunt.loadNpmTasks('assemble');
+  grunt.loadNpmTasks('grunt-connect');
   grunt.loadNpmTasks("grunt-contrib-concat");
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks("grunt-contrib-jasmine");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-karma");
-  grunt.loadNpmTasks('grunt-connect');
 
   grunt.registerTask("default", [
     "karma:unit:start",  
@@ -97,8 +126,5 @@ module.exports = function(grunt) {
   grunt.registerTask("test", [
     "watch:jasmine"
   ]);
-  grunt.registerTask("dist", [
-    "karma:ci",
-    "concat"
-  ]);
+  grunt.registerTask("dist", ["karma:ci", "concat", "copy", "assemble"]);
 };

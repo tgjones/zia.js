@@ -1,0 +1,24 @@
+---
+layout: default.html
+---
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="list-group">
+      {{#each pages}}
+        {{#is data.section "Examples"}}
+          <a href="{{relative ../../page.dest this.dest}}"
+            class="list-group-item{{#is ../../page.dest this.dest}} active{{/is}}">
+            {{data.title}}
+          </a>
+        {{/is }} 
+      {{/each}}
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="page-header">
+      <h1>{{title}}</h1>
+    </div>
+    {{> body }}
+  </div>
+</div>
