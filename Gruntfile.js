@@ -108,6 +108,13 @@ module.exports = function(grunt) {
         port: 8080,
         base: 'dist/site/'
       }
+    },
+
+    'gh-pages': {
+      options: {
+        base: 'dist/site'
+      },
+      src: '**/*'
     }
   });
 
@@ -117,6 +124,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks("grunt-contrib-jasmine");
   grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks("grunt-karma");
 
   grunt.registerTask("default", [
