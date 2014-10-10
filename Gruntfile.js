@@ -127,12 +127,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks("grunt-karma");
 
-  grunt.registerTask("default", [
-    "karma:unit:start",  
-    "watch"
-  ]);
-  grunt.registerTask("test", [
-    "watch:jasmine"
-  ]);
-  grunt.registerTask("dist", ["karma:ci", "concat", "copy", "assemble"]);
+  grunt.registerTask("default", [ "karma:unit:start", "watch" ]);
+  grunt.registerTask("test", [ "watch:jasmine" ]);
+  grunt.registerTask("dist", [ "karma:ci", "concat", "copy", "assemble" ]);
+  grunt.registerTask("deploy", [ "dist", "gh-pages" ]);
 };
