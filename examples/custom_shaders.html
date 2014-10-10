@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Custom Shaders - Zia.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../assets/css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/highlight.railscasts.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/site.css" media="screen">
+    <script type="text/javascript" src="../assets/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../assets/js/zia.js"></script>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../" class="navbar-brand">Zia.js</a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="examples/index.html">Examples</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="list-group">
+      
+        
+          <a href="basic_program.html"
+            class="list-group-item">
+            Basic Program
+          </a>
+         
+      
+        
+          <a href="custom_shaders.html"
+            class="list-group-item active">
+            Custom Shaders
+          </a>
+         
+      
+         
+      
+         
+      
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="page-header">
+      <h1>Custom Shaders</h1>
+    </div>
+    
+
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#output" data-toggle="tab">Output</a></li>
+  <li><a href="#source" data-toggle="tab">Source</a></li>
+</ul>
+
+<div id="hello" class="tab-content">
+  <div class="tab-pane active" id="output">
+    <canvas id="mainCanvas" style="width:100%;height:500px"></canvas>
+  </div>
+  <div class="tab-pane" id="source">
+    <pre class="hljs"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+
+  <span class="hljs-keyword">var</span> fragmentShaderCode = [
+    <span class="hljs-string">"varying highp vec2 vTextureCoord;"</span>,
+
+    <span class="hljs-string">"uniform sampler2D uSampler;"</span>,
+  
+    <span class="hljs-string">"void main(void) {"</span>,
+    <span class="hljs-string">"  gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));"</span>,
+    <span class="hljs-string">"}"</span>
+  ].join(<span class="hljs-string">'\n'</span>);
+
+  <span class="hljs-keyword">var</span> vertexShaderCode = [
+    <span class="hljs-string">"attribute vec3 aVertexPosition;"</span>,
+    <span class="hljs-string">"attribute vec2 aTextureCoord;"</span>,
+
+    <span class="hljs-string">"uniform mat4 uMVMatrix;"</span>,
+    <span class="hljs-string">"uniform mat4 uPMatrix;"</span>,
+    
+    <span class="hljs-string">"varying highp vec2 vTextureCoord;"</span>,
+
+    <span class="hljs-string">"void main(void) {"</span>,
+    <span class="hljs-string">"  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);"</span>,
+    <span class="hljs-string">"  vTextureCoord = aTextureCoord;"</span>,
+    <span class="hljs-string">"}"</span>
+  ].join(<span class="hljs-string">'\n'</span>);
+  
+  <span class="hljs-keyword">var</span> canvas = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'mainCanvas'</span>);
+  
+  <span class="hljs-keyword">var</span> graphicsDevice = <span class="hljs-keyword">new</span> Zia.GraphicsDevice(canvas);
+
+  <span class="hljs-keyword">var</span> vertexShader = <span class="hljs-keyword">new</span> Zia.VertexShader(graphicsDevice, vertexShaderCode);
+  <span class="hljs-keyword">var</span> fragmentShader = <span class="hljs-keyword">new</span> Zia.FragmentShader(graphicsDevice, fragmentShaderCode);
+  <span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice, {
+    textureEnabled: <span class="hljs-literal">true</span>
+  });
+
+  <span class="hljs-keyword">var</span> texture = Zia.Texture.createFromImagePath(graphicsDevice, <span class="hljs-string">'../assets/textures/UV_Grid_Sm.jpg'</span>);
+
+  <span class="hljs-keyword">var</span> vertexBuffer = <span class="hljs-keyword">new</span> Zia.VertexBuffer(graphicsDevice,
+    Zia.BoxPrimitive.vertexDeclaration);
+  vertexBuffer.setData(Zia.BoxPrimitive.vertices);
+
+  <span class="hljs-keyword">var</span> indexBuffer = <span class="hljs-keyword">new</span> Zia.IndexBuffer(graphicsDevice);
+  indexBuffer.setData(Zia.BoxPrimitive.indices);
+
+  <span class="hljs-keyword">var</span> projectionMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makePerspective(<span class="hljs-number">45</span>,
+    graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
+  <span class="hljs-keyword">var</span> viewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makeTranslation(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">6</span>);
+  <span class="hljs-keyword">var</span> modelMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().identity();
+
+  <span class="hljs-keyword">var</span> lastCubeUpdateTime, cubeRotation = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">var</span> rotationAxis = <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>).normalize();
+  <span class="hljs-keyword">var</span> modelViewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4();
+
+  graphicsDevice.setIndexBuffer(indexBuffer);
+  graphicsDevice.setVertexBuffers([vertexBuffer]);
+  graphicsDevice.setProgram(program);
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawScene</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">if</span> (graphicsDevice.resize()) {
+      projectionMatrix.makePerspective(<span class="hljs-number">45</span>,
+        graphicsDevice.viewport.aspectRatio,
+        <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
+    }
+    
+    graphicsDevice.clear(
+      Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
+      <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
+
+    modelMatrix.makeRotationAxis(rotationAxis, cubeRotation);
+    modelViewMatrix.multiplyMatrices(viewMatrix, modelMatrix);
+
+    program.begin();
+
+    program.texture = texture;
+    program.model = modelMatrix;
+    program.view = viewMatrix;
+    program.projection = projectionMatrix;
+
+    graphicsDevice.drawIndexedPrimitives(
+      Zia.PrimitiveType.TriangleList,
+      <span class="hljs-number">0</span>, <span class="hljs-number">36</span>);
+
+    program.end();
+
+    <span class="hljs-keyword">var</span> currentTime = (<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>).getTime();
+    <span class="hljs-keyword">if</span> (lastCubeUpdateTime) {
+      <span class="hljs-keyword">var</span> delta = currentTime - lastCubeUpdateTime;
+      
+      cubeRotation += (<span class="hljs-number">30</span> * delta) / <span class="hljs-number">100000.0</span>;
+    }
+    
+    lastCubeUpdateTime = currentTime;
+
+    requestAnimationFrame(drawScene);
+  }
+
+  requestAnimationFrame(drawScene);
+
+}, <span class="hljs-literal">false</span>);</pre>
+  </div>
+</div>
+
+
+
+<script type="text/javascript" src="../assets/js/example_custom_shaders.js"></script>
+  </div>
+</div>
+    </div>
+  </body>
+</html>
