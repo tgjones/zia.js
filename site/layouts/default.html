@@ -24,8 +24,8 @@
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
           <ul class="nav navbar-nav">
-            <li>
-              <a href="examples/index.html">Examples</a>
+            <li{{#is page.data.section "Examples"}} class="active"{{/is}}>
+              <a href="{{relative page.dest "examples/index.html"}}">Examples</a>
             </li>
           </ul>
         </div>

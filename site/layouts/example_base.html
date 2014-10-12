@@ -6,12 +6,14 @@ layout: default.html
   <div class="col-md-3">
     <div class="list-group">
       {{#each pages}}
-        {{#is data.section "Examples"}}
-          <a href="{{relative ../../page.dest this.dest}}"
-            class="list-group-item{{#is ../../page.dest this.dest}} active{{/is}}">
-            {{data.title}}
-          </a>
-        {{/is }} 
+        {{#isnt this.basename "index" }}
+          {{#is data.section "Examples"}}
+            <a href="{{relative ../../../page.dest this.dest}}"
+              class="list-group-item{{#is ../../../page.dest this.dest}} active{{/is}}">
+              {{data.title}}
+            </a>
+          {{/is}}
+        {{/isnt}}
       {{/each}}
     </div>
   </div>
