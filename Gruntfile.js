@@ -73,17 +73,6 @@ module.exports = function(grunt) {
       }
     },
 
-    watch: {
-      jasmine: {
-        files: [ srcFiles, testFiles, helperFiles ],
-        tasks: "jasmine:dev:build"
-      },
-      karma: {
-        files: [ srcFiles, testFiles, helperFiles ],
-        tasks: [ "concat", "karma:unit:run"]
-      }
-    },
-
     karma: {
       options: {
         browsers: ['Chrome'],
@@ -95,13 +84,15 @@ module.exports = function(grunt) {
         ],
         frameworks: ['jasmine']
       },
-      unit: {
+      dev: {
         background: true
       },
       ci: {
         singleRun: true
       }
     },
+
+    clean: ['dist/'],
 
     connect: {
       examples: {
@@ -115,20 +106,57 @@ module.exports = function(grunt) {
         base: 'dist/site'
       },
       src: '**/*'
-    }
+    },
+
+    watch: {
+      grunt: {
+        options: {
+          reload: true
+        },
+        files: [ 'Gruntfile.js' ]
+      },
+      js: {
+        files: srcFiles,
+        tasks: [ 'concat', 'copy' ]
+      },
+      jasmine: {
+        files: [ srcFiles, testFiles, helperFiles ],
+        tasks: "jasmine:dev:build"
+      },
+      karma: {
+        files: [ srcFiles, testFiles, helperFiles ],
+        tasks: [ "karma:dev:run"]
+      },
+      assemble_all: {
+        files: ['site/{includes,layouts}/**/*.html'],
+        tasks: ['assemble'],
+        options: { livereload:true }
+      },
+      assemble_pages: {
+        files: ['site/pages/**/*.html'],
+        tasks: ['newer:assemble'],
+        options: { livereload:true }
+      },
+      site_assets: {
+        options: { cwd: 'site/assets/', livereload: true },
+        files: ['**/*'],
+        tasks: ['copy']
+      },
+    },
   });
 
   grunt.loadNpmTasks('assemble');
   grunt.loadNpmTasks('grunt-connect');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks("grunt-contrib-jasmine");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks("grunt-karma");
+  grunt.loadNpmTasks('grunt-newer');
 
-  grunt.registerTask("default", [ "karma:unit:start", "watch" ]);
-  grunt.registerTask("test", [ "watch:jasmine" ]);
-  grunt.registerTask("dist", [ "karma:ci", "concat", "copy", "assemble" ]);
-  grunt.registerTask("deploy", [ "dist", "gh-pages" ]);
+  grunt.registerTask("build",   [ "clean", "karma:ci", "concat", "copy", "assemble" ]);
+  grunt.registerTask("default", [ "build", "karma:dev:start", "watch" ]);
+  grunt.registerTask("deploy",  [ "build", "gh-pages" ]);
 };
