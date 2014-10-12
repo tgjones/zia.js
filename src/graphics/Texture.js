@@ -4,7 +4,9 @@ Zia.Texture = function (graphicsDevice, options) {
   this._ready = false;
 
   this._options = Zia.ObjectUtil.reverseMerge(options || {}, {
-    filter: Zia.TextureFilter.MinNearestMagMipLinear
+    filter: Zia.TextureFilter.MinNearestMagMipLinear,
+    wrapS: Zia.TextureWrap.Repeat,
+    wrapT: Zia.TextureWrap.Repeat
   });
 };
 
@@ -53,8 +55,8 @@ Zia.Texture.prototype = {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     setImageDataCallback();
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    Zia.TextureWrap._applyS(gl, this._options.wrapS);
+    Zia.TextureWrap._applyT(gl, this._options.wrapT);
 
     Zia.TextureFilter._apply(gl, this._options.filter);
 

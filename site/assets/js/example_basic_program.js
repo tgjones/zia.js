@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     textureEnabled: true
   });
 
-  var texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
     '../assets/textures/UV_Grid_Sm.jpg');
 
   var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   program.view = viewMatrix;
   program.projection = projectionMatrix;
-  program.texture = texture;
   
   graphicsDevice.setIndexBuffer(indexBuffer);
   graphicsDevice.setVertexBuffers([vertexBuffer]);
@@ -48,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
     modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(cubeRotation));
     modelViewMatrix.multiplyMatrices(viewMatrix, modelMatrix);
 
+    program.texture = window.texture;
     program.model = modelMatrix;
     program.apply();
 
@@ -68,5 +68,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   requestAnimationFrame(drawScene);
+
+  var textureFilterSelect = $('#texture-filter');
+  textureFilterSelect.change(function() {
+    window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
+      '../assets/textures/UV_Grid_Sm.jpg',
+      { filter: Zia.TextureFilter[textureFilterSelect.val()] });
+  });
+  textureFilterSelect.change();
 
 }, false);

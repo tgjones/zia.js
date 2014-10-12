@@ -4234,7 +4234,9 @@ Zia.Texture = function (graphicsDevice, options) {
   this._ready = false;
 
   this._options = Zia.ObjectUtil.reverseMerge(options || {}, {
-    filter: Zia.TextureFilter.MinNearestMagMipLinear
+    filter: Zia.TextureFilter.MinNearestMagMipLinear,
+    wrapS: Zia.TextureWrap.Repeat,
+    wrapT: Zia.TextureWrap.Repeat
   });
 };
 
@@ -4283,8 +4285,8 @@ Zia.Texture.prototype = {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     setImageDataCallback();
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    Zia.TextureWrap._applyS(gl, this._options.wrapS);
+    Zia.TextureWrap._applyT(gl, this._options.wrapT);
 
     Zia.TextureFilter._apply(gl, this._options.filter);
 
@@ -4365,6 +4367,36 @@ Zia.TextureFilter = {
       case Zia.TextureFilter.MinMagLinear:
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        break;
+      default :
+        throw "Invalid value: " + filter;
+    }
+  }
+};
+
+Zia.TextureWrap = {
+  Repeat: 0,
+  ClampToEdge: 1,
+  MirroredRepeat: 2,
+
+  _applyS: function(gl, wrap) {
+    Zia.TextureWrap._apply(gl, gl.TEXTURE_WRAP_S, wrap);
+  },
+
+  _applyT: function(gl, wrap) {
+    Zia.TextureWrap._apply(gl, gl.TEXTURE_WRAP_T, wrap);
+  },
+
+  _apply: function(gl, which, wrap) {
+    switch (wrap) {
+      case Zia.TextureWrap.Repeat:
+        gl.texParameteri(gl.TEXTURE_2D, which, gl.REPEAT);
+        break;
+      case Zia.TextureWrap.ClampToEdge:
+        gl.texParameteri(gl.TEXTURE_2D, which, gl.CLAMP_TO_EDGE);
+        break;
+      case Zia.TextureWrap.MirroredRepeat:
+        gl.texParameteri(gl.TEXTURE_2D, which, gl.MIRRORED_REPEAT);
         break;
       default :
         throw "Invalid value: " + filter;
