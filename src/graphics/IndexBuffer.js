@@ -1,6 +1,10 @@
-Zia.IndexBuffer = function (graphicsDevice) {
+Zia.IndexBuffer = function (graphicsDevice, data) {
   this._gl = graphicsDevice._gl;
   this._buffer = this._gl.createBuffer();
+
+  if (data !== undefined) {
+    this.setData(data);
+  }
 };
 
 Zia.IndexBuffer.prototype = {

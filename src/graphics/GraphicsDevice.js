@@ -98,10 +98,6 @@ Zia.GraphicsDevice.prototype = {
     this._vertexBuffers = vertexBuffers;
   },
 
-  setProgram: function (program) {
-    this._currentProgram = program;
-  },
-
   drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
     var gl = this._gl;
 
@@ -119,6 +115,21 @@ Zia.GraphicsDevice.prototype = {
     }
   },
 
+  drawPrimitives: function(primitiveType, startVertex, vertexCount) {
+    var gl = this._gl;
+
+    var enabledAttributeLocations = this._bindVertexAttributes(gl);
+
+    gl.drawArrays(
+      this._getMode(primitiveType),
+      startVertex,
+      vertexCount);
+
+    for (var i = 0; i < enabledAttributeLocations.length; i++) {
+      gl.disableVertexAttribArray(enabledAttributeLocations[i]);
+    }
+  },
+
   resize: function () {
     var canvas = this._canvas;
 
@@ -129,9 +140,7 @@ Zia.GraphicsDevice.prototype = {
        canvas.width = width;
        canvas.height = height;
 
-      this.viewport.set(0, 0,
-        this._gl.drawingBufferWidth,
-        this._gl.drawingBufferHeight);
+      this.viewport.set(0, 0, width, height);
 
        return true;
     }

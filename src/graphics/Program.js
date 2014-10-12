@@ -36,6 +36,7 @@
   }
 
   Zia.Program = function (graphicsDevice, vertexShader, fragmentShader) {
+    this._graphicsDevice = graphicsDevice;
     var gl = this._gl = graphicsDevice._gl;
 
     var program = gl.createProgram();
@@ -68,15 +69,13 @@
 
 Zia.Program.prototype = {
 
-  begin: function() {
+  apply: function() {
+    this._graphicsDevice._currentProgram = this;
     this._gl.useProgram(this._program);
+    this._onApply();
   },
 
-  end: function() {
-    this._gl.useProgram(null);
-  },
-
-  // TODO: Apply apply method, and change setUniform to automatically call useProgram if necessary.
+  _onApply: function() { },
 
   setUniform: (function () {
     var temp = new Zia.Vector4();
@@ -92,8 +91,9 @@ Zia.Program.prototype = {
       if (uniform === undefined) {
         return;
       }
-
+      
       var gl = this._gl;
+
       switch (uniform.type) {
         case gl.FLOAT :
           gl.uniform1f(uniform.location, value);

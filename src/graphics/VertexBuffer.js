@@ -1,8 +1,12 @@
-Zia.VertexBuffer = function (graphicsDevice, vertexDeclaration) {
+Zia.VertexBuffer = function (graphicsDevice, vertexDeclaration, data) {
   this._gl = graphicsDevice._gl;
   this._buffer = this._gl.createBuffer();
 
   this._vertexDeclaration = vertexDeclaration;
+
+  if (data !== undefined) {
+    this.setData(data);
+  }
 };
 
 Zia.VertexBuffer.prototype = {

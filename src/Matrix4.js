@@ -260,14 +260,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  setRotationFromQuaternion: function ( q ) {
-
-    console.warn( 'Zia.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
-
-    return this.makeRotationFromQuaternion( q );
-
-  },
-
   makeRotationFromQuaternion: function ( q ) {
 
     var te = this.elements;
@@ -419,27 +411,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  multiplyVector3: function ( vector ) {
-
-    console.warn( 'Zia.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-    return vector.applyProjection( this );
-
-  },
-
-  multiplyVector4: function ( vector ) {
-
-    console.warn( 'Zia.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
-    return vector.applyMatrix4( this );
-
-  },
-
-  multiplyVector3Array: function ( a ) {
-
-    console.warn( 'Zia.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-    return this.applyToVector3Array( a );
-
-  },
-
   applyToVector3Array: function () {
 
     var v1 = new Zia.Vector3();
@@ -468,13 +439,6 @@ Zia.Matrix4.prototype = {
     };
 
   }(),
-
-  crossVector: function ( vector ) {
-
-    console.warn( 'Zia.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
-    return vector.applyMatrix4( this );
-
-  },
 
   determinant: function () {
 
@@ -570,21 +534,6 @@ Zia.Matrix4.prototype = {
     return array;
 
   },
-
-  getPosition: function () {
-
-    var v1 = new Zia.Vector3();
-
-    return function () {
-
-      console.warn( 'Zia.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
-
-      var te = this.elements;
-      return v1.set( te[ 12 ], te[ 13 ], te[ 14 ] );
-
-    };
-
-  }(),
 
   setPosition: function ( v ) {
 
@@ -870,7 +819,7 @@ Zia.Matrix4.prototype = {
 
   makePerspective: function ( fov, aspect, near, far ) {
 
-    var ymax = near * Math.tan( Zia.Math.degToRad( fov * 0.5 ) );
+    var ymax = near * Math.tan(fov * 0.5);
     var ymin = - ymax;
     var xmin = ymin * aspect;
     var xmax = ymax * aspect;

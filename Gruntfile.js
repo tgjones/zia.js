@@ -127,15 +127,10 @@ module.exports = function(grunt) {
         files: [ srcFiles, testFiles, helperFiles ],
         tasks: [ "karma:dev:run"]
       },
-      assemble_all: {
-        files: ['site/{includes,layouts}/**/*.html'],
+      assemble: {
+        files: ['site/{helpers,layouts,pages}/**/*.*'],
         tasks: ['assemble'],
-        options: { livereload:true }
-      },
-      assemble_pages: {
-        files: ['site/pages/**/*.html'],
-        tasks: ['newer:assemble'],
-        options: { livereload:true }
+        options: { livereload: true }
       },
       site_assets: {
         options: { cwd: 'site/assets/', livereload: true },

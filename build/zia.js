@@ -1958,14 +1958,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  setRotationFromQuaternion: function ( q ) {
-
-    console.warn( 'Zia.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
-
-    return this.makeRotationFromQuaternion( q );
-
-  },
-
   makeRotationFromQuaternion: function ( q ) {
 
     var te = this.elements;
@@ -2117,27 +2109,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  multiplyVector3: function ( vector ) {
-
-    console.warn( 'Zia.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-    return vector.applyProjection( this );
-
-  },
-
-  multiplyVector4: function ( vector ) {
-
-    console.warn( 'Zia.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
-    return vector.applyMatrix4( this );
-
-  },
-
-  multiplyVector3Array: function ( a ) {
-
-    console.warn( 'Zia.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-    return this.applyToVector3Array( a );
-
-  },
-
   applyToVector3Array: function () {
 
     var v1 = new Zia.Vector3();
@@ -2166,13 +2137,6 @@ Zia.Matrix4.prototype = {
     };
 
   }(),
-
-  crossVector: function ( vector ) {
-
-    console.warn( 'Zia.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
-    return vector.applyMatrix4( this );
-
-  },
 
   determinant: function () {
 
@@ -2268,21 +2232,6 @@ Zia.Matrix4.prototype = {
     return array;
 
   },
-
-  getPosition: function () {
-
-    var v1 = new Zia.Vector3();
-
-    return function () {
-
-      console.warn( 'Zia.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
-
-      var te = this.elements;
-      return v1.set( te[ 12 ], te[ 13 ], te[ 14 ] );
-
-    };
-
-  }(),
 
   setPosition: function ( v ) {
 
@@ -2568,7 +2517,7 @@ Zia.Matrix4.prototype = {
 
   makePerspective: function ( fov, aspect, near, far ) {
 
-    var ymax = near * Math.tan( Zia.Math.degToRad( fov * 0.5 ) );
+    var ymax = near * Math.tan(fov * 0.5);
     var ymin = - ymax;
     var xmin = ymin * aspect;
     var xmax = ymax * aspect;
@@ -3685,6 +3634,7 @@ Zia.Vector4.prototype = {
   }
 
   Zia.Program = function (graphicsDevice, vertexShader, fragmentShader) {
+    this._graphicsDevice = graphicsDevice;
     var gl = this._gl = graphicsDevice._gl;
 
     var program = gl.createProgram();
@@ -3717,15 +3667,13 @@ Zia.Vector4.prototype = {
 
 Zia.Program.prototype = {
 
-  begin: function() {
+  apply: function() {
+    this._graphicsDevice._currentProgram = this;
     this._gl.useProgram(this._program);
+    this._onApply();
   },
 
-  end: function() {
-    this._gl.useProgram(null);
-  },
-
-  // TODO: Apply apply method, and change setUniform to automatically call useProgram if necessary.
+  _onApply: function() { },
 
   setUniform: (function () {
     var temp = new Zia.Vector4();
@@ -3741,8 +3689,9 @@ Zia.Program.prototype = {
       if (uniform === undefined) {
         return;
       }
-
+      
       var gl = this._gl;
+
       switch (uniform.type) {
         case gl.FLOAT :
           gl.uniform1f(uniform.location, value);
@@ -3790,21 +3739,34 @@ Zia.Program.prototype = {
   function buildVertexShader(options) {
     var result = [];
 
-    // TODO: Add uMVPMatrix for combined model-view-projection matrix.
+    result.push("precision mediump float;");
 
+    // Attributes
     result.push("attribute vec3 aVertexPosition;");
-    result.push("attribute vec2 aTextureCoord;");
-
-    result.push("uniform mat4 uMMatrix;");
-    result.push("uniform mat4 uVMatrix;");
-    result.push("uniform mat4 uPMatrix;");
-
+    if (options.vertexColorEnabled) {
+      result.push("attribute vec4 aVertexColor;");
+    }
     if (options.textureEnabled) {
-      result.push("varying highp vec2 vTextureCoord;");
+      result.push("attribute vec2 aTextureCoord;");
     }
 
+    // Uniforms
+    result.push("uniform mat4 uMVPMatrix;");
+    result.push("uniform vec4 uDiffuseColor;");
+
+    // Varyings
+    result.push("varying vec4 vDiffuseColor;");
+    if (options.textureEnabled) {
+      result.push("varying vec2 vTextureCoord;");
+    }
+
+    // Code
     result.push("void main(void) {");
-    result.push("  gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);");
+    result.push("  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);");
+    result.push("  vDiffuseColor = uDiffuseColor;");
+    if (options.vertexColorEnabled) {
+      result.push("  vDiffuseColor *= aVertexColor;");
+    }
     if (options.textureEnabled) {
       result.push("  vTextureCoord = aTextureCoord;");
     }
@@ -3816,25 +3778,39 @@ Zia.Program.prototype = {
   function buildFragmentShader(options) {
     var result = [];
 
+    result.push("precision mediump float;");
+
+    result.push("varying vec4 vDiffuseColor;");
+
     if (options.textureEnabled) {
-      result.push("varying highp vec2 vTextureCoord;");
+      result.push("varying vec2 vTextureCoord;");
       result.push("uniform sampler2D uSampler;");
     }
 
     result.push("void main(void) {");
+    result.push("  vec4 color = vDiffuseColor;");
 
     if (options.textureEnabled) {
-      result.push("  gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));");
+      result.push("  color *= texture2D(uSampler, vTextureCoord);");
     }
 
+    result.push("  gl_FragColor = color;");
     result.push("}");
 
     return result.join('\n');
   }
 
   Zia.BasicProgram = function (graphicsDevice, options) {
+    this.model = new Zia.Matrix4();
+    this.view = new Zia.Matrix4();
+    this.projection = new Zia.Matrix4();
+    this.diffuseColor = new Zia.Vector3(1, 1, 1);
+    this.alpha = 1;
+    this.texture = null;
+
     options = Zia.ObjectUtil.reverseMerge(options || {}, {
-      textureEnabled: false
+      textureEnabled: false,
+      vertexColorEnabled: false
     });
 
     var vertexShader = new Zia.VertexShader(graphicsDevice, buildVertexShader(options));
@@ -3846,27 +3822,60 @@ Zia.Program.prototype = {
 
 Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
   model: {
-    get: function() { throw "Not implemented"; },
-    set: function(v) { this.setUniform('uMMatrix', v); }
+    get: function() { return this._model; },
+    set: function(v) { this._model = v; this._matrixChanged = true; }
   },
 
   view: {
-    get: function() { throw "Not implemented"; },
-    set: function(v) { this.setUniform('uVMatrix', v); }
+    get: function() { return this._view; },
+    set: function(v) { this._view = v; this._matrixChanged = true; }
   },
 
   projection: {
-    get: function() { throw "Not implemented"; },
-    set: function(v) { this.setUniform('uPMatrix', v); }
+    get: function() { return this._projection;; },
+    set: function(v) { this._projection = v; this._matrixChanged = true; }
+  },
+
+  diffuseColor: {
+    get: function() { return this._diffuseColor; },
+    set: function(v) { this._diffuseColor = v; this._diffuseColorChanged = true; }
+  },
+
+  alpha: {
+    get: function() { return this._alpha; },
+    set: function(v) { this._alpha = v; this._diffuseColorChanged = true; }
   },
 
   texture: {
-    get: function() { throw "Not implemented"; },
-    set: function(v) { this.setUniform('uSampler', v); }
+    get: function() { return this._texture; },
+    set: function(v) { this._texture = v; this._textureChanged = true; }
   },
 });
 
-// projection, view, model
+Zia.BasicProgram.prototype._onApply = (function() {
+  var modelViewProjectionMatrix = new Zia.Matrix4();
+  var diffuseColor = new Zia.Vector4();
+
+  return function() {
+    if (this._matrixChanged) {
+      modelViewProjectionMatrix.multiplyMatrices(this._projection, this._view);
+      modelViewProjectionMatrix.multiply(this._model);
+      this.setUniform('uMVPMatrix', modelViewProjectionMatrix);
+
+      this._matrixChanged = false;
+    }
+
+    if (this._diffuseColorChanged) {
+      var diffuse = this._diffuseColor;
+      diffuseColor.set(diffuse.x, diffuse.y, diffuse.z, this._alpha);
+      this.setUniform('uDiffuseColor', diffuseColor);
+    }
+
+    if (this._textureChanged) {
+      this.setUniform('uSampler', this._texture);
+    }
+  };
+})();
 
 Zia.Comparison = {
   Never: 0,
@@ -4013,10 +4022,6 @@ Zia.GraphicsDevice.prototype = {
     this._vertexBuffers = vertexBuffers;
   },
 
-  setProgram: function (program) {
-    this._currentProgram = program;
-  },
-
   drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
     var gl = this._gl;
 
@@ -4034,6 +4039,21 @@ Zia.GraphicsDevice.prototype = {
     }
   },
 
+  drawPrimitives: function(primitiveType, startVertex, vertexCount) {
+    var gl = this._gl;
+
+    var enabledAttributeLocations = this._bindVertexAttributes(gl);
+
+    gl.drawArrays(
+      this._getMode(primitiveType),
+      startVertex,
+      vertexCount);
+
+    for (var i = 0; i < enabledAttributeLocations.length; i++) {
+      gl.disableVertexAttribArray(enabledAttributeLocations[i]);
+    }
+  },
+
   resize: function () {
     var canvas = this._canvas;
 
@@ -4044,9 +4064,7 @@ Zia.GraphicsDevice.prototype = {
        canvas.width = width;
        canvas.height = height;
 
-      this.viewport.set(0, 0,
-        this._gl.drawingBufferWidth,
-        this._gl.drawingBufferHeight);
+      this.viewport.set(0, 0, width, height);
 
        return true;
     }
@@ -4102,9 +4120,13 @@ Zia.GraphicsDevice.prototype = {
 
 };
 
-Zia.IndexBuffer = function (graphicsDevice) {
+Zia.IndexBuffer = function (graphicsDevice, data) {
   this._gl = graphicsDevice._gl;
   this._buffer = this._gl.createBuffer();
+
+  if (data !== undefined) {
+    this.setData(data);
+  }
 };
 
 Zia.IndexBuffer.prototype = {
@@ -4276,11 +4298,15 @@ Zia.Texture.prototype = {
 
 };
 
-Zia.VertexBuffer = function (graphicsDevice, vertexDeclaration) {
+Zia.VertexBuffer = function (graphicsDevice, vertexDeclaration, data) {
   this._gl = graphicsDevice._gl;
   this._buffer = this._gl.createBuffer();
 
   this._vertexDeclaration = vertexDeclaration;
+
+  if (data !== undefined) {
+    this.setData(data);
+  }
 };
 
 Zia.VertexBuffer.prototype = {

@@ -26,9 +26,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();
   var modelViewMatrix = new Zia.Matrix4();
 
+  program.view = viewMatrix;
+  program.projection = projectionMatrix;
+  program.texture = texture;
+  
   graphicsDevice.setIndexBuffer(indexBuffer);
   graphicsDevice.setVertexBuffers([vertexBuffer]);
-  graphicsDevice.setProgram(program);
 
   function drawScene() {
     if (graphicsDevice.resize()) {
@@ -41,27 +44,21 @@ document.addEventListener('DOMContentLoaded', function () {
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       new Zia.Color4(0, 0, 0, 1), 1);
 
-    modelMatrix.makeRotationAxis(rotationAxis, cubeRotation);
+    modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(cubeRotation));
     modelViewMatrix.multiplyMatrices(viewMatrix, modelMatrix);
 
-    program.begin();
-
-    program.texture = texture;
     program.model = modelMatrix;
-    program.view = viewMatrix;
-    program.projection = projectionMatrix;
+    program.apply();
 
     graphicsDevice.drawIndexedPrimitives(
       Zia.PrimitiveType.TriangleList,
       0, 36);
 
-    program.end();
-
     var currentTime = (new Date).getTime();
     if (lastCubeUpdateTime) {
       var delta = currentTime - lastCubeUpdateTime;
       
-      cubeRotation += (30 * delta) / 100000.0;
+      cubeRotation += (30 * delta) / 1000.0;
     }
     
     lastCubeUpdateTime = currentTime;
