@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
     textureEnabled: true
   });
 
-  var texture = Zia.Texture.createFromImagePath(graphicsDevice, '../assets/textures/UV_Grid_Sm.jpg');
+  var texture = Zia.Texture.createFromImagePath(graphicsDevice,
+    '../assets/textures/UV_Grid_Sm.jpg');
 
   var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
     Zia.BoxPrimitive.vertexDeclaration);
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
-  var viewMatrix = new Zia.Matrix4().makeTranslation(0, 0, -6);
+  var viewMatrix = new Zia.Matrix4().makeTranslation(0, 0, -4);
   var modelMatrix = new Zia.Matrix4().identity();
 
   var lastCubeUpdateTime, cubeRotation = 0;

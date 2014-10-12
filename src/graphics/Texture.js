@@ -1,11 +1,15 @@
-Zia.Texture = function (graphicsDevice) {
+Zia.Texture = function (graphicsDevice, options) {
   this._gl = graphicsDevice._gl;
   this._texture = this._gl.createTexture();
   this._ready = false;
+
+  this._options = Zia.ObjectUtil.reverseMerge(options || {}, {
+    filter: Zia.TextureFilter.MinNearestMagMipLinear
+  });
 };
 
-Zia.Texture.createFromImagePath = function (graphicsDevice, imagePath) {
-  var result = new Zia.Texture(graphicsDevice);
+Zia.Texture.createFromImagePath = function (graphicsDevice, imagePath, options) {
+  var result = new Zia.Texture(graphicsDevice, options);
 
   var gl = graphicsDevice._gl;
   var image = new Image();
@@ -21,8 +25,8 @@ Zia.Texture.createFromImagePath = function (graphicsDevice, imagePath) {
   return result;
 };
 
-Zia.Texture.createFromImageData = function (graphicsDevice, imageData, width, height) {
-  var result = new Zia.Texture(graphicsDevice);
+Zia.Texture.createFromImageData = function (graphicsDevice, imageData, width, height, options) {
+  var result = new Zia.Texture(graphicsDevice, options);
 
   var gl = graphicsDevice._gl;
   result._handleImageLoad(function () {
@@ -52,8 +56,7 @@ Zia.Texture.prototype = {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+    Zia.TextureFilter._apply(gl, this._options.filter);
 
     gl.generateMipmap(gl.TEXTURE_2D);
     

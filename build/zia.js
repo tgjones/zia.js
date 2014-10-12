@@ -4228,14 +4228,18 @@ Zia.VertexShader = function (graphicsDevice, source) {
 
 Zia.VertexShader.prototype = Object.create(Zia.Shader.prototype);
 
-Zia.Texture = function (graphicsDevice) {
+Zia.Texture = function (graphicsDevice, options) {
   this._gl = graphicsDevice._gl;
   this._texture = this._gl.createTexture();
   this._ready = false;
+
+  this._options = Zia.ObjectUtil.reverseMerge(options || {}, {
+    filter: Zia.TextureFilter.MinNearestMagMipLinear
+  });
 };
 
-Zia.Texture.createFromImagePath = function (graphicsDevice, imagePath) {
-  var result = new Zia.Texture(graphicsDevice);
+Zia.Texture.createFromImagePath = function (graphicsDevice, imagePath, options) {
+  var result = new Zia.Texture(graphicsDevice, options);
 
   var gl = graphicsDevice._gl;
   var image = new Image();
@@ -4251,8 +4255,8 @@ Zia.Texture.createFromImagePath = function (graphicsDevice, imagePath) {
   return result;
 };
 
-Zia.Texture.createFromImageData = function (graphicsDevice, imageData, width, height) {
-  var result = new Zia.Texture(graphicsDevice);
+Zia.Texture.createFromImageData = function (graphicsDevice, imageData, width, height, options) {
+  var result = new Zia.Texture(graphicsDevice, options);
 
   var gl = graphicsDevice._gl;
   result._handleImageLoad(function () {
@@ -4282,8 +4286,7 @@ Zia.Texture.prototype = {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+    Zia.TextureFilter._apply(gl, this._options.filter);
 
     gl.generateMipmap(gl.TEXTURE_2D);
     
@@ -4296,6 +4299,77 @@ Zia.Texture.prototype = {
     this._gl.deleteTexture(this._texture);
   }
 
+};
+
+Zia.TextureFilter = {
+  MinMagMipNearest: 0,
+  MinMagNearestMipLinear: 1,
+  MinNearestMagLinearMipNearest: 2,
+  MinNearestMagMipLinear: 3,
+  MinLinearMagMipNearest: 4,
+  MinLinearMagNearestMipLinear: 5,
+  MinMagLinearMipNearest: 6,
+  MinMagMipLinear: 7,
+
+  MinMagNearest: 8,
+  MinNearestMagLinear: 9,
+  MinLinearMagNearest: 10,
+  MinMagLinear: 11,
+
+  _apply: function(gl, filter) {
+    switch (filter) {
+      case Zia.TextureFilter.MinMagMipNearest:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        break;
+      case Zia.TextureFilter.MinMagNearestMipLinear:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        break;
+      case Zia.TextureFilter.MinNearestMagLinearMipNearest:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        break;
+      case Zia.TextureFilter.MinNearestMagMipLinear:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        break;
+      case Zia.TextureFilter.MinLinearMagMipNearest:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        break;
+      case Zia.TextureFilter.MinLinearMagNearestMipLinear:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        break;
+      case Zia.TextureFilter.MinMagLinearMipNearest:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        break;
+      case Zia.TextureFilter.MinMagMipLinear:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        break;
+      case Zia.TextureFilter.MinMagNearest:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        break;
+      case Zia.TextureFilter.MinNearestMagLinear:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        break;
+      case Zia.TextureFilter.MinLinearMagNearest:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        break;
+      case Zia.TextureFilter.MinMagLinear:
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        break;
+      default :
+        throw "Invalid value: " + filter;
+    }
+  }
 };
 
 Zia.VertexBuffer = function (graphicsDevice, vertexDeclaration, data) {
