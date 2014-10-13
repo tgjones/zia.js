@@ -1,0 +1,26 @@
+{
+  "name": "zia.js",
+  "version": "0.1.0",
+  "homepage": "http://tgjones.github.io/zia.js",
+  "description": "WebGL-based game framework",
+  "main": "build/zia.min.js",
+  "keywords": [
+    "zia",
+    "ziajs",
+    "zia.js",
+    "3D",
+    "webgl"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "*.md",
+    "dist",
+    "lib",
+    "node_modules",
+    "site",
+    "src",
+    "test",
+    "LICENSE"
+  ]
+}

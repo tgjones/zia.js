@@ -108,6 +108,17 @@ module.exports = function(grunt) {
       src: '**/*'
     },
 
+    uglify: {
+      options: {
+        preserveComments: 'some'
+      },
+      dist: {
+        files: {
+          'build/zia.min.js': ['build/zia.js']
+        }
+      }
+    },
+
     watch: {
       grunt: {
         options: {
@@ -146,12 +157,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks("grunt-contrib-jasmine");
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks('grunt-newer');
 
-  grunt.registerTask("build",   [ "clean", "karma:ci", "concat", "copy", "assemble" ]);
+  grunt.registerTask("build",   [ "clean", "karma:ci", "concat", "copy", "uglify", "assemble" ]);
   grunt.registerTask("default", [ "build", "karma:dev:start", "watch" ]);
   grunt.registerTask("deploy",  [ "build", "gh-pages" ]);
 };
