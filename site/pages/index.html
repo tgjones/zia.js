@@ -2,4 +2,45 @@
 title: Home
 ---
 
-<p>Zia.js is an object-oriented WebGL-based game framework.</p>
+<div class="jumbotron">
+  <h1>Zia.js</h1>
+  <p>Zia.js is an object-oriented WebGL-based game framework.</p>
+</div>
+
+<div class="row">
+  <div class="col-lg-6">
+    {{#markdown}}
+
+## What is Zia.js?
+
+With Zia, I have borrowed heavily from the XNA framework design, although I have
+diverged from it in some places. For example, where Direct3D/XNA and WebGL naming
+conventions differ, I have preferred the WebGL terminology ("program",
+"fragment shader", etc.).
+
+## Why create yet another WebGL framework?
+
+Zia isn't a graphics engine, or a game engine. It doesn't compete with
+[Three.js](http://threejs.org/) or [Babylon.js](http://www.babylonjs.com/) -
+both of those are graphics engines, with scene graphs and other higher-level
+constructs. Zia simply provides a more friendly API for WebGL.
+
+There are, of course, [other](https://www.google.com/search?q=object+oriented+webgl)
+object-oriented WebGL wrappers out there. I have reviewed some of them, but I
+couldn't find any that matched my preferences for API design.
+
+## What does the name mean?
+
+Zia (pronounced zee-yah) stands for Zia Is Acronymed (a little in-joke for
+the ex-[XNA](http://en.wikipedia.org/wiki/Microsoft_XNA)-ers in the audience).
+
+Zia is also an Arabic name meaning "light", which seems appropriate for a
+rendering framework.
+
+    {{/markdown}}
+  </div>
+  <div class="col-lg-6">
+    <h2>Sample code</h2>
+    {{ exampleCode 'hello-world' }}
+  </div>
+</div>
