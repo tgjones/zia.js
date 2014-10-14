@@ -4,8 +4,10 @@
     <meta charset="utf-8">
     <title>Home - Zia.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="assets/css/bootstrap.css" media="screen">
-    <link rel="stylesheet" href="assets/css/highlight.railscasts.css" media="screen">
+    <link rel="stylesheet" href="assets/css/bootflat.css" media="screen">
+    <link rel="stylesheet" href="assets/css/highlight.solarized_light.css" media="screen">
     <link rel="stylesheet" href="assets/css/site.css" media="screen">
     <script type="text/javascript" src="assets/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
@@ -23,18 +25,136 @@
           </button>
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
-          <ul class="nav navbar-nav">
+          <ul class="nav navbar-nav pull-right">
             <li>
-              <a href="examples/index.html">Examples</a>
+              <a href="../../examples/index.html">Examples</a>
+            </li>
+            <li>
+              <a href="https://github.com/tgjones/zia.js">GitHub</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="container">
-      
 
-<p>Zia.js is an object-oriented WebGL-based game framework.</p>
+    
+
+<div class="home-intro">
+  <div class="container">
+    <h1>Zia.js</h1>
+    <p>An object-oriented WebGL-based game framework</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+      <h3 id="what-is-zia-js-">What is Zia.js?</h3>
+<p>Zia.js is an object-oriented, WebGL-based game framework. Right now it&#39;s
+focused on graphics. Sound, networking and general-purpose game APIs will be
+added later (if there&#39;s enough interest).</p>
+<p>Zia.js is <em>not</em> a graphics engine, and it&#39;s <em>not</em> a game engine. It could help
+with building either of those, but it&#39;s not one of those. It is a <em>framework</em>
+that can be used to build a game, or a game engine.</p>
+<p>Just like XNA gave game developers a friendly set of APIs to use to build games
+on Windows-based platforms, I&#39;m hoping to do the same for the web with Zia.js.
+The analogy with XNA isn&#39;t an accident. Just like XNA provided graphics API that were
+recognisably built on Direct3D, and yet higher-level and easier than
+Direct3D, so Zia.js provides graphics APIs that are built on WebGL.</p>
+
+
+      <hr />
+      <p class="text-center">
+        <a href="../../examples/index.html" class="btn btn-primary">See Examples</a>
+      </p>
+      <hr />
+
+      <h3>What does it look like?</h3>
+
+      <pre class="hljs"><span class="hljs-keyword">var</span> canvas = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'mainCanvas'</span>);
+
+<span class="hljs-keyword">var</span> graphicsDevice = <span class="hljs-keyword">new</span> Zia.GraphicsDevice(canvas);
+
+<span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice);
+
+<span class="hljs-keyword">var</span> vertexBuffer = <span class="hljs-keyword">new</span> Zia.VertexBuffer(graphicsDevice,
+  Zia.BoxPrimitive.vertexDeclaration,
+  Zia.BoxPrimitive.vertices);
+
+<span class="hljs-keyword">var</span> indexBuffer = <span class="hljs-keyword">new</span> Zia.IndexBuffer(graphicsDevice,
+  Zia.BoxPrimitive.indices);
+
+<span class="hljs-keyword">var</span> projectionMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makePerspective(<span class="hljs-number">45</span>,
+  graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
+<span class="hljs-keyword">var</span> viewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makeTranslation(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">4</span>);
+<span class="hljs-keyword">var</span> modelMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().identity();
+
+program.view = viewMatrix;
+program.projection = projectionMatrix;
+
+graphicsDevice.setIndexBuffer(indexBuffer);
+graphicsDevice.setVertexBuffers([vertexBuffer]);
+
+graphicsDevice.clear(
+  Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
+  <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
+
+program.model = modelMatrix;
+program.apply();
+
+graphicsDevice.drawIndexedPrimitives(
+  Zia.PrimitiveType.TriangleList,
+  <span class="hljs-number">0</span>, <span class="hljs-number">36</span>);</pre>
+
+      <h3 id="why-not-use-three-js-">Why not use Three.js?</h3>
+<p>Most sensible people who want to build a game will choose one of the excellent
+graphics or game engines already available for WebGL, such as 
+<a href="http://threejs.org/">Three.js</a> or <a href="http://www.babylonjs.com/">Babylon.js</a>. And
+so they should. But there is another group of people who like things a bit closer
+to the metal (although bear in mind this is Javascript, where you&#39;re already so
+far from the metal that it&#39;s hard to remember what metal even looks like).</p>
+<p>Zia.js is for <em>that</em> group of people. I&#39;m one of them myself. I spent years
+playing around with XNA, and was disappointed when it was cancelled.
+But these are exciting times for 3D graphics; WebGL is now supported in all
+major browsers, including Internet Explorer and Safari on iOS. Regardless of 
+whether it is &quot;the&quot; future for games, WebGL opens up unbelievably exciting 
+possibilities.</p>
+<h3 id="why-not-use-vanilla-webgl-">Why not use vanilla WebGL?</h3>
+<p>Great question. If you have experience with OpenGL, then you&#39;ll probably
+get up and running with WebGL very quickly. But if (like me) you come from
+Direct3D / XNA, WebGL will be... perplexing. Its state-based configuration methods,
+where you first bind a resource and call global methods that affect whatever
+you bound, take some getting used to. If you just want something similar to XNA,
+but for WebGL, then Zia.js is for you.</p>
+<h3 id="why-create-yet-another-webgl-framework-">Why create yet another WebGL framework?</h3>
+<p>Like I said above, Zia.js is lower-level than Three.js or Babylon.js, and
+higher-level than WebGL. There are
+<a href="https://www.google.com/search?q=object+oriented+webgl">other object-oriented WebGL wrappers</a>
+out there. I have reviewed some of them, but the ones I looked at either weren&#39;t
+maintained, or didn&#39;t have the type of API I was looking for.</p>
+<h3 id="what-does-the-name-mean-">What does the name mean?</h3>
+<p>Zia (pronounced zee-yah) stands for Zia Is Acronymed (a little in-joke for
+the ex-<a href="http://en.wikipedia.org/wiki/Microsoft_XNA">XNA</a>-ers in the audience).</p>
+<p>Zia is also an Arabic name meaning &quot;light&quot;, which seems appropriate for a
+rendering framework.</p>
+<h3 id="who-wrote-this-">Who wrote this?</h3>
+<p>I&#39;m Tim Jones. <a href="http://timjones.tw">Here&#39;s my website</a>.</p>
+
+      <hr />
+
+      <p class="text-center">
+        <a href="../../examples/index.html" class="btn btn-primary btn-lg">Examples</a>
+      </p>
+    </div>
+    <div class="col-md-2"></div>
+  </div>
+</div>
+
+    <div class="container footer-container">
+      <div class="footer-copyright text-center">
+        © 2014 <a href="http://timjones.tw">Tim Jones</a>
+      </div>
     </div>
   </body>
 </html>
