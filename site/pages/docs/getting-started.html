@@ -1,0 +1,62 @@
+---
+title: Getting Started
+section: Docs
+layout: page.html
+---
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+      {{#markdown}}
+# Getting Started
+
+## Download Zia.js
+
+Download zia.js from the [GitHub repository](https://github.com/tgjones/zia.js):
+
+* [zia.js](https://raw.githubusercontent.com/tgjones/zia.js/master/build/zia.js)
+* [zia.min.js](https://raw.githubusercontent.com/tgjones/zia.js/master/build/zia.min.js)
+
+## Create HTML file
+
+Create a new HTML file:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="zia.js"></script>
+  </head>
+  <body>
+    <canvas id="mainCanvas" style="width:600px;height:400px"></canvas>
+
+    <script>
+      // Add script here      
+    </script>
+  </body>
+</html>
+```
+
+## Add script
+
+Add script to the section marked "`// Add script here`".
+
+      {{/markdown}}
+
+      {{ exampleCode 'getting-started' }}
+
+      {{#markdown}}
+
+## That's it!
+
+You should see this:
+
+      {{/markdown}}
+
+      <canvas id="mainCanvas" style="width:100%;height:400px"></canvas>
+      <script type="text/javascript" src="{{assets}}/js/example-getting-started.js"></script>
+    </div>
+    <div class="col-md-2"></div>
+  </div>
+</div>

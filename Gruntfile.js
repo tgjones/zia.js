@@ -1,6 +1,8 @@
 module.exports = function(grunt) {
   "use strict";
 
+  var hljs = require('highlight.js');
+
   var vendorFiles = [
     "lib/webgl-debug.js",
   ];
@@ -24,6 +26,16 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     assemble: {
+      options: {
+        marked: {
+          highlight: function(code, lang) {
+            if (lang === undefined) lang = 'bash';
+            if (lang === 'html') lang = 'xml';
+            if (lang === 'js') lang = 'javascript';
+            return hljs.highlight(lang, code).value;
+          }
+        }
+      },
       dist: {
         options: {
           flatten: false,
