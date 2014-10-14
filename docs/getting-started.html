@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Getting Started - Zia.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../assets/css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/bootflat.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/highlight.solarized_light.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/site.css" media="screen">
+    <script type="text/javascript" src="../assets/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../assets/js/zia.js"></script>
+    <script type="text/javascript" src="../assets/js/site.js"></script>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../" class="navbar-brand">Zia.js</a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav pull-right">
+            <li class="active">
+              <a href="getting-started.html">Docs</a>
+            </li>
+            <li>
+              <a href="../examples/index.html">Examples</a>
+            </li>
+            <li>
+              <a href="https://github.com/tgjones/zia.js">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    
+
+<div class="container">
+  
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+      <h1 id="getting-started">Getting Started</h1>
+<h2 id="download-zia-js">Download Zia.js</h2>
+<p>Download zia.js from the <a href="https://github.com/tgjones/zia.js">GitHub repository</a>:</p>
+<ul>
+<li><a href="https://raw.githubusercontent.com/tgjones/zia.js/master/build/zia.js">zia.js</a></li>
+<li><a href="https://raw.githubusercontent.com/tgjones/zia.js/master/build/zia.min.js">zia.min.js</a></li>
+</ul>
+<h2 id="create-html-file">Create HTML file</h2>
+<p>Create a new HTML file:</p>
+<pre><code class="language-html"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"zia.js"</span>&gt;</span><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">canvas</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"mainCanvas"</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">"width:600px;height:400px"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">canvas</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="javascript">
+      <span class="hljs-comment">// Add script here      </span>
+    </span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span></code></pre>
+<h2 id="add-script">Add script</h2>
+<p>Add script to the section marked &quot;<code>// Add script here</code>&quot;.</p>
+
+
+      <pre class="hljs"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    
+  <span class="hljs-keyword">var</span> canvas = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'mainCanvas'</span>);
+  
+  <span class="hljs-keyword">var</span> graphicsDevice = <span class="hljs-keyword">new</span> Zia.GraphicsDevice(canvas);
+
+  <span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice, {
+    vertexColorEnabled: <span class="hljs-literal">true</span>
+  });
+
+  <span class="hljs-keyword">var</span> pyramidVertexPositionBuffer = <span class="hljs-keyword">new</span> Zia.VertexBuffer(graphicsDevice,
+    <span class="hljs-keyword">new</span> Zia.VertexDeclaration(
+    [
+      <span class="hljs-keyword">new</span> Zia.VertexElement(<span class="hljs-string">"aVertexPosition"</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>)
+    ]),
+    <span class="hljs-keyword">new</span> <span class="hljs-built_in">Float32Array</span>(
+    [
+      <span class="hljs-comment">// Front face</span>
+       <span class="hljs-number">0.0</span>,  <span class="hljs-number">1.0</span>,  <span class="hljs-number">0.0</span>,
+      -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,  <span class="hljs-number">1.0</span>,
+       <span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,  <span class="hljs-number">1.0</span>,
+
+      <span class="hljs-comment">// Right face</span>
+       <span class="hljs-number">0.0</span>,  <span class="hljs-number">1.0</span>,  <span class="hljs-number">0.0</span>,
+       <span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,  <span class="hljs-number">1.0</span>,
+       <span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,
+
+      <span class="hljs-comment">// Back face</span>
+       <span class="hljs-number">0.0</span>,  <span class="hljs-number">1.0</span>,  <span class="hljs-number">0.0</span>,
+       <span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,
+      -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,
+
+      <span class="hljs-comment">// Left face</span>
+       <span class="hljs-number">0.0</span>,  <span class="hljs-number">1.0</span>,  <span class="hljs-number">0.0</span>,
+      -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,
+      -<span class="hljs-number">1.0</span>, -<span class="hljs-number">1.0</span>,  <span class="hljs-number">1.0</span>
+    ]));
+
+  <span class="hljs-keyword">var</span> pyramidVertexColorBuffer = <span class="hljs-keyword">new</span> Zia.VertexBuffer(graphicsDevice,
+    <span class="hljs-keyword">new</span> Zia.VertexDeclaration(
+    [
+      <span class="hljs-keyword">new</span> Zia.VertexElement(<span class="hljs-string">"aVertexColor"</span>, <span class="hljs-number">4</span>, <span class="hljs-number">0</span>)
+    ]),
+    <span class="hljs-keyword">new</span> <span class="hljs-built_in">Float32Array</span>(
+    [
+      <span class="hljs-comment">// Front face</span>
+      <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">1.0</span>,
+
+      <span class="hljs-comment">// Right face</span>
+      <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>,
+
+      <span class="hljs-comment">// Back face</span>
+      <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">1.0</span>,
+
+      <span class="hljs-comment">// Left face</span>
+      <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">1.0</span>,
+      <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>
+    ]));
+
+  <span class="hljs-keyword">var</span> projectionMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makePerspective(<span class="hljs-number">45</span>,
+    graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
+  <span class="hljs-keyword">var</span> viewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makeTranslation(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">4</span>);
+
+  <span class="hljs-keyword">var</span> pyramidModelMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().identity();
+
+  <span class="hljs-keyword">var</span> pyramidRotationAxis = <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+
+  <span class="hljs-keyword">var</span> rotationPyramid = <span class="hljs-number">0</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawScene</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">if</span> (graphicsDevice.resize()) {
+      projectionMatrix.makePerspective(<span class="hljs-number">45</span>,
+        graphicsDevice.viewport.aspectRatio,
+        <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
+    }
+
+    graphicsDevice.clear(
+      Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
+      <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
+
+    program.view = viewMatrix;
+    program.projection = projectionMatrix;
+
+    <span class="hljs-comment">// Draw pyramid.</span>
+
+    graphicsDevice.setIndexBuffer(<span class="hljs-literal">null</span>);
+    graphicsDevice.setVertexBuffers(
+    [
+      pyramidVertexPositionBuffer,
+      pyramidVertexColorBuffer
+    ]);
+
+    pyramidModelMatrix.makeRotationAxis(pyramidRotationAxis,
+      Zia.Math.degToRad(rotationPyramid));
+
+    program.model = pyramidModelMatrix;
+    program.apply();
+
+    graphicsDevice.drawPrimitives(
+      Zia.PrimitiveType.TriangleList,
+      <span class="hljs-number">0</span>, <span class="hljs-number">12</span>);
+  }
+
+  <span class="hljs-keyword">var</span> lastTime = <span class="hljs-number">0</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">animate</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> timeNow = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime();
+    <span class="hljs-keyword">if</span> (lastTime != <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">var</span> elapsed = timeNow - lastTime;
+      rotationPyramid += (<span class="hljs-number">90</span> * elapsed) / <span class="hljs-number">1000.0</span>;
+    }
+    lastTime = timeNow;
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tick</span><span class="hljs-params">()</span> </span>{
+    requestAnimationFrame(tick);
+    drawScene();
+    animate();
+  }
+
+  tick();
+
+}, <span class="hljs-literal">false</span>);</pre>
+
+      <h2 id="that-s-it-">That&#39;s it!</h2>
+<p>You should see this:</p>
+
+
+      <canvas id="mainCanvas" style="width:100%;height:400px"></canvas>
+      <script type="text/javascript" src="../assets/js/example-getting-started.js"></script>
+    </div>
+    <div class="col-md-2"></div>
+  </div>
+</div>
+</div>
+
+    <div class="container footer-container">
+      <div class="footer-copyright text-center">
+        © 2014 <a href="http://timjones.tw">Tim Jones</a>
+      </div>
+    </div>
+  </body>
+</html>
