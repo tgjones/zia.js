@@ -1,26 +1,27 @@
 ---
-layout: default.html
+layout: page.html
 ---
 
 <div class="row">
-  <div class="col-md-3">
-    <div class="list-group">
-      {{#each pages}}
-        {{#isnt this.basename "index" }}
-          {{#is data.section "Examples"}}
-            <a href="{{relative ../../../page.dest this.dest}}"
-              class="list-group-item{{#is ../../../page.dest this.dest}} active{{/is}}">
+  <div class="col-md-3 sidebar-nav">
+    {{#each examples}}
+      <div class="sidebar-nav-section">
+        <h3>{{capitalizeFirst example}}</h3>
+        <ul class="list-unstyled">
+          {{#each pages}}
+          <li>
+            <a href="{{relative ../../page.dest this.dest}}"
+              class="{{#is ../../page.dest this.dest}}active{{/is}}">
               {{data.title}}
             </a>
-          {{/is}}
-        {{/isnt}}
-      {{/each}}
-    </div>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    {{/each}}
   </div>
   <div class="col-md-9">
-    <div class="page-header">
-      <h1>{{title}}</h1>
-    </div>
+    <h1>{{title}}</h1>
     {{> body }}
   </div>
 </div>

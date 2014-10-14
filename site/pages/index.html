@@ -1,35 +1,83 @@
 ---
+layout: default.html
 title: Home
 ---
 
-<div class="jumbotron">
-  <h1>Zia.js</h1>
-  <p>Zia.js is an object-oriented WebGL-based game framework.</p>
+<div class="home-intro">
+  <div class="container">
+    <h1>Zia.js</h1>
+    <p>An object-oriented WebGL-based game framework</p>
+  </div>
 </div>
 
-<div class="row">
-  <div class="col-lg-6">
-    {{#markdown}}
+<div class="container">
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+      {{#markdown}}
+### What is Zia.js?
 
-## What is Zia.js?
+Zia.js is an object-oriented, WebGL-based game framework. Right now it's
+focused on graphics. Sound, networking and general-purpose game APIs will be
+added later (if there's enough interest).
 
-With Zia, I have borrowed heavily from the XNA framework design, although I have
-diverged from it in some places. For example, where Direct3D/XNA and WebGL naming
-conventions differ, I have preferred the WebGL terminology ("program",
-"fragment shader", etc.).
+Zia.js is *not* a graphics engine, and it's *not* a game engine. It could help
+with building either of those, but it's not one of those. It is a *framework*
+that can be used to build a game, or a game engine.
 
-## Why create yet another WebGL framework?
+Just like XNA gave game developers a friendly set of APIs to use to build games
+on Windows-based platforms, I'm hoping to do the same for the web with Zia.js.
+The analogy with XNA isn't an accident. Just like XNA provided graphics API that were
+recognisably built on Direct3D, and yet higher-level and easier than
+Direct3D, so Zia.js provides graphics APIs that are built on WebGL.
+      {{/markdown}}
 
-Zia isn't a graphics engine, or a game engine. It doesn't compete with
-[Three.js](http://threejs.org/) or [Babylon.js](http://www.babylonjs.com/) -
-both of those are graphics engines, with scene graphs and other higher-level
-constructs. Zia simply provides a more friendly API for WebGL.
+      <hr />
+      <p class="text-center">
+        <a href="{{relative page.dest "examples/index.html"}}" class="btn btn-primary">See Examples</a>
+      </p>
+      <hr />
 
-There are, of course, [other](https://www.google.com/search?q=object+oriented+webgl)
-object-oriented WebGL wrappers out there. I have reviewed some of them, but I
-couldn't find any that matched my preferences for API design.
+      <h3>What does it look like?</h3>
 
-## What does the name mean?
+      {{ exampleCode 'hello-world' }}
+
+      {{#markdown}}
+
+### Why not use Three.js?
+
+Most sensible people who want to build a game will choose one of the excellent
+graphics or game engines already available for WebGL, such as 
+[Three.js](http://threejs.org/) or [Babylon.js](http://www.babylonjs.com/). And
+so they should. But there is another group of people who like things a bit closer
+to the metal (although bear in mind this is Javascript, where you're already so
+far from the metal that it's hard to remember what metal even looks like).
+
+Zia.js is for *that* group of people. I'm one of them myself. I spent years
+playing around with XNA, and was disappointed when it was cancelled.
+But these are exciting times for 3D graphics; WebGL is now supported in all
+major browsers, including Internet Explorer and Safari on iOS. Regardless of 
+whether it is "the" future for games, WebGL opens up unbelievably exciting 
+possibilities.
+
+### Why not use vanilla WebGL?
+
+Great question. If you have experience with OpenGL, then you'll probably
+get up and running with WebGL very quickly. But if (like me) you come from
+Direct3D / XNA, WebGL will be... perplexing. Its state-based configuration methods,
+where you first bind a resource and call global methods that affect whatever
+you bound, take some getting used to. If you just want something similar to XNA,
+but for WebGL, then Zia.js is for you.
+
+### Why create yet another WebGL framework?
+
+Like I said above, Zia.js is lower-level than Three.js or Babylon.js, and
+higher-level than WebGL. There are
+[other object-oriented WebGL wrappers](https://www.google.com/search?q=object+oriented+webgl)
+out there. I have reviewed some of them, but the ones I looked at either weren't
+maintained, or didn't have the type of API I was looking for.
+
+### What does the name mean?
 
 Zia (pronounced zee-yah) stands for Zia Is Acronymed (a little in-joke for
 the ex-[XNA](http://en.wikipedia.org/wiki/Microsoft_XNA)-ers in the audience).
@@ -37,10 +85,17 @@ the ex-[XNA](http://en.wikipedia.org/wiki/Microsoft_XNA)-ers in the audience).
 Zia is also an Arabic name meaning "light", which seems appropriate for a
 rendering framework.
 
-    {{/markdown}}
-  </div>
-  <div class="col-lg-6">
-    <h2>Sample code</h2>
-    {{ exampleCode 'hello-world' }}
+### Who wrote this?
+
+I'm Tim Jones. [Here's my website](http://timjones.tw).
+
+{{/markdown}}
+      <hr />
+
+      <p class="text-center">
+        <a href="{{relative page.dest "examples/index.html"}}" class="btn btn-primary btn-lg">Examples</a>
+      </p>
+    </div>
+    <div class="col-md-2"></div>
   </div>
 </div>

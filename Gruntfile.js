@@ -32,7 +32,13 @@ module.exports = function(grunt) {
           helpers: ['site/helpers/*.js'],
           partials: ['site/includes/**/*.html'],
           layoutdir: 'site/layouts',
-          layout: 'default.html'
+          layout: 'page.html',
+          collections: [
+            {
+              name: 'examples',
+              sortby: 'order'
+            }
+          ]
         },
         expand: true,
         cwd: 'site/pages',
@@ -54,7 +60,7 @@ module.exports = function(grunt) {
     copy: {
       dist: {
         files: [
-          {expand:true, cwd: 'site/assets/', src: ['**/*'], dest: 'dist/site/assets/', filter:'isFile'},
+          {expand:true, cwd: 'site/assets/', src: ['**/*','!**/*.scss'], dest: 'dist/site/assets/', filter:'isFile'},
           {expand:true, cwd: 'build/', src: ['*.js'], dest: 'dist/site/assets/js', filter: 'isFile'}
         ]
       }
@@ -108,6 +114,14 @@ module.exports = function(grunt) {
       src: '**/*'
     },
 
+    sass: {
+      dist: {
+        files: {
+          'dist/site/assets/css/site.css': 'site/assets/css/site.scss'
+        }
+      }
+    },
+
     uglify: {
       options: {
         preserveComments: 'some'
@@ -125,6 +139,13 @@ module.exports = function(grunt) {
           reload: true
         },
         files: [ 'Gruntfile.js' ]
+      },
+      sass: {
+        files: ['site/assets/**/*.scss'],
+        tasks: ['sass'],
+        options: {
+          livereload: true
+        }
       },
       js: {
         files: srcFiles,
@@ -157,13 +178,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks("grunt-contrib-jasmine");
+  grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks('grunt-newer');
 
-  grunt.registerTask("build",   [ "clean", "karma:ci", "concat", "copy", "uglify", "assemble" ]);
+  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "assemble" ]);
   grunt.registerTask("default", [ "build", "karma:dev:start", "watch" ]);
   grunt.registerTask("deploy",  [ "build", "gh-pages" ]);
 };
