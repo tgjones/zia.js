@@ -81,13 +81,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  extractPosition: function ( m ) {
-
-    console.warn( 'ZiaMatrix4: .extractPosition() has been renamed to .copyPosition().' );
-    return this.copyPosition( m );
-
-  },
-
   copyPosition: function ( m ) {
 
     var te = this.elements;

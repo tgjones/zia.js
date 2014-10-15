@@ -1779,13 +1779,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  extractPosition: function ( m ) {
-
-    console.warn( 'ZiaMatrix4: .extractPosition() has been renamed to .copyPosition().' );
-    return this.copyPosition( m );
-
-  },
-
   copyPosition: function ( m ) {
 
     var te = this.elements;
@@ -3735,147 +3728,148 @@ Zia.Program.prototype = {
 
 };
 
-(function () {
-  function buildVertexShader(options) {
-    var result = [];
+// Based on EffectHelpers from XNA. Original licence follows:
+//-----------------------------------------------------------------------------
+// EffectHelpers.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
 
-    result.push("precision mediump float;");
+Zia.ProgramDirtyFlags = {
+  ModelViewProj : 1,
+  Model         : 2,
+  EyePosition   : 4,
+  MaterialColor : 8,
+  All           : -1
+};
 
-    // Attributes
-    result.push("attribute vec3 aVertexPosition;");
-    if (options.vertexColorEnabled) {
-      result.push("attribute vec4 aVertexColor;");
-    }
-    if (options.textureEnabled) {
-      result.push("attribute vec2 aTextureCoord;");
-    }
+Zia.ProgramUtil = {
 
-    // Uniforms
-    result.push("uniform mat4 uMVPMatrix;");
-    result.push("uniform vec4 uDiffuseColor;");
+  /** Sets up the standard key/fill/back lighting rig. */
+  enableDefaultLighting: function(light0, light1, light2) {
+    // Key light.
+    light0.direction = new Zia.Vector3(-0.5265408, -0.5735765, -0.6275069);
+    light0.diffuseColor = new Zia.Vector3(1, 0.9607844, 0.8078432);
+    light0.specularColor = new Zia.Vector3(1, 0.9607844, 0.8078432);
+    light0.enabled = true;
 
-    // Varyings
-    result.push("varying vec4 vDiffuseColor;");
-    if (options.textureEnabled) {
-      result.push("varying vec2 vTextureCoord;");
-    }
+    // Fill light.
+    light1.direction = new Zia.Vector3(0.7198464, 0.3420201, 0.6040227);
+    light1.diffuseColor = new Zia.Vector3(0.9647059, 0.7607844, 0.4078432);
+    light1.specularColor = new Zia.Vector3();
+    light1.enabled = true;
 
-    // Code
-    result.push("void main(void) {");
-    result.push("  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);");
-    result.push("  vDiffuseColor = uDiffuseColor;");
-    if (options.vertexColorEnabled) {
-      result.push("  vDiffuseColor *= aVertexColor;");
-    }
-    if (options.textureEnabled) {
-      result.push("  vTextureCoord = aTextureCoord;");
-    }
-    result.push("}");
-    
-    return result.join('\n');
-  }
+    // Back light.
+    light2.direction = new Zia.Vector3(0.4545195, -0.7660444, 0.4545195);
+    light2.diffuseColor = new Zia.Vector3(0.3231373, 0.3607844, 0.3937255);
+    light2.specularColor = new Zia.Vector3(0.3231373, 0.3607844, 0.3937255);
+    light2.enabled = true;
 
-  function buildFragmentShader(options) {
-    var result = [];
-
-    result.push("precision mediump float;");
-
-    result.push("varying vec4 vDiffuseColor;");
-
-    if (options.textureEnabled) {
-      result.push("varying vec2 vTextureCoord;");
-      result.push("uniform sampler2D uSampler;");
-    }
-
-    result.push("void main(void) {");
-    result.push("  vec4 color = vDiffuseColor;");
-
-    if (options.textureEnabled) {
-      result.push("  color *= texture2D(uSampler, vTextureCoord);");
-    }
-
-    result.push("  gl_FragColor = color;");
-    result.push("}");
-
-    return result.join('\n');
-  }
-
-  Zia.BasicProgram = function (graphicsDevice, options) {
-    this.model = new Zia.Matrix4();
-    this.view = new Zia.Matrix4();
-    this.projection = new Zia.Matrix4();
-    this.diffuseColor = new Zia.Vector3(1, 1, 1);
-    this.alpha = 1;
-    this.texture = null;
-
-    options = Zia.ObjectUtil.reverseMerge(options || {}, {
-      textureEnabled: false,
-      vertexColorEnabled: false
-    });
-
-    var vertexShader = new Zia.VertexShader(graphicsDevice, buildVertexShader(options));
-    var fragmentShader = new Zia.FragmentShader(graphicsDevice, buildFragmentShader(options));
-
-    Zia.Program.call(this, graphicsDevice, vertexShader, fragmentShader);
-  };
-})();
-
-Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
-  model: {
-    get: function() { return this._model; },
-    set: function(v) { this._model = v; this._matrixChanged = true; }
+    // Ambient light.
+    return new Zia.Vector3(0.05333332, 0.09882354, 0.1819608);
   },
 
-  view: {
-    get: function() { return this._view; },
-    set: function(v) { this._view = v; this._matrixChanged = true; }
-  },
+  /** Lazily recomputes the model+view+projection matrix based on
+   *  the current effect parameter settings.
+   */
+  setModelViewProj: (function() {
+    var modelViewProjectionMatrix = new Zia.Matrix4();
 
-  projection: {
-    get: function() { return this._projection;; },
-    set: function(v) { this._projection = v; this._matrixChanged = true; }
-  },
+    return function(program, dirtyFlags, model, view, projection, modelView) {
+      // Recompute the model+view+projection matrix?
+      if ((dirtyFlags & Zia.ProgramDirtyFlags.ModelViewProj) != 0) {
+        modelView.multiplyMatrices(view, model);
+        modelViewProjectionMatrix.multiplyMatrices(projection, modelView);
+        program.setUniform('uMVPMatrix', modelViewProjectionMatrix);
+          
+        dirtyFlags &= ~Zia.ProgramDirtyFlags.ModelViewProj;
+      }
+      return dirtyFlags;
+    };
+  })(),
 
-  diffuseColor: {
-    get: function() { return this._diffuseColor; },
-    set: function(v) { this._diffuseColor = v; this._diffuseColorChanged = true; }
-  },
+  /** Sets the diffuse/emissive/alpha material color parameters. */
+  setMaterialColor: function(program, lightingEnabled, alpha, diffuseColor, emissiveColor, ambientLightColor) {
+    // Desired lighting model:
+    //
+    //     ((AmbientLightColor + sum(diffuse directional light)) * DiffuseColor) + EmissiveColor
+    //
+    // When lighting is disabled, ambient and directional lights are ignored, leaving:
+    //
+    //     DiffuseColor + EmissiveColor
+    //
+    // For the lighting disabled case, we can save one shader instruction by precomputing
+    // diffuse+emissive on the CPU, after which the shader can use DiffuseColor directly,
+    // ignoring its emissive parameter.
+    //
+    // When lighting is enabled, we can merge the ambient and emissive settings. If we
+    // set our emissive parameter to emissive+(ambient*diffuse), the shader no longer
+    // needs to bother adding the ambient contribution, simplifying its computation to:
+    //
+    //     (sum(diffuse directional light) * DiffuseColor) + EmissiveColor
+    //
+    // For further optimization goodness, we merge material alpha with the diffuse
+    // color parameter, and premultiply all color values by this alpha.
+            
+    if (lightingEnabled) {
+      var diffuse = new Zia.Vector4(
+        diffuseColor.x * alpha, 
+        diffuseColor.y * alpha, 
+        diffuseColor.z * alpha, 
+        alpha);
 
-  alpha: {
-    get: function() { return this._alpha; },
-    set: function(v) { this._alpha = v; this._diffuseColorChanged = true; }
-  },
+      var emissive = new Zia.Vector3(
+       (emissiveColor.x + ambientLightColor.x * diffuseColor.x) * alpha,
+       (emissiveColor.y + ambientLightColor.y * diffuseColor.y) * alpha,
+       (emissiveColor.z + ambientLightColor.z * diffuseColor.z) * alpha);
 
-  texture: {
-    get: function() { return this._texture; },
-    set: function(v) { this._texture = v; this._textureChanged = true; }
-  },
-});
-
-Zia.BasicProgram.prototype._onApply = (function() {
-  var modelViewProjectionMatrix = new Zia.Matrix4();
-  var diffuseColor = new Zia.Vector4();
-
-  return function() {
-    if (this._matrixChanged) {
-      modelViewProjectionMatrix.multiplyMatrices(this._projection, this._view);
-      modelViewProjectionMatrix.multiply(this._model);
-      this.setUniform('uMVPMatrix', modelViewProjectionMatrix);
-
-      this._matrixChanged = false;
+      program.setUniform('uDiffuseColor', diffuse);
+      program.setUniform('uEmissiveColor', emissive);
     }
+    else
+    {
+      var diffuse = new Zia.Vector4(
+        (diffuseColor.x + emissiveColor.x) * alpha,
+        (diffuseColor.y + emissiveColor.y) * alpha,
+        (diffuseColor.z + emissiveColor.z) * alpha,
+        alpha);
 
-    if (this._diffuseColorChanged) {
-      var diffuse = this._diffuseColor;
-      diffuseColor.set(diffuse.x, diffuse.y, diffuse.z, this._alpha);
-      this.setUniform('uDiffuseColor', diffuseColor);
+      program.setUniform('uDiffuseColor', diffuse);
     }
+  },
 
-    if (this._textureChanged) {
-      this.setUniform('uSampler', this._texture);
+  setLightingMatrices: (function() {
+    var modelInverseTransposeMatrix = new Zia.Matrix4();
+    var viewInverseMatrix = new Zia.Matrix4();
+    var eyePosition = new Zia.Vector3();
+
+    return function(program, dirtyFlags, model, view) {
+      // Set the world and world inverse transpose matrices.
+      if ((dirtyFlags & Zia.ProgramDirtyFlags.Model) != 0) {
+        program.setUniform('uMMatrix', model);
+
+        modelInverseTransposeMatrix.getInverse(model);
+        modelInverseTransposeMatrix.transpose();
+        program.setUniform('uMMatrixInverseTranspose', modelInverseTransposeMatrix);
+          
+        dirtyFlags &= ~Zia.ProgramDirtyFlags.Model;
+      }
+
+      // Set the eye position.
+      if ((dirtyFlags & Zia.ProgramDirtyFlags.EyePosition) != 0) {
+        viewInverseMatrix.getInverse(view);
+        eyePosition.setFromMatrixColumn(3, viewInverseMatrix);
+        program.setUniform('uEyePosition', eyePosition);
+
+        dirtyFlags &= ~Zia.ProgramDirtyFlags.EyePosition;
+      }
+
+      return dirtyFlags;
     }
-  };
-})();
+  })()                                   
+
+};
 
 Zia.Comparison = {
   Never: 0,
@@ -4597,6 +4591,404 @@ Zia.BoxPrimitive = {
       16, 17, 18,     16, 18, 19,   // right
       20, 21, 22,     20, 22, 23    // left
     ])
+};
+
+(function () {
+  function addLighting(result) {
+    result.push("uniform vec3 uDirLight0Direction;");
+    result.push("uniform vec3 uDirLight0DiffuseColor;");
+    result.push("uniform vec3 uDirLight0SpecularColor;");
+
+    result.push("uniform vec3 uDirLight1Direction;");
+    result.push("uniform vec3 uDirLight1DiffuseColor;");
+    result.push("uniform vec3 uDirLight1SpecularColor;");
+
+    result.push("uniform vec3 uDirLight2Direction;");
+    result.push("uniform vec3 uDirLight2DiffuseColor;");
+    result.push("uniform vec3 uDirLight2SpecularColor;");
+
+    result.push("uniform vec3 uEyePosition;");
+
+    result.push("varying vec3 vPositionWS;");
+    result.push("varying vec3 vNormalWS;");
+
+    result.push("struct ColorPair {");
+    result.push("  vec3 Diffuse;");
+    result.push("  vec3 Specular;");
+    result.push("};");
+
+    result.push("ColorPair ComputeLights(vec3 eyeVector, vec3 worldNormal) {");
+    result.push("  mat3 lightDirections;");
+    result.push("  mat3 lightDiffuse;");
+    result.push("  mat3 lightSpecular;");
+    result.push("  mat3 halfVectors;");
+
+    result.push("  for (int i = 0; i < 3; i++) {");
+    result.push("    lightDirections[i] = mat3(uDirLight0Direction,     uDirLight1Direction,     uDirLight2Direction)    [i];");
+    result.push("    lightDiffuse[i]    = mat3(uDirLight0DiffuseColor,  uDirLight1DiffuseColor,  uDirLight2DiffuseColor) [i];");
+    result.push("    lightSpecular[i]   = mat3(uDirLight0SpecularColor, uDirLight1SpecularColor, uDirLight2SpecularColor)[i];");
+    result.push("    halfVectors[i] = normalize(eyeVector - lightDirections[i]);");
+    result.push("  }");
+
+    result.push("  vec3 dotL = -lightDirections * worldNormal;");
+    result.push("  vec3 dotH = halfVectors * worldNormal;");
+
+    result.push("  vec3 zeroL = step(vec3(0), dotL);");
+
+    result.push("  vec3 diffuse  = zeroL * dotL;");
+    result.push("  vec3 specular = pow(max(dotH, vec3(0)) * zeroL, vec3(uSpecularPower));");
+
+    result.push("  ColorPair result;");
+
+    result.push("  result.Diffuse  = (diffuse  * lightDiffuse)  * uDiffuseColor.rgb + uEmissiveColor;");
+    result.push("  result.Specular = (specular * lightSpecular) * uSpecularColor;");
+
+    result.push("  return result;");
+    result.push("}");
+  }
+
+  function buildVertexShader(options) {
+    var result = [];
+
+    result.push("precision mediump float;");
+
+    // Attributes
+    result.push("attribute vec3 aVertexPosition;");
+    if (options.lightingEnabled) {
+      result.push("attribute vec3 aVertexNormal;");
+    }
+    if (options.vertexColorEnabled) {
+      result.push("attribute vec4 aVertexColor;");
+    }
+    if (options.textureEnabled) {
+      result.push("attribute vec2 aTextureCoord;");
+    }
+
+    // Uniforms
+    result.push("uniform mat4 uMVPMatrix;");
+    if (options.lightingEnabled) {
+      result.push("uniform mat4 uMMatrix;");
+      result.push("uniform mat3 uMMatrixInverseTranspose;");
+    }
+    result.push("uniform vec4 uDiffuseColor;");
+
+    // Varyings
+    result.push("varying vec4 vDiffuseColor;");
+    if (options.lightingEnabled) {
+      result.push("varying vec3 vPositionWS;");
+      result.push("varying vec3 vNormalWS;");
+    }
+    if (options.textureEnabled) {
+      result.push("varying vec2 vTextureCoord;");
+    }
+
+    // Code
+    result.push("void main(void) {");
+    result.push("  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);");
+    if (options.lightingEnabled) {
+      result.push("  vDiffuseColor = vec4(1, 1, 1, uDiffuseColor.a);");
+      result.push("  vPositionWS = (uMMatrix * vec4(aVertexPosition, 1.0)).xyz;");
+      result.push("  vNormalWS = normalize(uMMatrixInverseTranspose * aVertexNormal);");
+    } else {
+      result.push("  vDiffuseColor = uDiffuseColor;");
+    }
+    if (options.vertexColorEnabled) {
+      result.push("  vDiffuseColor *= aVertexColor;");
+    }
+    if (options.textureEnabled) {
+      result.push("  vTextureCoord = aTextureCoord;");
+    }
+    result.push("}");
+    
+    return result.join('\n');
+  }
+
+  function buildFragmentShader(options) {
+    var result = [];
+
+    result.push("precision mediump float;");
+
+    result.push("varying vec4 vDiffuseColor;");
+
+    if (options.textureEnabled) {
+      result.push("varying vec2 vTextureCoord;");
+      result.push("uniform sampler2D uSampler;");
+    }
+
+    if (options.lightingEnabled) {
+      result.push("uniform vec4 uDiffuseColor;");
+      result.push("uniform vec3 uEmissiveColor;");
+      result.push("uniform vec3 uSpecularColor;");
+      result.push("uniform float uSpecularPower;");
+
+      addLighting(result);
+    }
+
+    result.push("void main(void) {");
+    result.push("  vec4 color = vDiffuseColor;");
+
+    if (options.textureEnabled) {
+      result.push("  color *= texture2D(uSampler, vTextureCoord);");
+    }
+
+    if (options.lightingEnabled) {
+      result.push("  vec3 eyeVector = normalize(uEyePosition - vPositionWS);");
+      result.push("  vec3 worldNormal = normalize(vNormalWS);");
+      result.push("  ColorPair lightResult = ComputeLights(eyeVector, worldNormal);");
+      result.push("  color.rgb *= lightResult.Diffuse;");
+    }
+
+    result.push("  gl_FragColor = color;");
+    result.push("}");
+
+    return result.join('\n');
+  }
+
+  Zia.BasicProgram = function (graphicsDevice, options) {
+    this._dirtyFlags = Zia.ProgramDirtyFlags.All;
+
+    this.model = new Zia.Matrix4();
+    this.view = new Zia.Matrix4();
+    this.projection = new Zia.Matrix4();
+    this._modelView = new Zia.Matrix4();
+    this.diffuseColor = new Zia.Vector3(1, 1, 1);
+    this.emissiveColor = new Zia.Vector3();
+    this.ambientLightColor = new Zia.Vector3();
+    this.alpha = 1;
+    this.texture = null;
+
+    this._directionalLight0 = new Zia.DirectionalLight(this, 0);
+    this._directionalLight1 = new Zia.DirectionalLight(this, 0);
+    this._directionalLight2 = new Zia.DirectionalLight(this, 0);
+
+    options = Zia.ObjectUtil.reverseMerge(options || {}, {
+      lightingEnabled: false,
+      textureEnabled: false,
+      vertexColorEnabled: false
+    });
+    this._options = options;
+
+    var vertexShader = new Zia.VertexShader(graphicsDevice, buildVertexShader(options));
+    var fragmentShader = new Zia.FragmentShader(graphicsDevice, buildFragmentShader(options));
+
+    Zia.Program.call(this, graphicsDevice, vertexShader, fragmentShader);
+  };
+})();
+
+(function() {
+  var DF = Zia.ProgramDirtyFlags;
+
+  Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
+    model: {
+      get: function() { return this._model; },
+      set: function(v) {
+        this._model = v;
+        this._dirtyFlags |= DF.Model | DF.ModelViewProj | DF.Fog;
+      }
+    },
+
+    view: {
+      get: function() { return this._view; },
+      set: function(v) {
+        this._view = v;
+        this._dirtyFlags |= DF.ModelViewProj | DF.EyePosition | DF.Fog;
+      }
+    },
+
+    projection: {
+      get: function() { return this._projection;; },
+      set: function(v) {
+        this._projection = v;
+        this._dirtyFlags |= DF.ModelViewProj;
+      }
+    },
+
+    diffuseColor: {
+      get: function() { return this._diffuseColor; },
+      set: function(v) {
+        this._diffuseColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    emissiveColor: {
+      get: function() { return this._emissiveColor; },
+      set: function(v) {
+        this._emissiveColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    ambientLightColor: {
+      get: function() { return this._ambientLightColor; },
+      set: function(v) {
+        this._ambientLightColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    alpha: {
+      get: function() { return this._alpha; },
+      set: function(v) {
+        this._alpha = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    texture: {
+      get: function() { return this._texture; },
+      set: function(v) {
+        this._texture = v;
+        this._textureChanged = true;
+      }
+    },
+
+    directionalLight0: {
+      get: function() { return this._directionalLight0; }
+    },
+
+    directionalLight1: {
+      get: function() { return this._directionalLight1; }
+    },
+
+    directionalLight2: {
+      get: function() { return this._directionalLight2; }
+    }
+  });
+
+  Zia.BasicProgram.prototype.enableDefaultLighting = function() {
+    if (!this._options.lightingEnabled) {
+      throw "Lighting must be enabled when creating this program.";
+    }
+
+    this.ambientLightColor = Zia.ProgramUtil.enableDefaultLighting(
+      this._directionalLight0,
+      this._directionalLight1,
+      this._directionalLight2);
+  };
+
+  Zia.BasicProgram.prototype._onApply = (function() {
+    var modelViewProjectionMatrix = new Zia.Matrix4();
+    
+    var diffuseColor = new Zia.Vector4();
+
+    return function() {
+
+      // Recompute the model+view+projection matrix?
+      this._dirtyFlags = Zia.ProgramUtil.setModelViewProj(
+        this, this._dirtyFlags,
+        this._model, this._view, this._projection,
+        this._modelView);
+      
+      // Recompute the diffuse/emissive/alpha material color parameters?
+      if ((this._dirtyFlags & DF.MaterialColor) != 0) {
+        Zia.ProgramUtil.setMaterialColor(
+          this, this._options.lightingEnabled,
+          this._alpha, this._diffuseColor, this._emissiveColor,
+          this._ambientLightColor);
+
+        this._dirtyFlags &= ~DF.MaterialColor;
+      }
+
+      if (this._options.lightingEnabled) {
+          // Recompute the world inverse transpose and eye position?
+          this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
+            this, this._dirtyFlags, this._model, this._view);
+      }
+
+      if (this._textureChanged) {
+        this.setUniform('uSampler', this._texture);
+        this._textureChanged = false;
+      }
+
+      this._directionalLight0._apply();
+      this._directionalLight1._apply();
+      this._directionalLight2._apply();
+    };
+  })();
+})();
+
+Zia.DirectionalLight = function(program, index) {
+  this._program = program;
+  this._index = index;
+
+  this.direction = new Zia.Vector3();
+  this.diffuseColor = new Zia.Vector3();
+  this.specularColor = new Zia.Vector3();
+  this.enabled = false;
+};
+
+Zia.DirectionalLight.prototype = {
+
+  get direction() {
+    return this._direction;
+  },
+
+  set direction(v) {
+    this._direction = v;
+    this._directionChanged = true;
+  },
+
+  get diffuseColor() {
+    return this._diffuseColor;
+  },
+
+  set diffuseColor(v) {
+    this._diffuseColor = v;
+    this._diffuseColorChanged = true;
+  },
+
+  get specularColor() {
+    return this._specularColor;
+  },
+
+  set specularColor(v) {
+    this._specularColor = v;
+    this._specularColorChanged = true;
+  },
+
+  get enabled() {
+    return this._enabled;
+  },
+
+  set enabled(v) {
+    this._enabled = v;
+    this._enabledChanged = true;
+  },
+
+  _apply: (function() {
+    var zero = new Zia.Vector3();
+
+    return function() {
+      if (this._directionChanged) {
+        this._setUniform("Direction", this._direction);
+        this._directionChanged = false;
+      }
+
+      if (this._diffuseColorChanged && this._enabled) {
+        this._setUniform("DiffuseColor", this._diffuseColor);
+        this._diffuseColorChanged = false;
+      }
+      
+      if (this._specularColorChanged && this._enabled) {
+        this._setUniform("SpecularColor", this._specularColor);
+        this._specularColorChanged = false;
+      }
+
+      if (this._enabledChanged) {
+        if (!this._enabled) {
+          this._setUniform("DiffuseColor", zero);
+          this._setUniform("SpecularColor", zero);
+        }
+        this._enabledChanged = false;
+      }
+    };
+  })(),
+
+  _setUniform: function(name, value) {
+    this._program.setUniform("uDirLight" + this._index + name, value);
+  }
+
 };
 
 (function () {

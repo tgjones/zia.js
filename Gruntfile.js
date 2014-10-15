@@ -12,7 +12,8 @@ module.exports = function(grunt) {
     "src/Quaternion.js",
     "src/Vector3.js",
     "src/*.js",
-    "src/graphics/Program.js",
+    "src/graphics/programs/Program.js",
+    "src/graphics/programs/ProgramUtil.js",
     "src/**/*.js",
   ];
 

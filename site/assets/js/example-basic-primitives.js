@@ -5,8 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
   var program = new Zia.BasicProgram(graphicsDevice, {
-    vertexColorEnabled: true
+    vertexColorEnabled: true,
+    lightingEnabled: true
   });
+  program.enableDefaultLighting();
 
   var pyramidVertexPositionBuffer = new Zia.VertexBuffer(graphicsDevice,
     new Zia.VertexDeclaration(
