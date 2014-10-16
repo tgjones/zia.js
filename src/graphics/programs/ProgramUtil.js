@@ -110,7 +110,7 @@ Zia.ProgramUtil = {
   },
 
   setLightingMatrices: (function() {
-    var modelInverseTransposeMatrix = new Zia.Matrix4();
+    var modelInverseTransposeMatrix = new Zia.Matrix3();
     var viewInverseMatrix = new Zia.Matrix4();
     var eyePosition = new Zia.Vector3();
 
@@ -119,8 +119,7 @@ Zia.ProgramUtil = {
       if ((dirtyFlags & Zia.ProgramDirtyFlags.Model) != 0) {
         program.setUniform('uMMatrix', model);
 
-        modelInverseTransposeMatrix.getInverse(model);
-        modelInverseTransposeMatrix.transpose();
+        modelInverseTransposeMatrix.getNormalMatrix(model);
         program.setUniform('uMMatrixInverseTranspose', modelInverseTransposeMatrix);
           
         dirtyFlags &= ~Zia.ProgramDirtyFlags.Model;

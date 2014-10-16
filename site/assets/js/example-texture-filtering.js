@@ -5,22 +5,25 @@ document.addEventListener('DOMContentLoaded', function () {
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
   var program = new Zia.BasicProgram(graphicsDevice, {
-    textureEnabled: true
+    textureEnabled: true,
+    lightingEnabled: true
   });
+  program.enableDefaultLighting();
 
   window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
     '../assets/textures/UV_Grid_Sm.jpg');
 
-  var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
-    Zia.BoxPrimitive.vertexDeclaration);
-  vertexBuffer.setData(Zia.BoxPrimitive.vertices);
-
-  var indexBuffer = new Zia.IndexBuffer(graphicsDevice);
-  indexBuffer.setData(Zia.BoxPrimitive.indices);
+  var cubeBuffers = Zia.GeometricPrimitive.createVertexAndIndexBuffers(
+    graphicsDevice, Zia.GeometricPrimitive.Cube);
 
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
-  var viewMatrix = new Zia.Matrix4().makeTranslation(0, 0, -4);
+
+  var viewMatrix = new Zia.Matrix4().makeLookAt(
+    new Zia.Vector3(0, 0, -4),
+    new Zia.Vector3(0, 0, 0),
+    new Zia.Vector3(0, 1, 0));
+
   var modelMatrix = new Zia.Matrix4().identity();
 
   var lastCubeUpdateTime, cubeRotation = 0;
@@ -30,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
   program.view = viewMatrix;
   program.projection = projectionMatrix;
   
-  graphicsDevice.setIndexBuffer(indexBuffer);
-  graphicsDevice.setVertexBuffers([vertexBuffer]);
+  graphicsDevice.setIndexBuffer(cubeBuffers.indexBuffer);
+  graphicsDevice.setVertexBuffers([cubeBuffers.vertexBuffer]);
 
   function drawScene() {
     if (graphicsDevice.resize()) {
@@ -48,6 +51,19 @@ document.addEventListener('DOMContentLoaded', function () {
     modelViewMatrix.multiplyMatrices(viewMatrix, modelMatrix);
 
     program.texture = window.texture;
+    program.model = modelMatrix;
+    program.apply();
+
+    graphicsDevice.drawIndexedPrimitives(
+      Zia.PrimitiveType.TriangleList,
+      0, 36);
+
+    modelMatrix.elements[12] = 2;
+    program.model = modelMatrix;
+    program.apply();
+
+    modelMatrix.elements[12] = 0;
+    modelMatrix.elements[14] = 2;
     program.model = modelMatrix;
     program.apply();
 

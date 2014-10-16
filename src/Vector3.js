@@ -535,7 +535,7 @@ Zia.Vector3.prototype = {
 
   },
 
-  cross: function ( v, w ) {
+  cross: function ( v ) {
 
     var x = this._x, y = this._y, z = this._z;
 

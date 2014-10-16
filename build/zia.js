@@ -1019,7 +1019,7 @@ Zia.Vector3.prototype = {
 
   },
 
-  cross: function ( v, w ) {
+  cross: function ( v ) {
 
     var x = this._x, y = this._y, z = this._z;
 
@@ -1723,6 +1723,288 @@ Zia.Math = {
  * THE SOFTWARE.
  */
 
+Zia.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+
+  this.elements = new Float32Array( 9 );
+
+  var te = this.elements;
+
+  te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 3 ] = n12 || 0; te[ 6 ] = n13 || 0;
+  te[ 1 ] = n21 || 0; te[ 4 ] = ( n22 !== undefined ) ? n22 : 1; te[ 7 ] = n23 || 0;
+  te[ 2 ] = n31 || 0; te[ 5 ] = n32 || 0; te[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
+
+};
+
+Zia.Matrix3.prototype = {
+
+  constructor: Zia.Matrix3,
+
+  set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+
+    var te = this.elements;
+
+    te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
+    te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
+    te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
+
+    return this;
+
+  },
+
+  identity: function () {
+
+    this.set(
+
+      1, 0, 0,
+      0, 1, 0,
+      0, 0, 1
+
+    );
+
+    return this;
+
+  },
+
+  copy: function ( m ) {
+
+    var me = m.elements;
+
+    this.set(
+
+      me[ 0 ], me[ 3 ], me[ 6 ],
+      me[ 1 ], me[ 4 ], me[ 7 ],
+      me[ 2 ], me[ 5 ], me[ 8 ]
+
+    );
+
+    return this;
+
+  },
+
+  applyToVector3Array: function () {
+
+    var v1 = new Zia.Vector3();
+
+    return function ( array, offset, length ) {
+
+      if ( offset === undefined ) offset = 0;
+      if ( length === undefined ) length = array.length;
+
+      for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+
+        v1.x = array[ j ];
+        v1.y = array[ j + 1 ];
+        v1.z = array[ j + 2 ];
+
+        v1.applyMatrix3( this );
+
+        array[ j ]     = v1.x;
+        array[ j + 1 ] = v1.y;
+        array[ j + 2 ] = v1.z;
+
+      }
+
+      return array;
+
+    };
+
+  }(),
+
+  multiplyScalar: function ( s ) {
+
+    var te = this.elements;
+
+    te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
+    te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
+    te[ 2 ] *= s; te[ 5 ] *= s; te[ 8 ] *= s;
+
+    return this;
+
+  },
+
+  determinant: function () {
+
+    var te = this.elements;
+
+    var a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
+      d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
+      g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
+
+    return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
+
+  },
+
+  getInverse: function ( matrix, throwOnNonInvertible ) {
+
+    // input: Zia.Matrix4
+    // ( based on http://code.google.com/p/webgl-mjs/ )
+
+    var me = matrix.elements;
+    var te = this.elements;
+
+    te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
+    te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
+    te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
+    te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
+    te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
+    te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
+    te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
+    te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
+    te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
+
+    var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
+
+    // no inverse
+
+    if ( det === 0 ) {
+
+      var msg = "Matrix3.getInverse(): can't invert matrix, determinant is 0";
+
+      if ( throwOnNonInvertible || false ) {
+
+        throw new Error( msg );
+
+      } else {
+
+        console.warn( msg );
+
+      }
+
+      this.identity();
+
+      return this;
+
+    }
+
+    this.multiplyScalar( 1.0 / det );
+
+    return this;
+
+  },
+
+  transpose: function () {
+
+    var tmp, m = this.elements;
+
+    tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
+    tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
+    tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
+
+    return this;
+
+  },
+
+  flattenToArrayOffset: function ( array, offset ) {
+
+    var te = this.elements;
+
+    array[ offset     ] = te[ 0 ];
+    array[ offset + 1 ] = te[ 1 ];
+    array[ offset + 2 ] = te[ 2 ];
+
+    array[ offset + 3 ] = te[ 3 ];
+    array[ offset + 4 ] = te[ 4 ];
+    array[ offset + 5 ] = te[ 5 ];
+
+    array[ offset + 6 ] = te[ 6 ];
+    array[ offset + 7 ] = te[ 7 ];
+    array[ offset + 8 ]  = te[ 8 ];
+
+    return array;
+
+  },
+
+  getNormalMatrix: function ( m ) {
+
+    // input: Zia.Matrix4
+
+    this.getInverse( m ).transpose();
+
+    return this;
+
+  },
+
+  transposeIntoArray: function ( r ) {
+
+    var m = this.elements;
+
+    r[ 0 ] = m[ 0 ];
+    r[ 1 ] = m[ 3 ];
+    r[ 2 ] = m[ 6 ];
+    r[ 3 ] = m[ 1 ];
+    r[ 4 ] = m[ 4 ];
+    r[ 5 ] = m[ 7 ];
+    r[ 6 ] = m[ 2 ];
+    r[ 7 ] = m[ 5 ];
+    r[ 8 ] = m[ 8 ];
+
+    return this;
+
+  },
+
+  fromArray: function ( array ) {
+
+    this.elements.set( array );
+
+    return this;
+
+  },
+
+  toArray: function () {
+
+    var te = this.elements;
+
+    return [
+      te[ 0 ], te[ 1 ], te[ 2 ],
+      te[ 3 ], te[ 4 ], te[ 5 ],
+      te[ 6 ], te[ 7 ], te[ 8 ]
+    ];
+
+  },
+
+  clone: function () {
+
+    var te = this.elements;
+
+    return new Zia.Matrix3(
+
+      te[ 0 ], te[ 3 ], te[ 6 ],
+      te[ 1 ], te[ 4 ], te[ 7 ],
+      te[ 2 ], te[ 5 ], te[ 8 ]
+
+    );
+
+  }
+
+};
+
+/**
+ * Original code from three.js project. https://github.com/mrdoob/three.js
+ * Original code published with the following license:
+ *
+ * The MIT License
+ * 
+ * Copyright &copy; 2010-2014 three.js authors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 Zia.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
   this.elements = new Float32Array( 16 );
@@ -1988,7 +2270,7 @@ Zia.Matrix4.prototype = {
 
   },
 
-  lookAt: function () {
+  makeLookAt: function () {
 
     var x = new Zia.Vector3();
     var y = new Zia.Vector3();
@@ -1998,29 +2280,18 @@ Zia.Matrix4.prototype = {
 
       var te = this.elements;
 
-      z.subVectors( eye, target ).normalize();
+      z.subVectors(eye, target).normalize();
+      x.crossVectors(up, z).normalize();
+      y.crossVectors(z, x);
 
-      if ( z.length() === 0 ) {
+      var translateX = x.dot(eye);
+      var translateY = y.dot(eye);
+      var translateZ = z.dot(eye);
 
-        z.z = 1;
-
-      }
-
-      x.crossVectors( up, z ).normalize();
-
-      if ( x.length() === 0 ) {
-
-        z.x += 0.0001;
-        x.crossVectors( up, z ).normalize();
-
-      }
-
-      y.crossVectors( z, x );
-
-
-      te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
-      te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
-      te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
+      te[0] = x.x; te[4] = y.x; te[8] = z.x;  te[12] = -translateX;
+      te[1] = x.y; te[5] = y.y; te[9] = z.y;  te[13] = -translateY;
+      te[2] = x.z; te[6] = y.z; te[10] = z.z; te[14] = -translateZ;
+      te[3] = 0;   te[7] = 0;   te[11] = 0;   te[15] = 1;
 
       return this;
 
@@ -2238,7 +2509,7 @@ Zia.Matrix4.prototype = {
 
   },
 
-  getInverse: function ( m, throwOnInvertible ) {
+  getInverse: function ( m, throwOnNonInvertible ) {
 
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     var te = this.elements;
@@ -2272,7 +2543,7 @@ Zia.Matrix4.prototype = {
 
       var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-      if ( throwOnInvertible || false ) {
+      if ( throwOnNonInvertible || false ) {
 
         throw new Error( msg );
 
@@ -3589,6 +3860,44 @@ Zia.Vector4.prototype = {
 
 };
 
+Zia.GeometricPrimitive = {
+
+  createVertexAndIndexBuffers: function(graphicsDevice, primitive) {
+    var vertexData = [];
+    for (var i = 0; i < primitive.positions.length; i++) {
+      vertexData.push(primitive.positions[i].x);
+      vertexData.push(primitive.positions[i].y);
+      vertexData.push(primitive.positions[i].z);
+      vertexData.push(primitive.normals[i].x);
+      vertexData.push(primitive.normals[i].y);
+      vertexData.push(primitive.normals[i].z);
+      vertexData.push(primitive.textureCoordinates[i].x);
+      vertexData.push(primitive.textureCoordinates[i].y);
+    }
+
+    var vertices = new Float32Array(vertexData);
+
+    var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
+      new Zia.VertexDeclaration(
+      [
+        new Zia.VertexElement("aVertexPosition", 3, 0),
+        new Zia.VertexElement("aVertexNormal", 3, 3 * 4),
+        new Zia.VertexElement("aTextureCoord", 2, 6 * 4)
+      ]),
+      vertices);
+
+    var indexBuffer = new Zia.IndexBuffer(graphicsDevice,
+      new Uint16Array(primitive.indices));
+
+    // TODO: Create Model and ModelMesh classes.
+    return {
+      vertexBuffer: vertexBuffer,
+      indexBuffer: indexBuffer
+    };
+  }
+
+};
+
 (function() {
 
   // From http://bocoup.com/weblog/counting-uniforms-in-webgl/
@@ -3840,7 +4149,7 @@ Zia.ProgramUtil = {
   },
 
   setLightingMatrices: (function() {
-    var modelInverseTransposeMatrix = new Zia.Matrix4();
+    var modelInverseTransposeMatrix = new Zia.Matrix3();
     var viewInverseMatrix = new Zia.Matrix4();
     var eyePosition = new Zia.Vector3();
 
@@ -3849,8 +4158,7 @@ Zia.ProgramUtil = {
       if ((dirtyFlags & Zia.ProgramDirtyFlags.Model) != 0) {
         program.setUniform('uMMatrix', model);
 
-        modelInverseTransposeMatrix.getInverse(model);
-        modelInverseTransposeMatrix.transpose();
+        modelInverseTransposeMatrix.getNormalMatrix(model);
         program.setUniform('uMMatrixInverseTranspose', modelInverseTransposeMatrix);
           
         dirtyFlags &= ~Zia.ProgramDirtyFlags.Model;
@@ -3944,10 +4252,6 @@ Zia.GraphicsDevice = function (canvas, debug) {
   if (debug) {
     gl = this._gl = Zia.DebugUtil.makeDebugContext(gl);
   }
-
-  // TODO: Move this to somewhere else.
-  gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
 
   // TODO: Handle WebContextLost event.
   
@@ -4536,62 +4840,170 @@ Zia.Viewport.prototype = {
   },
 };
 
-Zia.BoxPrimitive = {
-  vertexDeclaration: new Zia.VertexDeclaration(
-    [
-      new Zia.VertexElement("aVertexPosition", 3, 0),
-      new Zia.VertexElement("aTextureCoord", 2, 3 * 4)
-    ]),
+// -----------------------------------------------------------------------------
+// The following code is a port of SharpDX https://github.com/sharpdx/sharpdx
+// -----------------------------------------------------------------------------
+// Copyright (c) 2010-2014 SharpDX - Alexandre Mutel
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+// -----------------------------------------------------------------------------
+// The following code is a port of DirectXTk http://directxtk.codeplex.com
+// -----------------------------------------------------------------------------
+// Microsoft Public License (Ms-PL)
+//
+// This license governs use of the accompanying software. If you use the 
+// software, you accept this license. If you do not accept the license, do not
+// use the software.
+//
+// 1. Definitions
+// The terms "reproduce," "reproduction," "derivative works," and 
+// "distribution" have the same meaning here as under U.S. copyright law.
+// A "contribution" is the original software, or any additions or changes to 
+// the software.
+// A "contributor" is any person that distributes its contribution under this 
+// license.
+// "Licensed patents" are a contributor's patent claims that read directly on 
+// its contribution.
+//
+// 2. Grant of Rights
+// (A) Copyright Grant- Subject to the terms of this license, including the 
+// license conditions and limitations in section 3, each contributor grants 
+// you a non-exclusive, worldwide, royalty-free copyright license to reproduce
+// its contribution, prepare derivative works of its contribution, and 
+// distribute its contribution or any derivative works that you create.
+// (B) Patent Grant- Subject to the terms of this license, including the license
+// conditions and limitations in section 3, each contributor grants you a 
+// non-exclusive, worldwide, royalty-free license under its licensed patents to
+// make, have made, use, sell, offer for sale, import, and/or otherwise dispose
+// of its contribution in the software or derivative works of the contribution 
+// in the software.
+//
+// 3. Conditions and Limitations
+// (A) No Trademark License- This license does not grant you rights to use any 
+// contributors' name, logo, or trademarks.
+// (B) If you bring a patent claim against any contributor over patents that 
+// you claim are infringed by the software, your patent license from such 
+// contributor to the software ends automatically.
+// (C) If you distribute any portion of the software, you must retain all 
+// copyright, patent, trademark, and attribution notices that are present in the
+// software.
+// (D) If you distribute any portion of the software in source code form, you 
+// may do so only under this license by including a complete copy of this 
+// license with your distribution. If you distribute any portion of the software
+// in compiled or object code form, you may only do so under a license that 
+// complies with this license.
+// (E) The software is licensed "as-is." You bear the risk of using it. The
+// contributors give no express warranties, guarantees or conditions. You may
+// have additional consumer rights under your local laws which this license 
+// cannot change. To the extent permitted under your local laws, the 
+// contributors exclude the implied warranties of merchantability, fitness for a
+// particular purpose and non-infringement.
 
-  vertices: new Float32Array(
-    [
-      // Front face
-      -1.0, -1.0,  1.0,   0.0,  0.0,
-       1.0, -1.0,  1.0,   1.0,  0.0,
-       1.0,  1.0,  1.0,   1.0,  1.0,
-      -1.0,  1.0,  1.0,   0.0,  1.0,
-      
-      // Back face
-      -1.0, -1.0, -1.0,   0.0,  0.0,
-      -1.0,  1.0, -1.0,   1.0,  0.0,
-       1.0,  1.0, -1.0,   1.0,  1.0,
-       1.0, -1.0, -1.0,   0.0,  1.0,
-      
-      // Top face
-      -1.0,  1.0, -1.0,   0.0,  0.0,
-      -1.0,  1.0,  1.0,   1.0,  0.0,
-       1.0,  1.0,  1.0,   1.0,  1.0,
-       1.0,  1.0, -1.0,   0.0,  1.0,
-      
-      // Bottom face
-      -1.0, -1.0, -1.0,   0.0,  0.0,
-       1.0, -1.0, -1.0,   1.0,  0.0,
-       1.0, -1.0,  1.0,   1.0,  1.0,
-      -1.0, -1.0,  1.0,   0.0,  1.0,
-      
-      // Right face
-       1.0, -1.0, -1.0,   0.0,  0.0,
-       1.0,  1.0, -1.0,   1.0,  0.0,
-       1.0,  1.0,  1.0,   1.0,  1.0,
-       1.0, -1.0,  1.0,   0.0,  1.0,
-      
-      // Left face
-      -1.0, -1.0, -1.0,   0.0,  0.0,
-      -1.0, -1.0,  1.0,   1.0,  0.0,
-      -1.0,  1.0,  1.0,   1.0,  1.0,
-      -1.0,  1.0, -1.0,   0.0,  1.0
-    ]),
+(function() {
 
-  indices: new Uint16Array(
-    [
-      0,  1,  2,      0,  2,  3,    // front
-      4,  5,  6,      4,  6,  7,    // back
-      8,  9,  10,     8,  10, 11,   // top
-      12, 13, 14,     12, 14, 15,   // bottom
-      16, 17, 18,     16, 18, 19,   // right
-      20, 21, 22,     20, 22, 23    // left
-    ])
-};
+  var cubeFaceCount = 6;
+
+  var faceNormals = [
+    new Zia.Vector3(0, 0, 1),
+    new Zia.Vector3(0, 0, -1),
+    new Zia.Vector3(1, 0, 0),
+    new Zia.Vector3(-1, 0, 0),
+    new Zia.Vector3(0, 1, 0),
+    new Zia.Vector3(0, -1, 0)
+  ];
+
+  var textureCoordinates = [
+    new Zia.Vector2(1, 0),
+    new Zia.Vector2(1, 1),
+    new Zia.Vector2(0, 1),
+    new Zia.Vector2(0, 0),
+  ];
+
+  var size = 1.0;
+
+  var positions = [];
+  var normals = [];
+  var texCoords = [];
+  var indices = [];
+
+  size /= 2.0;
+
+  var side1 = new Zia.Vector3();
+  var side2 = new Zia.Vector3();
+
+  // Create each face in turn.
+  for (var i = 0; i < cubeFaceCount; i++) {
+    var normal = faceNormals[i];
+
+    // Get two vectors perpendicular both to the face normal and to each other.
+    var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
+
+    side1.set(normal.x, normal.y, normal.z);
+    side1.cross(basis);
+
+    side2.set(normal.x, normal.y, normal.z);
+    side2.cross(side1);
+
+    // Six indices (two triangles) per face.
+    var vbase = i * 4;
+    indices.push(vbase + 0);
+    indices.push(vbase + 2);
+    indices.push(vbase + 1);
+
+    indices.push(vbase + 0);
+    indices.push(vbase + 3);
+    indices.push(vbase + 2);
+
+    // Four vertices per face.
+
+    // (normal - side1 - side2) * size
+    positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
+
+    // (normal - side1 + side2) * size
+    positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));
+
+    // (normal + side1 + side2) * size
+    positions.push(normal.clone().add(side1).add(side2).multiplyScalar(size));
+
+    // (normal + side1 - side2) * size
+    positions.push(normal.clone().add(side1).sub(side2).multiplyScalar(size));
+
+    normals.push(normal);
+    normals.push(normal);
+    normals.push(normal);
+    normals.push(normal);
+
+    texCoords.push(textureCoordinates[0]);
+    texCoords.push(textureCoordinates[1]);
+    texCoords.push(textureCoordinates[2]);
+    texCoords.push(textureCoordinates[3]);
+  }
+
+  /** A cube has six faces, each one pointing in a different direction. */
+  Zia.GeometricPrimitive.Cube = {
+    positions: positions,
+    normals: normals,
+    textureCoordinates: texCoords,
+    indices: indices
+  };
+
+})();
 
 (function () {
   function addLighting(result) {

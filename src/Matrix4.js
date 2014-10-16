@@ -290,7 +290,7 @@ Zia.Matrix4.prototype = {
 
   },
 
-  lookAt: function () {
+  makeLookAt: function () {
 
     var x = new Zia.Vector3();
     var y = new Zia.Vector3();
@@ -300,29 +300,18 @@ Zia.Matrix4.prototype = {
 
       var te = this.elements;
 
-      z.subVectors( eye, target ).normalize();
+      z.subVectors(eye, target).normalize();
+      x.crossVectors(up, z).normalize();
+      y.crossVectors(z, x);
 
-      if ( z.length() === 0 ) {
+      var translateX = x.dot(eye);
+      var translateY = y.dot(eye);
+      var translateZ = z.dot(eye);
 
-        z.z = 1;
-
-      }
-
-      x.crossVectors( up, z ).normalize();
-
-      if ( x.length() === 0 ) {
-
-        z.x += 0.0001;
-        x.crossVectors( up, z ).normalize();
-
-      }
-
-      y.crossVectors( z, x );
-
-
-      te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
-      te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
-      te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
+      te[0] = x.x; te[4] = y.x; te[8] = z.x;  te[12] = -translateX;
+      te[1] = x.y; te[5] = y.y; te[9] = z.y;  te[13] = -translateY;
+      te[2] = x.z; te[6] = y.z; te[10] = z.z; te[14] = -translateZ;
+      te[3] = 0;   te[7] = 0;   te[11] = 0;   te[15] = 1;
 
       return this;
 
@@ -540,7 +529,7 @@ Zia.Matrix4.prototype = {
 
   },
 
-  getInverse: function ( m, throwOnInvertible ) {
+  getInverse: function ( m, throwOnNonInvertible ) {
 
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     var te = this.elements;
@@ -574,7 +563,7 @@ Zia.Matrix4.prototype = {
 
       var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-      if ( throwOnInvertible || false ) {
+      if ( throwOnNonInvertible || false ) {
 
         throw new Error( msg );
 

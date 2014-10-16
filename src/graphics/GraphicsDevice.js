@@ -27,10 +27,6 @@ Zia.GraphicsDevice = function (canvas, debug) {
     gl = this._gl = Zia.DebugUtil.makeDebugContext(gl);
   }
 
-  // TODO: Move this to somewhere else.
-  gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
-
   // TODO: Handle WebContextLost event.
   
   var viewport = this._viewport = new Zia.Viewport(
