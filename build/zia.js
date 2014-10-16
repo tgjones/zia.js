@@ -2288,9 +2288,9 @@ Zia.Matrix4.prototype = {
       var translateY = y.dot(eye);
       var translateZ = z.dot(eye);
 
-      te[0] = x.x; te[4] = y.x; te[8] = z.x;  te[12] = -translateX;
-      te[1] = x.y; te[5] = y.y; te[9] = z.y;  te[13] = -translateY;
-      te[2] = x.z; te[6] = y.z; te[10] = z.z; te[14] = -translateZ;
+      te[0] = x.x; te[4] = x.y; te[8] = x.z;  te[12] = -translateX;
+      te[1] = y.x; te[5] = y.y; te[9] = y.z;  te[13] = -translateY;
+      te[2] = z.x; te[6] = z.y; te[10] = z.z; te[14] = -translateZ;
       te[3] = 0;   te[7] = 0;   te[11] = 0;   te[15] = 1;
 
       return this;
@@ -4929,10 +4929,10 @@ Zia.Viewport.prototype = {
   ];
 
   var textureCoordinates = [
-    new Zia.Vector2(1, 0),
     new Zia.Vector2(1, 1),
-    new Zia.Vector2(0, 1),
+    new Zia.Vector2(1, 0),
     new Zia.Vector2(0, 0),
+    new Zia.Vector2(0, 1)
   ];
 
   var size = 1.0;
@@ -5042,18 +5042,18 @@ Zia.Viewport.prototype = {
     result.push("    halfVectors[i] = normalize(eyeVector - lightDirections[i]);");
     result.push("  }");
 
-    result.push("  vec3 dotL = -lightDirections * worldNormal;");
-    result.push("  vec3 dotH = halfVectors * worldNormal;");
+    result.push("  vec3 dotL = worldNormal * -lightDirections;");
+    result.push("  vec3 dotH = worldNormal * halfVectors;");
 
-    result.push("  vec3 zeroL = step(vec3(0), dotL);");
+    result.push("  vec3 zeroL = step(vec3(0.0), dotL);");
 
     result.push("  vec3 diffuse  = zeroL * dotL;");
-    result.push("  vec3 specular = pow(max(dotH, vec3(0)) * zeroL, vec3(uSpecularPower));");
+    result.push("  vec3 specular = pow(max(dotH, vec3(0.0)) * zeroL, vec3(uSpecularPower));");
 
     result.push("  ColorPair result;");
 
-    result.push("  result.Diffuse  = (diffuse  * lightDiffuse)  * uDiffuseColor.rgb + uEmissiveColor;");
-    result.push("  result.Specular = (specular * lightSpecular) * uSpecularColor;");
+    result.push("  result.Diffuse  = (lightDiffuse * diffuse)  * uDiffuseColor.rgb + uEmissiveColor;");
+    result.push("  result.Specular = (lightSpecular * specular) * uSpecularColor;");
 
     result.push("  return result;");
     result.push("}");
@@ -5170,8 +5170,8 @@ Zia.Viewport.prototype = {
     this.texture = null;
 
     this._directionalLight0 = new Zia.DirectionalLight(this, 0);
-    this._directionalLight1 = new Zia.DirectionalLight(this, 0);
-    this._directionalLight2 = new Zia.DirectionalLight(this, 0);
+    this._directionalLight1 = new Zia.DirectionalLight(this, 1);
+    this._directionalLight2 = new Zia.DirectionalLight(this, 2);
 
     options = Zia.ObjectUtil.reverseMerge(options || {}, {
       lightingEnabled: false,

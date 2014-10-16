@@ -87,10 +87,10 @@
   ];
 
   var textureCoordinates = [
-    new Zia.Vector2(1, 0),
     new Zia.Vector2(1, 1),
-    new Zia.Vector2(0, 1),
+    new Zia.Vector2(1, 0),
     new Zia.Vector2(0, 0),
+    new Zia.Vector2(0, 1)
   ];
 
   var size = 1.0;

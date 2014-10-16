@@ -35,18 +35,18 @@
     result.push("    halfVectors[i] = normalize(eyeVector - lightDirections[i]);");
     result.push("  }");
 
-    result.push("  vec3 dotL = -lightDirections * worldNormal;");
-    result.push("  vec3 dotH = halfVectors * worldNormal;");
+    result.push("  vec3 dotL = worldNormal * -lightDirections;");
+    result.push("  vec3 dotH = worldNormal * halfVectors;");
 
-    result.push("  vec3 zeroL = step(vec3(0), dotL);");
+    result.push("  vec3 zeroL = step(vec3(0.0), dotL);");
 
     result.push("  vec3 diffuse  = zeroL * dotL;");
-    result.push("  vec3 specular = pow(max(dotH, vec3(0)) * zeroL, vec3(uSpecularPower));");
+    result.push("  vec3 specular = pow(max(dotH, vec3(0.0)) * zeroL, vec3(uSpecularPower));");
 
     result.push("  ColorPair result;");
 
-    result.push("  result.Diffuse  = (diffuse  * lightDiffuse)  * uDiffuseColor.rgb + uEmissiveColor;");
-    result.push("  result.Specular = (specular * lightSpecular) * uSpecularColor;");
+    result.push("  result.Diffuse  = (lightDiffuse * diffuse)  * uDiffuseColor.rgb + uEmissiveColor;");
+    result.push("  result.Specular = (lightSpecular * specular) * uSpecularColor;");
 
     result.push("  return result;");
     result.push("}");
@@ -163,8 +163,8 @@
     this.texture = null;
 
     this._directionalLight0 = new Zia.DirectionalLight(this, 0);
-    this._directionalLight1 = new Zia.DirectionalLight(this, 0);
-    this._directionalLight2 = new Zia.DirectionalLight(this, 0);
+    this._directionalLight1 = new Zia.DirectionalLight(this, 1);
+    this._directionalLight2 = new Zia.DirectionalLight(this, 2);
 
     options = Zia.ObjectUtil.reverseMerge(options || {}, {
       lightingEnabled: false,

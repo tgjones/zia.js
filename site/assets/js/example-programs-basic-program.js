@@ -70,12 +70,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
   requestAnimationFrame(drawScene);
 
-  var textureFilterSelect = $('#texture-filter');
-  textureFilterSelect.change(function() {
-    window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
-      '../assets/textures/UV_Grid_Sm.jpg',
-      { filter: Zia.TextureFilter[textureFilterSelect.val()] });
-  });
-  textureFilterSelect.change();
-
 }, false);

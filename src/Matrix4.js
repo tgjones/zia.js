@@ -308,9 +308,9 @@ Zia.Matrix4.prototype = {
       var translateY = y.dot(eye);
       var translateZ = z.dot(eye);
 
-      te[0] = x.x; te[4] = y.x; te[8] = z.x;  te[12] = -translateX;
-      te[1] = x.y; te[5] = y.y; te[9] = z.y;  te[13] = -translateY;
-      te[2] = x.z; te[6] = y.z; te[10] = z.z; te[14] = -translateZ;
+      te[0] = x.x; te[4] = x.y; te[8] = x.z;  te[12] = -translateX;
+      te[1] = y.x; te[5] = y.y; te[9] = y.z;  te[13] = -translateY;
+      te[2] = z.x; te[6] = z.y; te[10] = z.z; te[14] = -translateZ;
       te[3] = 0;   te[7] = 0;   te[11] = 0;   te[15] = 1;
 
       return this;
