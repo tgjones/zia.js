@@ -40,10 +40,8 @@ hr {
   .sidebar-nav .sidebar-nav-section h3 {
     text-transform: uppercase;
     font-size: 14px; }
-  .sidebar-nav .sidebar-nav-section a {
+  .sidebar-nav .sidebar-nav-section a.active {
     color: #666; }
-    .sidebar-nav .sidebar-nav-section a.active {
-      color: #3bafda; }
 
 .hljs {
   word-wrap: normal;

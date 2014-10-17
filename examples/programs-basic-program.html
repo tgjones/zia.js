@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Texture Filtering - Zia.js</title>
+    <title>Programs - Basic Program - Zia.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="../assets/css/bootstrap.css" media="screen">
@@ -62,14 +62,14 @@
           
           <li>
             <a href="programs-basic-program.html"
-              class="">
+              class="active">
               Programs - Basic Program
             </a>
           </li>
           
           <li>
             <a href="texture-filtering.html"
-              class="active">
+              class="">
               Texture Filtering
             </a>
           </li>
@@ -79,7 +79,7 @@
     
   </div>
   <div class="col-md-9">
-    <h1>Texture Filtering</h1>
+    <h1>Programs - Basic Program</h1>
     
 
 <div class="panel">
@@ -93,26 +93,6 @@
       <canvas id="mainCanvas" style="width:100%;height:500px"></canvas>
 
       
-
-<form class="form-inline" role="form">
-  <div class="form-group">
-    <label for="texture-filter">Filter</label>
-    <select id="texture-filter" class="form-control">
-      <option>MinMagMipNearest</option>
-      <option>MinMagNearestMipLinear</option>
-      <option>MinNearestMagLinearMipNearest</option>
-      <option>MinNearestMagMipLinear</option>
-      <option>MinLinearMagMipNearest</option>
-      <option>MinLinearMagNearestMipLinear</option>
-      <option>MinMagLinearMipNearest</option>
-      <option>MinMagMipLinear</option>
-      <option>MinMagNearest</option>
-      <option>MinNearestMagLinear</option>
-      <option>MinLinearMagNearest</option>
-      <option>MinMagLinear</option>
-    </select>
-  </div>
-</form>
     </div>
     <div class="tab-pane" id="source">
       <pre class="hljs"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
@@ -127,8 +107,9 @@
   });
   program.enableDefaultLighting();
 
-  <span class="hljs-built_in">window</span>.texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  <span class="hljs-keyword">var</span> texture = Zia.Texture.createFromImagePath(graphicsDevice,
     <span class="hljs-string">'../assets/textures/UV_Grid_Sm.jpg'</span>);
+  program.texture = texture;
 
   <span class="hljs-keyword">var</span> cubeModel = Zia.GeometricPrimitive.convertToModel(
     graphicsDevice, Zia.GeometricPrimitive.createCube());
@@ -166,8 +147,6 @@
 
     modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(cubeRotation));
 
-    program.texture = <span class="hljs-built_in">window</span>.texture;
-
     cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
 
     <span class="hljs-keyword">var</span> currentTime = (<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>).getTime();
@@ -184,20 +163,12 @@
 
   requestAnimationFrame(drawScene);
 
-  <span class="hljs-keyword">var</span> textureFilterSelect = $(<span class="hljs-string">'#texture-filter'</span>);
-  textureFilterSelect.change(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-    <span class="hljs-built_in">window</span>.texture = Zia.Texture.createFromImagePath(graphicsDevice,
-      <span class="hljs-string">'../assets/textures/UV_Grid_Sm.jpg'</span>,
-      { filter: Zia.TextureFilter[textureFilterSelect.val()] });
-  });
-  textureFilterSelect.change();
-
 }, <span class="hljs-literal">false</span>);</pre>
     </div>
   </div>
 </div>
 
-<script type="text/javascript" src="../assets/js/example-texture-filtering.js"></script>
+<script type="text/javascript" src="../assets/js/example-programs-basic-program.js"></script>
   </div>
 </div>
 </div>

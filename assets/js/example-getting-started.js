@@ -5,74 +5,31 @@ document.addEventListener('DOMContentLoaded', function () {
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
   var program = new Zia.BasicProgram(graphicsDevice, {
-    vertexColorEnabled: true
+    lightingEnabled: true
   });
+  program.diffuseColor = new Zia.Vector3(0, 1, 1);
+  program.enableDefaultLighting();
 
-  var pyramidVertexPositionBuffer = new Zia.VertexBuffer(graphicsDevice,
-    new Zia.VertexDeclaration(
-    [
-      new Zia.VertexElement("aVertexPosition", 3, 0)
-    ]),
-    new Float32Array(
-    [
-      // Front face
-       0.0,  1.0,  0.0,
-      -1.0, -1.0,  1.0,
-       1.0, -1.0,  1.0,
+  var cubeModel = Zia.GeometricPrimitive.convertToModel(
+    graphicsDevice, Zia.GeometricPrimitive.createCube());
 
-      // Right face
-       0.0,  1.0,  0.0,
-       1.0, -1.0,  1.0,
-       1.0, -1.0, -1.0,
-
-      // Back face
-       0.0,  1.0,  0.0,
-       1.0, -1.0, -1.0,
-      -1.0, -1.0, -1.0,
-
-      // Left face
-       0.0,  1.0,  0.0,
-      -1.0, -1.0, -1.0,
-      -1.0, -1.0,  1.0
-    ]));
-
-  var pyramidVertexColorBuffer = new Zia.VertexBuffer(graphicsDevice,
-    new Zia.VertexDeclaration(
-    [
-      new Zia.VertexElement("aVertexColor", 4, 0)
-    ]),
-    new Float32Array(
-    [
-      // Front face
-      1.0, 0.0, 0.0, 1.0,
-      0.0, 1.0, 0.0, 1.0,
-      0.0, 0.0, 1.0, 1.0,
-
-      // Right face
-      1.0, 0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0, 1.0,
-      0.0, 1.0, 0.0, 1.0,
-
-      // Back face
-      1.0, 0.0, 0.0, 1.0,
-      0.0, 1.0, 0.0, 1.0,
-      0.0, 0.0, 1.0, 1.0,
-
-      // Left face
-      1.0, 0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0, 1.0,
-      0.0, 1.0, 0.0, 1.0
-    ]));
+  for (var i = 0; i < cubeModel.meshes.length; i++) {
+    var mesh = cubeModel.meshes[i];
+    for (var j = 0; j < mesh.meshParts.length; j++) {
+      mesh.meshParts[j].program = program;
+    }
+  }
 
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
-  var viewMatrix = new Zia.Matrix4().makeTranslation(0, 0, -4);
+  var viewMatrix = new Zia.Matrix4().makeLookAt(
+    new Zia.Vector3(0, 1, -2),
+    new Zia.Vector3(0, 0, 0),
+    new Zia.Vector3(0, 1, 0));
+  var modelMatrix = new Zia.Matrix4().identity();
 
-  var pyramidModelMatrix = new Zia.Matrix4().identity();
-
-  var pyramidRotationAxis = new Zia.Vector3(0, 1, 0);
-
-  var rotationPyramid = 0;
+  var rotationAxis = new Zia.Vector3(0, 1, 0);
+  var rotationAngle = 0;
 
   function drawScene() {
     if (graphicsDevice.resize()) {
@@ -85,27 +42,10 @@ document.addEventListener('DOMContentLoaded', function () {
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       new Zia.Color4(0, 0, 0, 1), 1);
 
-    program.view = viewMatrix;
-    program.projection = projectionMatrix;
+    modelMatrix.makeRotationAxis(rotationAxis,
+      Zia.Math.degToRad(rotationAngle));
 
-    // Draw pyramid.
-
-    graphicsDevice.setIndexBuffer(null);
-    graphicsDevice.setVertexBuffers(
-    [
-      pyramidVertexPositionBuffer,
-      pyramidVertexColorBuffer
-    ]);
-
-    pyramidModelMatrix.makeRotationAxis(pyramidRotationAxis,
-      Zia.Math.degToRad(rotationPyramid));
-
-    program.model = pyramidModelMatrix;
-    program.apply();
-
-    graphicsDevice.drawPrimitives(
-      Zia.PrimitiveType.TriangleList,
-      0, 12);
+    cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
   }
 
   var lastTime = 0;
@@ -114,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var timeNow = new Date().getTime();
     if (lastTime != 0) {
       var elapsed = timeNow - lastTime;
-      rotationPyramid += (90 * elapsed) / 1000.0;
+      rotationAngle += (50 * elapsed) / 1000.0;
     }
     lastTime = timeNow;
   }

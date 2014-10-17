@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   program.enableDefaultLighting();
 
-  window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  var texture = Zia.Texture.createFromImagePath(graphicsDevice,
     '../assets/textures/UV_Grid_Sm.jpg');
+  program.texture = texture;
 
   var cubeModel = Zia.GeometricPrimitive.convertToModel(
     graphicsDevice, Zia.GeometricPrimitive.createCube());
@@ -49,8 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(cubeRotation));
 
-    program.texture = window.texture;
-
     cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
 
     var currentTime = (new Date).getTime();
@@ -66,13 +65,5 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   requestAnimationFrame(drawScene);
-
-  var textureFilterSelect = $('#texture-filter');
-  textureFilterSelect.change(function() {
-    window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
-      '../assets/textures/UV_Grid_Sm.jpg',
-      { filter: Zia.TextureFilter[textureFilterSelect.val()] });
-  });
-  textureFilterSelect.change();
 
 }, false);

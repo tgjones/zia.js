@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Basic Primitives - Zia.js</title>
+    <title>Primitives - Zia.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="../assets/css/bootstrap.css" media="screen">
@@ -54,9 +54,16 @@
         <ul class="list-unstyled">
           
           <li>
-            <a href="basic-primitives.html"
+            <a href="primitives.html"
               class="active">
-              Basic Primitives
+              Primitives
+            </a>
+          </li>
+          
+          <li>
+            <a href="programs-basic-program.html"
+              class="">
+              Programs - Basic Program
             </a>
           </li>
           
@@ -72,7 +79,7 @@
     
   </div>
   <div class="col-md-9">
-    <h1>Basic Primitives</h1>
+    <h1>Primitives</h1>
     
 
 <div class="panel">
@@ -258,8 +265,8 @@
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
 
-    program.view = viewMatrix;
-    program.projection = projectionMatrix;
+    program.viewMatrix = viewMatrix;
+    program.projectionMatrix = projectionMatrix;
 
     <span class="hljs-comment">// Draw pyramid.</span>
 
@@ -274,7 +281,7 @@
     tempMatrix.makeRotationAxis(pyramidRotationAxis, Zia.Math.degToRad(rotationPyramid));
     pyramidModelMatrix.multiply(tempMatrix);
 
-    program.model = pyramidModelMatrix;
+    program.modelMatrix = pyramidModelMatrix;
     program.apply();
 
     graphicsDevice.drawPrimitives(
@@ -294,7 +301,7 @@
     tempMatrix.makeRotationAxis(cubeRotationAxis, Zia.Math.degToRad(rotationCube));
     cubeModelMatrix.multiply(tempMatrix);
 
-    program.model = cubeModelMatrix;
+    program.modelMatrix = cubeModelMatrix;
     program.apply();
 
     graphicsDevice.drawIndexedPrimitives(
@@ -327,7 +334,7 @@
   </div>
 </div>
 
-<script type="text/javascript" src="../assets/js/example-basic-primitives.js"></script>
+<script type="text/javascript" src="../assets/js/example-primitives.js"></script>
   </div>
 </div>
 </div>

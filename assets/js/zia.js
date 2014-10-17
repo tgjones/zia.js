@@ -1019,7 +1019,7 @@ Zia.Vector3.prototype = {
 
   },
 
-  cross: function ( v, w ) {
+  cross: function ( v ) {
 
     var x = this._x, y = this._y, z = this._z;
 
@@ -1723,6 +1723,288 @@ Zia.Math = {
  * THE SOFTWARE.
  */
 
+Zia.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+
+  this.elements = new Float32Array( 9 );
+
+  var te = this.elements;
+
+  te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 3 ] = n12 || 0; te[ 6 ] = n13 || 0;
+  te[ 1 ] = n21 || 0; te[ 4 ] = ( n22 !== undefined ) ? n22 : 1; te[ 7 ] = n23 || 0;
+  te[ 2 ] = n31 || 0; te[ 5 ] = n32 || 0; te[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
+
+};
+
+Zia.Matrix3.prototype = {
+
+  constructor: Zia.Matrix3,
+
+  set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+
+    var te = this.elements;
+
+    te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
+    te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
+    te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
+
+    return this;
+
+  },
+
+  identity: function () {
+
+    this.set(
+
+      1, 0, 0,
+      0, 1, 0,
+      0, 0, 1
+
+    );
+
+    return this;
+
+  },
+
+  copy: function ( m ) {
+
+    var me = m.elements;
+
+    this.set(
+
+      me[ 0 ], me[ 3 ], me[ 6 ],
+      me[ 1 ], me[ 4 ], me[ 7 ],
+      me[ 2 ], me[ 5 ], me[ 8 ]
+
+    );
+
+    return this;
+
+  },
+
+  applyToVector3Array: function () {
+
+    var v1 = new Zia.Vector3();
+
+    return function ( array, offset, length ) {
+
+      if ( offset === undefined ) offset = 0;
+      if ( length === undefined ) length = array.length;
+
+      for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+
+        v1.x = array[ j ];
+        v1.y = array[ j + 1 ];
+        v1.z = array[ j + 2 ];
+
+        v1.applyMatrix3( this );
+
+        array[ j ]     = v1.x;
+        array[ j + 1 ] = v1.y;
+        array[ j + 2 ] = v1.z;
+
+      }
+
+      return array;
+
+    };
+
+  }(),
+
+  multiplyScalar: function ( s ) {
+
+    var te = this.elements;
+
+    te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
+    te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
+    te[ 2 ] *= s; te[ 5 ] *= s; te[ 8 ] *= s;
+
+    return this;
+
+  },
+
+  determinant: function () {
+
+    var te = this.elements;
+
+    var a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
+      d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
+      g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
+
+    return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
+
+  },
+
+  getInverse: function ( matrix, throwOnNonInvertible ) {
+
+    // input: Zia.Matrix4
+    // ( based on http://code.google.com/p/webgl-mjs/ )
+
+    var me = matrix.elements;
+    var te = this.elements;
+
+    te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
+    te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
+    te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
+    te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
+    te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
+    te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
+    te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
+    te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
+    te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
+
+    var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
+
+    // no inverse
+
+    if ( det === 0 ) {
+
+      var msg = "Matrix3.getInverse(): can't invert matrix, determinant is 0";
+
+      if ( throwOnNonInvertible || false ) {
+
+        throw new Error( msg );
+
+      } else {
+
+        console.warn( msg );
+
+      }
+
+      this.identity();
+
+      return this;
+
+    }
+
+    this.multiplyScalar( 1.0 / det );
+
+    return this;
+
+  },
+
+  transpose: function () {
+
+    var tmp, m = this.elements;
+
+    tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
+    tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
+    tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
+
+    return this;
+
+  },
+
+  flattenToArrayOffset: function ( array, offset ) {
+
+    var te = this.elements;
+
+    array[ offset     ] = te[ 0 ];
+    array[ offset + 1 ] = te[ 1 ];
+    array[ offset + 2 ] = te[ 2 ];
+
+    array[ offset + 3 ] = te[ 3 ];
+    array[ offset + 4 ] = te[ 4 ];
+    array[ offset + 5 ] = te[ 5 ];
+
+    array[ offset + 6 ] = te[ 6 ];
+    array[ offset + 7 ] = te[ 7 ];
+    array[ offset + 8 ]  = te[ 8 ];
+
+    return array;
+
+  },
+
+  getNormalMatrix: function ( m ) {
+
+    // input: Zia.Matrix4
+
+    this.getInverse( m ).transpose();
+
+    return this;
+
+  },
+
+  transposeIntoArray: function ( r ) {
+
+    var m = this.elements;
+
+    r[ 0 ] = m[ 0 ];
+    r[ 1 ] = m[ 3 ];
+    r[ 2 ] = m[ 6 ];
+    r[ 3 ] = m[ 1 ];
+    r[ 4 ] = m[ 4 ];
+    r[ 5 ] = m[ 7 ];
+    r[ 6 ] = m[ 2 ];
+    r[ 7 ] = m[ 5 ];
+    r[ 8 ] = m[ 8 ];
+
+    return this;
+
+  },
+
+  fromArray: function ( array ) {
+
+    this.elements.set( array );
+
+    return this;
+
+  },
+
+  toArray: function () {
+
+    var te = this.elements;
+
+    return [
+      te[ 0 ], te[ 1 ], te[ 2 ],
+      te[ 3 ], te[ 4 ], te[ 5 ],
+      te[ 6 ], te[ 7 ], te[ 8 ]
+    ];
+
+  },
+
+  clone: function () {
+
+    var te = this.elements;
+
+    return new Zia.Matrix3(
+
+      te[ 0 ], te[ 3 ], te[ 6 ],
+      te[ 1 ], te[ 4 ], te[ 7 ],
+      te[ 2 ], te[ 5 ], te[ 8 ]
+
+    );
+
+  }
+
+};
+
+/**
+ * Original code from three.js project. https://github.com/mrdoob/three.js
+ * Original code published with the following license:
+ *
+ * The MIT License
+ * 
+ * Copyright &copy; 2010-2014 three.js authors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 Zia.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
   this.elements = new Float32Array( 16 );
@@ -1776,13 +2058,6 @@ Zia.Matrix4.prototype = {
     this.elements.set( m.elements );
 
     return this;
-
-  },
-
-  extractPosition: function ( m ) {
-
-    console.warn( 'ZiaMatrix4: .extractPosition() has been renamed to .copyPosition().' );
-    return this.copyPosition( m );
 
   },
 
@@ -1995,7 +2270,7 @@ Zia.Matrix4.prototype = {
 
   },
 
-  lookAt: function () {
+  makeLookAt: function () {
 
     var x = new Zia.Vector3();
     var y = new Zia.Vector3();
@@ -2005,29 +2280,18 @@ Zia.Matrix4.prototype = {
 
       var te = this.elements;
 
-      z.subVectors( eye, target ).normalize();
+      z.subVectors(eye, target).normalize();
+      x.crossVectors(up, z).normalize();
+      y.crossVectors(z, x);
 
-      if ( z.length() === 0 ) {
+      var translateX = x.dot(eye);
+      var translateY = y.dot(eye);
+      var translateZ = z.dot(eye);
 
-        z.z = 1;
-
-      }
-
-      x.crossVectors( up, z ).normalize();
-
-      if ( x.length() === 0 ) {
-
-        z.x += 0.0001;
-        x.crossVectors( up, z ).normalize();
-
-      }
-
-      y.crossVectors( z, x );
-
-
-      te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
-      te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
-      te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
+      te[0] = x.x; te[4] = x.y; te[8] = x.z;  te[12] = -translateX;
+      te[1] = y.x; te[5] = y.y; te[9] = y.z;  te[13] = -translateY;
+      te[2] = z.x; te[6] = z.y; te[10] = z.z; te[14] = -translateZ;
+      te[3] = 0;   te[7] = 0;   te[11] = 0;   te[15] = 1;
 
       return this;
 
@@ -2245,7 +2509,7 @@ Zia.Matrix4.prototype = {
 
   },
 
-  getInverse: function ( m, throwOnInvertible ) {
+  getInverse: function ( m, throwOnNonInvertible ) {
 
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     var te = this.elements;
@@ -2279,7 +2543,7 @@ Zia.Matrix4.prototype = {
 
       var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-      if ( throwOnInvertible || false ) {
+      if ( throwOnNonInvertible || false ) {
 
         throw new Error( msg );
 
@@ -3596,6 +3860,62 @@ Zia.Vector4.prototype = {
 
 };
 
+Zia.GeometricPrimitive = {
+
+  convertToModel: function(graphicsDevice, primitive) {
+    var vertexData = [];
+    for (var i = 0; i < primitive.positions.length; i++) {
+      vertexData.push(primitive.positions[i].x);
+      vertexData.push(primitive.positions[i].y);
+      vertexData.push(primitive.positions[i].z);
+      vertexData.push(primitive.normals[i].x);
+      vertexData.push(primitive.normals[i].y);
+      vertexData.push(primitive.normals[i].z);
+      vertexData.push(primitive.textureCoordinates[i].x);
+      vertexData.push(primitive.textureCoordinates[i].y);
+    }
+
+    var vertices = new Float32Array(vertexData);
+
+    var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
+      new Zia.VertexDeclaration(
+      [
+        new Zia.VertexElement("aVertexPosition", 3, 0),
+        new Zia.VertexElement("aVertexNormal", 3, 3 * 4),
+        new Zia.VertexElement("aTextureCoord", 2, 6 * 4)
+      ]),
+      vertices);
+
+    var indexBuffer = new Zia.IndexBuffer(graphicsDevice,
+      new Uint16Array(primitive.indices));
+
+    var program = new Zia.BasicProgram(graphicsDevice);
+
+    var model = new Zia.Model(
+      [
+        new Zia.ModelMesh(graphicsDevice,
+          [
+            new Zia.ModelMeshPart({
+              indexBuffer: indexBuffer,
+              startIndex: 0,
+              indexCount: primitive.indices.length,
+              vertexBuffer: vertexBuffer
+            })
+          ])
+      ]);
+
+    for (var i = 0; i < model.meshes.length; i++) {
+      var mesh = model.meshes[i];
+      for (var j = 0; j < mesh.meshParts.length; j++) {
+        mesh.meshParts[j].program = program;
+      }
+    }
+
+    return model;
+  }
+
+};
+
 (function() {
 
   // From http://bocoup.com/weblog/counting-uniforms-in-webgl/
@@ -3735,147 +4055,147 @@ Zia.Program.prototype = {
 
 };
 
-(function () {
-  function buildVertexShader(options) {
-    var result = [];
+// Based on EffectHelpers from XNA. Original licence follows:
+//-----------------------------------------------------------------------------
+// EffectHelpers.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
 
-    result.push("precision mediump float;");
+Zia.ProgramDirtyFlags = {
+  ModelViewProj : 1,
+  Model         : 2,
+  EyePosition   : 4,
+  MaterialColor : 8,
+  All           : -1
+};
 
-    // Attributes
-    result.push("attribute vec3 aVertexPosition;");
-    if (options.vertexColorEnabled) {
-      result.push("attribute vec4 aVertexColor;");
-    }
-    if (options.textureEnabled) {
-      result.push("attribute vec2 aTextureCoord;");
-    }
+Zia.ProgramUtil = {
 
-    // Uniforms
-    result.push("uniform mat4 uMVPMatrix;");
-    result.push("uniform vec4 uDiffuseColor;");
+  /** Sets up the standard key/fill/back lighting rig. */
+  enableDefaultLighting: function(light0, light1, light2) {
+    // Key light.
+    light0.direction = new Zia.Vector3(-0.5265408, -0.5735765, -0.6275069);
+    light0.diffuseColor = new Zia.Vector3(1, 0.9607844, 0.8078432);
+    light0.specularColor = new Zia.Vector3(1, 0.9607844, 0.8078432);
+    light0.enabled = true;
 
-    // Varyings
-    result.push("varying vec4 vDiffuseColor;");
-    if (options.textureEnabled) {
-      result.push("varying vec2 vTextureCoord;");
-    }
+    // Fill light.
+    light1.direction = new Zia.Vector3(0.7198464, 0.3420201, 0.6040227);
+    light1.diffuseColor = new Zia.Vector3(0.9647059, 0.7607844, 0.4078432);
+    light1.specularColor = new Zia.Vector3();
+    light1.enabled = true;
 
-    // Code
-    result.push("void main(void) {");
-    result.push("  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);");
-    result.push("  vDiffuseColor = uDiffuseColor;");
-    if (options.vertexColorEnabled) {
-      result.push("  vDiffuseColor *= aVertexColor;");
-    }
-    if (options.textureEnabled) {
-      result.push("  vTextureCoord = aTextureCoord;");
-    }
-    result.push("}");
-    
-    return result.join('\n');
-  }
+    // Back light.
+    light2.direction = new Zia.Vector3(0.4545195, -0.7660444, 0.4545195);
+    light2.diffuseColor = new Zia.Vector3(0.3231373, 0.3607844, 0.3937255);
+    light2.specularColor = new Zia.Vector3(0.3231373, 0.3607844, 0.3937255);
+    light2.enabled = true;
 
-  function buildFragmentShader(options) {
-    var result = [];
-
-    result.push("precision mediump float;");
-
-    result.push("varying vec4 vDiffuseColor;");
-
-    if (options.textureEnabled) {
-      result.push("varying vec2 vTextureCoord;");
-      result.push("uniform sampler2D uSampler;");
-    }
-
-    result.push("void main(void) {");
-    result.push("  vec4 color = vDiffuseColor;");
-
-    if (options.textureEnabled) {
-      result.push("  color *= texture2D(uSampler, vTextureCoord);");
-    }
-
-    result.push("  gl_FragColor = color;");
-    result.push("}");
-
-    return result.join('\n');
-  }
-
-  Zia.BasicProgram = function (graphicsDevice, options) {
-    this.model = new Zia.Matrix4();
-    this.view = new Zia.Matrix4();
-    this.projection = new Zia.Matrix4();
-    this.diffuseColor = new Zia.Vector3(1, 1, 1);
-    this.alpha = 1;
-    this.texture = null;
-
-    options = Zia.ObjectUtil.reverseMerge(options || {}, {
-      textureEnabled: false,
-      vertexColorEnabled: false
-    });
-
-    var vertexShader = new Zia.VertexShader(graphicsDevice, buildVertexShader(options));
-    var fragmentShader = new Zia.FragmentShader(graphicsDevice, buildFragmentShader(options));
-
-    Zia.Program.call(this, graphicsDevice, vertexShader, fragmentShader);
-  };
-})();
-
-Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
-  model: {
-    get: function() { return this._model; },
-    set: function(v) { this._model = v; this._matrixChanged = true; }
+    // Ambient light.
+    return new Zia.Vector3(0.05333332, 0.09882354, 0.1819608);
   },
 
-  view: {
-    get: function() { return this._view; },
-    set: function(v) { this._view = v; this._matrixChanged = true; }
-  },
+  /** Lazily recomputes the model+view+projection matrix based on
+   *  the current effect parameter settings.
+   */
+  setModelViewProj: (function() {
+    var modelViewProjectionMatrix = new Zia.Matrix4();
 
-  projection: {
-    get: function() { return this._projection;; },
-    set: function(v) { this._projection = v; this._matrixChanged = true; }
-  },
+    return function(program, dirtyFlags, model, view, projection, modelView) {
+      // Recompute the model+view+projection matrix?
+      if ((dirtyFlags & Zia.ProgramDirtyFlags.ModelViewProj) != 0) {
+        modelView.multiplyMatrices(view, model);
+        modelViewProjectionMatrix.multiplyMatrices(projection, modelView);
+        program.setUniform('uMVPMatrix', modelViewProjectionMatrix);
+          
+        dirtyFlags &= ~Zia.ProgramDirtyFlags.ModelViewProj;
+      }
+      return dirtyFlags;
+    };
+  })(),
 
-  diffuseColor: {
-    get: function() { return this._diffuseColor; },
-    set: function(v) { this._diffuseColor = v; this._diffuseColorChanged = true; }
-  },
+  /** Sets the diffuse/emissive/alpha material color parameters. */
+  setMaterialColor: function(program, lightingEnabled, alpha, diffuseColor, emissiveColor, ambientLightColor) {
+    // Desired lighting model:
+    //
+    //     ((AmbientLightColor + sum(diffuse directional light)) * DiffuseColor) + EmissiveColor
+    //
+    // When lighting is disabled, ambient and directional lights are ignored, leaving:
+    //
+    //     DiffuseColor + EmissiveColor
+    //
+    // For the lighting disabled case, we can save one shader instruction by precomputing
+    // diffuse+emissive on the CPU, after which the shader can use DiffuseColor directly,
+    // ignoring its emissive parameter.
+    //
+    // When lighting is enabled, we can merge the ambient and emissive settings. If we
+    // set our emissive parameter to emissive+(ambient*diffuse), the shader no longer
+    // needs to bother adding the ambient contribution, simplifying its computation to:
+    //
+    //     (sum(diffuse directional light) * DiffuseColor) + EmissiveColor
+    //
+    // For further optimization goodness, we merge material alpha with the diffuse
+    // color parameter, and premultiply all color values by this alpha.
+            
+    if (lightingEnabled) {
+      var diffuse = new Zia.Vector4(
+        diffuseColor.x * alpha, 
+        diffuseColor.y * alpha, 
+        diffuseColor.z * alpha, 
+        alpha);
 
-  alpha: {
-    get: function() { return this._alpha; },
-    set: function(v) { this._alpha = v; this._diffuseColorChanged = true; }
-  },
+      var emissive = new Zia.Vector3(
+       (emissiveColor.x + ambientLightColor.x * diffuseColor.x) * alpha,
+       (emissiveColor.y + ambientLightColor.y * diffuseColor.y) * alpha,
+       (emissiveColor.z + ambientLightColor.z * diffuseColor.z) * alpha);
 
-  texture: {
-    get: function() { return this._texture; },
-    set: function(v) { this._texture = v; this._textureChanged = true; }
-  },
-});
-
-Zia.BasicProgram.prototype._onApply = (function() {
-  var modelViewProjectionMatrix = new Zia.Matrix4();
-  var diffuseColor = new Zia.Vector4();
-
-  return function() {
-    if (this._matrixChanged) {
-      modelViewProjectionMatrix.multiplyMatrices(this._projection, this._view);
-      modelViewProjectionMatrix.multiply(this._model);
-      this.setUniform('uMVPMatrix', modelViewProjectionMatrix);
-
-      this._matrixChanged = false;
+      program.setUniform('uDiffuseColor', diffuse);
+      program.setUniform('uEmissiveColor', emissive);
     }
+    else
+    {
+      var diffuse = new Zia.Vector4(
+        (diffuseColor.x + emissiveColor.x) * alpha,
+        (diffuseColor.y + emissiveColor.y) * alpha,
+        (diffuseColor.z + emissiveColor.z) * alpha,
+        alpha);
 
-    if (this._diffuseColorChanged) {
-      var diffuse = this._diffuseColor;
-      diffuseColor.set(diffuse.x, diffuse.y, diffuse.z, this._alpha);
-      this.setUniform('uDiffuseColor', diffuseColor);
+      program.setUniform('uDiffuseColor', diffuse);
     }
+  },
 
-    if (this._textureChanged) {
-      this.setUniform('uSampler', this._texture);
+  setLightingMatrices: (function() {
+    var modelInverseTransposeMatrix = new Zia.Matrix3();
+    var viewInverseMatrix = new Zia.Matrix4();
+    var eyePosition = new Zia.Vector3();
+
+    return function(program, dirtyFlags, model, view) {
+      // Set the world and world inverse transpose matrices.
+      if ((dirtyFlags & Zia.ProgramDirtyFlags.Model) != 0) {
+        program.setUniform('uMMatrix', model);
+
+        modelInverseTransposeMatrix.getNormalMatrix(model);
+        program.setUniform('uMMatrixInverseTranspose', modelInverseTransposeMatrix);
+          
+        dirtyFlags &= ~Zia.ProgramDirtyFlags.Model;
+      }
+
+      // Set the eye position.
+      if ((dirtyFlags & Zia.ProgramDirtyFlags.EyePosition) != 0) {
+        viewInverseMatrix.getInverse(view);
+        eyePosition.setFromMatrixColumn(3, viewInverseMatrix);
+        program.setUniform('uEyePosition', eyePosition);
+
+        dirtyFlags &= ~Zia.ProgramDirtyFlags.EyePosition;
+      }
+
+      return dirtyFlags;
     }
-  };
-})();
+  })()                                   
+
+};
 
 Zia.Comparison = {
   Never: 0,
@@ -3951,10 +4271,6 @@ Zia.GraphicsDevice = function (canvas, debug) {
     gl = this._gl = Zia.DebugUtil.makeDebugContext(gl);
   }
 
-  // TODO: Move this to somewhere else.
-  gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
-
   // TODO: Handle WebContextLost event.
   
   var viewport = this._viewport = new Zia.Viewport(
@@ -4020,6 +4336,10 @@ Zia.GraphicsDevice.prototype = {
 
   setVertexBuffers: function (vertexBuffers) {
     this._vertexBuffers = vertexBuffers;
+  },
+
+  setVertexBuffer: function(vertexBuffer) {
+    this._vertexBuffers = [vertexBuffer];
   },
 
   drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
@@ -4139,6 +4459,122 @@ Zia.IndexBuffer.prototype = {
 
   destroy: function() {
     this._gl.deleteBuffer(this._buffer);
+  }
+
+};
+
+Zia.Model = function(meshes) {
+  this.meshes = meshes;
+};
+
+Zia.Model.prototype = {
+
+  draw: function(modelMatrix, viewMatrix, projectionMatrix) {
+    for (var i = 0; i < this.meshes.length; i++) {
+      var mesh = this.meshes[i];
+
+      for (var j = 0; j < mesh.programs.length; j++) {
+        var program = mesh.programs[j];
+
+        program.modelMatrix = modelMatrix;
+        program.viewMatrix = viewMatrix;
+        program.projectionMatrix = projectionMatrix;
+      }
+
+      mesh.draw();
+    }
+  }
+
+};
+
+Zia.ModelMesh = function(graphicsDevice, meshParts) {
+  this.graphicsDevice = graphicsDevice;
+  this.meshParts = meshParts;
+
+  for (var i = 0; i < meshParts.length; i++) {
+    meshParts[i]._parent = this;
+  }
+
+  this.programs = [];
+}
+
+Zia.ModelMesh.prototype = {
+
+  draw: function() {
+
+    for (var i = 0; i < this.meshParts.length; i++) {
+
+      var meshPart = this.meshParts[i];
+      var program = meshPart.program;
+
+      if (meshPart.indexCount > 0) {
+
+        this.graphicsDevice.setVertexBuffer(meshPart.vertexBuffer);
+        this.graphicsDevice.setIndexBuffer(meshPart.indexBuffer);
+
+        program.apply();
+
+        this.graphicsDevice.drawIndexedPrimitives(
+          Zia.PrimitiveType.TriangleList,
+          meshPart.startIndex, meshPart.indexCount);
+
+      }
+
+    }
+
+  }
+
+};
+
+Zia.ModelMeshPart = function(options) {
+  options = Zia.ObjectUtil.reverseMerge(options || {}, {
+    indexBuffer: null,
+    startIndex: 0,
+    indexCount: 0,
+    vertexBuffer: null
+  });
+
+  this.indexBuffer = options.indexBuffer;
+  this.startIndex = options.startIndex;
+  this.indexCount = options.indexCount;
+  this.vertexBuffer = options.vertexBuffer;
+
+  this._program = null;
+  this._parent = null;
+};
+
+
+Zia.ModelMeshPart.prototype = {
+
+  get program() { return this._program; },
+
+  set program(value) {
+    if (value === this._program)
+      return;
+
+    if (this._program) {
+      // First check to see if any other parts are using this program.
+      var removeProgram = true;
+
+      for (var i = 0; i < this._parent.meshParts.length; i++) {
+        var meshPart = this._parent.meshParts[i];
+        if (meshPart !== this && meshPart._program === this._program) {
+          removeProgram = false;
+          break;
+        }
+      }
+
+      if (removeProgram) {
+        var programIndex = this._parent.programs.indexOf(this._program);
+        if (programIndex >= 0) {
+          this._parent.programs.splice(programIndex, 1);
+        }
+      }
+    }
+
+    // Set the new program.
+    this._program = value;
+    this._parent.programs.push(value); // TODO: Check for duplicates?
   }
 
 };
@@ -4542,61 +4978,573 @@ Zia.Viewport.prototype = {
   },
 };
 
-Zia.BoxPrimitive = {
-  vertexDeclaration: new Zia.VertexDeclaration(
-    [
-      new Zia.VertexElement("aVertexPosition", 3, 0),
-      new Zia.VertexElement("aTextureCoord", 2, 3 * 4)
-    ]),
+// -----------------------------------------------------------------------------
+// The following code is a port of SharpDX https://github.com/sharpdx/sharpdx
+// -----------------------------------------------------------------------------
+// Copyright (c) 2010-2014 SharpDX - Alexandre Mutel
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+// -----------------------------------------------------------------------------
+// The following code is a port of DirectXTk http://directxtk.codeplex.com
+// -----------------------------------------------------------------------------
+// Microsoft Public License (Ms-PL)
+//
+// This license governs use of the accompanying software. If you use the 
+// software, you accept this license. If you do not accept the license, do not
+// use the software.
+//
+// 1. Definitions
+// The terms "reproduce," "reproduction," "derivative works," and 
+// "distribution" have the same meaning here as under U.S. copyright law.
+// A "contribution" is the original software, or any additions or changes to 
+// the software.
+// A "contributor" is any person that distributes its contribution under this 
+// license.
+// "Licensed patents" are a contributor's patent claims that read directly on 
+// its contribution.
+//
+// 2. Grant of Rights
+// (A) Copyright Grant- Subject to the terms of this license, including the 
+// license conditions and limitations in section 3, each contributor grants 
+// you a non-exclusive, worldwide, royalty-free copyright license to reproduce
+// its contribution, prepare derivative works of its contribution, and 
+// distribute its contribution or any derivative works that you create.
+// (B) Patent Grant- Subject to the terms of this license, including the license
+// conditions and limitations in section 3, each contributor grants you a 
+// non-exclusive, worldwide, royalty-free license under its licensed patents to
+// make, have made, use, sell, offer for sale, import, and/or otherwise dispose
+// of its contribution in the software or derivative works of the contribution 
+// in the software.
+//
+// 3. Conditions and Limitations
+// (A) No Trademark License- This license does not grant you rights to use any 
+// contributors' name, logo, or trademarks.
+// (B) If you bring a patent claim against any contributor over patents that 
+// you claim are infringed by the software, your patent license from such 
+// contributor to the software ends automatically.
+// (C) If you distribute any portion of the software, you must retain all 
+// copyright, patent, trademark, and attribution notices that are present in the
+// software.
+// (D) If you distribute any portion of the software in source code form, you 
+// may do so only under this license by including a complete copy of this 
+// license with your distribution. If you distribute any portion of the software
+// in compiled or object code form, you may only do so under a license that 
+// complies with this license.
+// (E) The software is licensed "as-is." You bear the risk of using it. The
+// contributors give no express warranties, guarantees or conditions. You may
+// have additional consumer rights under your local laws which this license 
+// cannot change. To the extent permitted under your local laws, the 
+// contributors exclude the implied warranties of merchantability, fitness for a
+// particular purpose and non-infringement.
 
-  vertices: new Float32Array(
-    [
-      // Front face
-      -1.0, -1.0,  1.0,   0.0,  0.0,
-       1.0, -1.0,  1.0,   1.0,  0.0,
-       1.0,  1.0,  1.0,   1.0,  1.0,
-      -1.0,  1.0,  1.0,   0.0,  1.0,
-      
-      // Back face
-      -1.0, -1.0, -1.0,   0.0,  0.0,
-      -1.0,  1.0, -1.0,   1.0,  0.0,
-       1.0,  1.0, -1.0,   1.0,  1.0,
-       1.0, -1.0, -1.0,   0.0,  1.0,
-      
-      // Top face
-      -1.0,  1.0, -1.0,   0.0,  0.0,
-      -1.0,  1.0,  1.0,   1.0,  0.0,
-       1.0,  1.0,  1.0,   1.0,  1.0,
-       1.0,  1.0, -1.0,   0.0,  1.0,
-      
-      // Bottom face
-      -1.0, -1.0, -1.0,   0.0,  0.0,
-       1.0, -1.0, -1.0,   1.0,  0.0,
-       1.0, -1.0,  1.0,   1.0,  1.0,
-      -1.0, -1.0,  1.0,   0.0,  1.0,
-      
-      // Right face
-       1.0, -1.0, -1.0,   0.0,  0.0,
-       1.0,  1.0, -1.0,   1.0,  0.0,
-       1.0,  1.0,  1.0,   1.0,  1.0,
-       1.0, -1.0,  1.0,   0.0,  1.0,
-      
-      // Left face
-      -1.0, -1.0, -1.0,   0.0,  0.0,
-      -1.0, -1.0,  1.0,   1.0,  0.0,
-      -1.0,  1.0,  1.0,   1.0,  1.0,
-      -1.0,  1.0, -1.0,   0.0,  1.0
-    ]),
+(function() {
 
-  indices: new Uint16Array(
-    [
-      0,  1,  2,      0,  2,  3,    // front
-      4,  5,  6,      4,  6,  7,    // back
-      8,  9,  10,     8,  10, 11,   // top
-      12, 13, 14,     12, 14, 15,   // bottom
-      16, 17, 18,     16, 18, 19,   // right
-      20, 21, 22,     20, 22, 23    // left
-    ])
+  var cubeFaceCount = 6;
+
+  var faceNormals = [
+    new Zia.Vector3(0, 0, 1),
+    new Zia.Vector3(0, 0, -1),
+    new Zia.Vector3(1, 0, 0),
+    new Zia.Vector3(-1, 0, 0),
+    new Zia.Vector3(0, 1, 0),
+    new Zia.Vector3(0, -1, 0)
+  ];
+
+  var textureCoordinates = [
+    new Zia.Vector2(1, 1),
+    new Zia.Vector2(1, 0),
+    new Zia.Vector2(0, 0),
+    new Zia.Vector2(0, 1)
+  ];
+
+  var side1 = new Zia.Vector3();
+  var side2 = new Zia.Vector3();
+
+  /** A cube has six faces, each one pointing in a different direction. */
+  Zia.GeometricPrimitive.createCube = function(size) {
+    if (size === undefined) {
+      size = 1.0;
+    }
+
+    var positions = [];
+    var normals = [];
+    var texCoords = [];
+    var indices = [];
+
+    size /= 2.0;
+
+    // Create each face in turn.
+    for (var i = 0; i < cubeFaceCount; i++) {
+      var normal = faceNormals[i];
+
+      // Get two vectors perpendicular both to the face normal and to each other.
+      var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
+
+      side1.set(normal.x, normal.y, normal.z);
+      side1.cross(basis);
+
+      side2.set(normal.x, normal.y, normal.z);
+      side2.cross(side1);
+
+      // Six indices (two triangles) per face.
+      var vbase = i * 4;
+      indices.push(vbase + 0);
+      indices.push(vbase + 2);
+      indices.push(vbase + 1);
+
+      indices.push(vbase + 0);
+      indices.push(vbase + 3);
+      indices.push(vbase + 2);
+
+      // Four vertices per face.
+
+      // (normal - side1 - side2) * size
+      positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
+
+      // (normal - side1 + side2) * size
+      positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));
+
+      // (normal + side1 + side2) * size
+      positions.push(normal.clone().add(side1).add(side2).multiplyScalar(size));
+
+      // (normal + side1 - side2) * size
+      positions.push(normal.clone().add(side1).sub(side2).multiplyScalar(size));
+
+      normals.push(normal);
+      normals.push(normal);
+      normals.push(normal);
+      normals.push(normal);
+
+      texCoords.push(textureCoordinates[0]);
+      texCoords.push(textureCoordinates[1]);
+      texCoords.push(textureCoordinates[2]);
+      texCoords.push(textureCoordinates[3]);
+    }
+
+    return {
+      positions: positions,
+      normals: normals,
+      textureCoordinates: texCoords,
+      indices: indices
+    };
+  };
+
+})();
+
+(function () {
+  function addLighting(result) {
+    result.push("uniform vec3 uDirLight0Direction;");
+    result.push("uniform vec3 uDirLight0DiffuseColor;");
+    result.push("uniform vec3 uDirLight0SpecularColor;");
+
+    result.push("uniform vec3 uDirLight1Direction;");
+    result.push("uniform vec3 uDirLight1DiffuseColor;");
+    result.push("uniform vec3 uDirLight1SpecularColor;");
+
+    result.push("uniform vec3 uDirLight2Direction;");
+    result.push("uniform vec3 uDirLight2DiffuseColor;");
+    result.push("uniform vec3 uDirLight2SpecularColor;");
+
+    result.push("uniform vec3 uEyePosition;");
+
+    result.push("varying vec3 vPositionWS;");
+    result.push("varying vec3 vNormalWS;");
+
+    result.push("struct ColorPair {");
+    result.push("  vec3 Diffuse;");
+    result.push("  vec3 Specular;");
+    result.push("};");
+
+    result.push("ColorPair ComputeLights(vec3 eyeVector, vec3 worldNormal) {");
+    result.push("  mat3 lightDirections;");
+    result.push("  mat3 lightDiffuse;");
+    result.push("  mat3 lightSpecular;");
+    result.push("  mat3 halfVectors;");
+
+    result.push("  for (int i = 0; i < 3; i++) {");
+    result.push("    lightDirections[i] = mat3(uDirLight0Direction,     uDirLight1Direction,     uDirLight2Direction)    [i];");
+    result.push("    lightDiffuse[i]    = mat3(uDirLight0DiffuseColor,  uDirLight1DiffuseColor,  uDirLight2DiffuseColor) [i];");
+    result.push("    lightSpecular[i]   = mat3(uDirLight0SpecularColor, uDirLight1SpecularColor, uDirLight2SpecularColor)[i];");
+    result.push("    halfVectors[i] = normalize(eyeVector - lightDirections[i]);");
+    result.push("  }");
+
+    result.push("  vec3 dotL = worldNormal * -lightDirections;");
+    result.push("  vec3 dotH = worldNormal * halfVectors;");
+
+    result.push("  vec3 zeroL = step(vec3(0.0), dotL);");
+
+    result.push("  vec3 diffuse  = zeroL * dotL;");
+    result.push("  vec3 specular = pow(max(dotH, vec3(0.0)) * zeroL, vec3(uSpecularPower));");
+
+    result.push("  ColorPair result;");
+
+    result.push("  result.Diffuse  = (lightDiffuse * diffuse)  * uDiffuseColor.rgb + uEmissiveColor;");
+    result.push("  result.Specular = (lightSpecular * specular) * uSpecularColor;");
+
+    result.push("  return result;");
+    result.push("}");
+  }
+
+  function buildVertexShader(options) {
+    var result = [];
+
+    result.push("precision mediump float;");
+
+    // Attributes
+    result.push("attribute vec3 aVertexPosition;");
+    if (options.lightingEnabled) {
+      result.push("attribute vec3 aVertexNormal;");
+    }
+    if (options.vertexColorEnabled) {
+      result.push("attribute vec4 aVertexColor;");
+    }
+    if (options.textureEnabled) {
+      result.push("attribute vec2 aTextureCoord;");
+    }
+
+    // Uniforms
+    result.push("uniform mat4 uMVPMatrix;");
+    if (options.lightingEnabled) {
+      result.push("uniform mat4 uMMatrix;");
+      result.push("uniform mat3 uMMatrixInverseTranspose;");
+    }
+    result.push("uniform vec4 uDiffuseColor;");
+
+    // Varyings
+    result.push("varying vec4 vDiffuseColor;");
+    if (options.lightingEnabled) {
+      result.push("varying vec3 vPositionWS;");
+      result.push("varying vec3 vNormalWS;");
+    }
+    if (options.textureEnabled) {
+      result.push("varying vec2 vTextureCoord;");
+    }
+
+    // Code
+    result.push("void main(void) {");
+    result.push("  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);");
+    if (options.lightingEnabled) {
+      result.push("  vDiffuseColor = vec4(1, 1, 1, uDiffuseColor.a);");
+      result.push("  vPositionWS = (uMMatrix * vec4(aVertexPosition, 1.0)).xyz;");
+      result.push("  vNormalWS = normalize(uMMatrixInverseTranspose * aVertexNormal);");
+    } else {
+      result.push("  vDiffuseColor = uDiffuseColor;");
+    }
+    if (options.vertexColorEnabled) {
+      result.push("  vDiffuseColor *= aVertexColor;");
+    }
+    if (options.textureEnabled) {
+      result.push("  vTextureCoord = aTextureCoord;");
+    }
+    result.push("}");
+    
+    return result.join('\n');
+  }
+
+  function buildFragmentShader(options) {
+    var result = [];
+
+    result.push("precision mediump float;");
+
+    result.push("varying vec4 vDiffuseColor;");
+
+    if (options.textureEnabled) {
+      result.push("varying vec2 vTextureCoord;");
+      result.push("uniform sampler2D uSampler;");
+    }
+
+    if (options.lightingEnabled) {
+      result.push("uniform vec4 uDiffuseColor;");
+      result.push("uniform vec3 uEmissiveColor;");
+      result.push("uniform vec3 uSpecularColor;");
+      result.push("uniform float uSpecularPower;");
+
+      addLighting(result);
+    }
+
+    result.push("void main(void) {");
+    result.push("  vec4 color = vDiffuseColor;");
+
+    if (options.textureEnabled) {
+      result.push("  color *= texture2D(uSampler, vTextureCoord);");
+    }
+
+    if (options.lightingEnabled) {
+      result.push("  vec3 eyeVector = normalize(uEyePosition - vPositionWS);");
+      result.push("  vec3 worldNormal = normalize(vNormalWS);");
+      result.push("  ColorPair lightResult = ComputeLights(eyeVector, worldNormal);");
+      result.push("  color.rgb *= lightResult.Diffuse;");
+    }
+
+    result.push("  gl_FragColor = color;");
+    result.push("}");
+
+    return result.join('\n');
+  }
+
+  Zia.BasicProgram = function (graphicsDevice, options) {
+    this._dirtyFlags = Zia.ProgramDirtyFlags.All;
+
+    this.modelMatrix = new Zia.Matrix4();
+    this.viewMatrix = new Zia.Matrix4();
+    this.projectionMatrix = new Zia.Matrix4();
+    this._modelView = new Zia.Matrix4();
+    this.diffuseColor = new Zia.Vector3(1, 1, 1);
+    this.emissiveColor = new Zia.Vector3();
+    this.ambientLightColor = new Zia.Vector3();
+    this.alpha = 1;
+    this.texture = null;
+
+    this._directionalLight0 = new Zia.DirectionalLight(this, 0);
+    this._directionalLight1 = new Zia.DirectionalLight(this, 1);
+    this._directionalLight2 = new Zia.DirectionalLight(this, 2);
+
+    options = Zia.ObjectUtil.reverseMerge(options || {}, {
+      lightingEnabled: false,
+      textureEnabled: false,
+      vertexColorEnabled: false
+    });
+    this._options = options;
+
+    var vertexShader = new Zia.VertexShader(graphicsDevice, buildVertexShader(options));
+    var fragmentShader = new Zia.FragmentShader(graphicsDevice, buildFragmentShader(options));
+
+    Zia.Program.call(this, graphicsDevice, vertexShader, fragmentShader);
+  };
+})();
+
+(function() {
+  var DF = Zia.ProgramDirtyFlags;
+
+  Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
+    modelMatrix: {
+      get: function() { return this._modelMatrix; },
+      set: function(v) {
+        this._modelMatrix = v;
+        this._dirtyFlags |= DF.Model | DF.ModelViewProj | DF.Fog;
+      }
+    },
+
+    viewMatrix: {
+      get: function() { return this._viewMatrix; },
+      set: function(v) {
+        this._viewMatrix = v;
+        this._dirtyFlags |= DF.ModelViewProj | DF.EyePosition | DF.Fog;
+      }
+    },
+
+    projectionMatrix: {
+      get: function() { return this._projectionMatrix; },
+      set: function(v) {
+        this._projectionMatrix = v;
+        this._dirtyFlags |= DF.ModelViewProj;
+      }
+    },
+
+    diffuseColor: {
+      get: function() { return this._diffuseColor; },
+      set: function(v) {
+        this._diffuseColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    emissiveColor: {
+      get: function() { return this._emissiveColor; },
+      set: function(v) {
+        this._emissiveColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    ambientLightColor: {
+      get: function() { return this._ambientLightColor; },
+      set: function(v) {
+        this._ambientLightColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    alpha: {
+      get: function() { return this._alpha; },
+      set: function(v) {
+        this._alpha = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    texture: {
+      get: function() { return this._texture; },
+      set: function(v) {
+        this._texture = v;
+        this._textureChanged = true;
+      }
+    },
+
+    directionalLight0: {
+      get: function() { return this._directionalLight0; }
+    },
+
+    directionalLight1: {
+      get: function() { return this._directionalLight1; }
+    },
+
+    directionalLight2: {
+      get: function() { return this._directionalLight2; }
+    }
+  });
+
+  Zia.BasicProgram.prototype.enableDefaultLighting = function() {
+    if (!this._options.lightingEnabled) {
+      throw "Lighting must be enabled when creating this program.";
+    }
+
+    this.ambientLightColor = Zia.ProgramUtil.enableDefaultLighting(
+      this._directionalLight0,
+      this._directionalLight1,
+      this._directionalLight2);
+  };
+
+  Zia.BasicProgram.prototype._onApply = (function() {
+    var modelViewProjectionMatrix = new Zia.Matrix4();
+    
+    var diffuseColor = new Zia.Vector4();
+
+    return function() {
+
+      // Recompute the model+view+projection matrix?
+      this._dirtyFlags = Zia.ProgramUtil.setModelViewProj(
+        this, this._dirtyFlags,
+        this._modelMatrix, this._viewMatrix, this._projectionMatrix,
+        this._modelView);
+      
+      // Recompute the diffuse/emissive/alpha material color parameters?
+      if ((this._dirtyFlags & DF.MaterialColor) != 0) {
+        Zia.ProgramUtil.setMaterialColor(
+          this, this._options.lightingEnabled,
+          this._alpha, this._diffuseColor, this._emissiveColor,
+          this._ambientLightColor);
+
+        this._dirtyFlags &= ~DF.MaterialColor;
+      }
+
+      if (this._options.lightingEnabled) {
+          // Recompute the world inverse transpose and eye position?
+          this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
+            this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
+      }
+
+      if (this._textureChanged) {
+        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
+          this.setUniform('uSampler', this._texture);
+          this._textureChanged = false;
+        }
+      }
+
+      this._directionalLight0._apply();
+      this._directionalLight1._apply();
+      this._directionalLight2._apply();
+    };
+  })();
+})();
+
+Zia.DirectionalLight = function(program, index) {
+  this._program = program;
+  this._index = index;
+
+  this.direction = new Zia.Vector3();
+  this.diffuseColor = new Zia.Vector3();
+  this.specularColor = new Zia.Vector3();
+  this.enabled = false;
+};
+
+Zia.DirectionalLight.prototype = {
+
+  get direction() {
+    return this._direction;
+  },
+
+  set direction(v) {
+    this._direction = v;
+    this._directionChanged = true;
+  },
+
+  get diffuseColor() {
+    return this._diffuseColor;
+  },
+
+  set diffuseColor(v) {
+    this._diffuseColor = v;
+    this._diffuseColorChanged = true;
+  },
+
+  get specularColor() {
+    return this._specularColor;
+  },
+
+  set specularColor(v) {
+    this._specularColor = v;
+    this._specularColorChanged = true;
+  },
+
+  get enabled() {
+    return this._enabled;
+  },
+
+  set enabled(v) {
+    this._enabled = v;
+    this._enabledChanged = true;
+  },
+
+  _apply: (function() {
+    var zero = new Zia.Vector3();
+
+    return function() {
+      if (this._directionChanged) {
+        this._setUniform("Direction", this._direction);
+        this._directionChanged = false;
+      }
+
+      if (this._diffuseColorChanged && this._enabled) {
+        this._setUniform("DiffuseColor", this._diffuseColor);
+        this._diffuseColorChanged = false;
+      }
+      
+      if (this._specularColorChanged && this._enabled) {
+        this._setUniform("SpecularColor", this._specularColor);
+        this._specularColorChanged = false;
+      }
+
+      if (this._enabledChanged) {
+        if (!this._enabled) {
+          this._setUniform("DiffuseColor", zero);
+          this._setUniform("SpecularColor", zero);
+        }
+        this._enabledChanged = false;
+      }
+    };
+  })(),
+
+  _setUniform: function(name, value) {
+    this._program.setUniform("uDirLight" + this._index + name, value);
+  }
+
 };
 
 (function () {
