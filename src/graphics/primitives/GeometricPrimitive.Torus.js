@@ -75,92 +75,78 @@
 
 (function() {
 
-  var cubeFaceCount = 6;
-
-  var faceNormals = [
-    new Zia.Vector3(0, 0, 1),
-    new Zia.Vector3(0, 0, -1),
-    new Zia.Vector3(1, 0, 0),
-    new Zia.Vector3(-1, 0, 0),
-    new Zia.Vector3(0, 1, 0),
-    new Zia.Vector3(0, -1, 0)
-  ];
-
-  var textureCoordinates = [
-    new Zia.Vector2(1, 1),
-    new Zia.Vector2(1, 0),
-    new Zia.Vector2(0, 0),
-    new Zia.Vector2(0, 1)
-  ];
-
-  var side1 = new Zia.Vector3();
-  var side2 = new Zia.Vector3();
-
-  /** Creates a cube primitive. */
-  Zia.GeometricPrimitive.createCube = function(size) {
-    if (size === undefined) {
-      size = 1.0;
+  /** Creates a torus primitive. */
+  Zia.GeometricPrimitive.createTorus = function(diameter, thickness, tessellation) {
+    if (diameter === undefined) {
+      diameter = 1.0;
     }
+    if (thickness === undefined) {
+      thickness = 0.33;
+    }
+    if (tessellation === undefined) {
+      tessellation = 32;
+    }
+
+    if (tessellation < 3)
+      throw "tessellation parameter out of range";
 
     var positions = [];
     var normals = [];
-    var texCoords = [];
+    var textureCoordinates = [];
     var indices = [];
 
-    size /= 2.0;
+    var stride = tessellation + 1;
 
-    // Create each face in turn.
-    for (var i = 0; i < cubeFaceCount; i++) {
-      var normal = faceNormals[i];
+    var translateTransform = new Zia.Matrix4().makeTranslation(diameter/2, 0, 0);
+    var transform = new Zia.Matrix4();
 
-      // Get two vectors perpendicular both to the face normal and to each other.
-      var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
+    // First we loop around the main ring of the torus.
+    for (var i = 0; i <= tessellation; i++) {
+      var u = i/tessellation;
 
-      side1.set(normal.x, normal.y, normal.z);
-      side1.cross(basis);
+      var outerAngle = i*Zia.MathUtil.TWO_PI/tessellation - Zia.MathUtil.PI_OVER_TWO;
 
-      side2.set(normal.x, normal.y, normal.z);
-      side2.cross(side1);
+      // Create a transform matrix that will align geometry to
+      // slice perpendicularly though the current ring position.
+      transform.makeRotationY(outerAngle).multiply(translateTransform);
 
-      // Six indices (two triangles) per face.
-      var vbase = i * 4;
-      indices.push(vbase + 0);
-      indices.push(vbase + 2);
-      indices.push(vbase + 1);
+      // Now we loop along the other axis, around the side of the tube.
+      for (var j = 0; j <= tessellation; j++) {
+        var v = 1 - j/tessellation;
 
-      indices.push(vbase + 0);
-      indices.push(vbase + 3);
-      indices.push(vbase + 2);
+        var innerAngle = j*Zia.MathUtil.TWO_PI/tessellation + Math.PI;
+        var dx = Math.cos(innerAngle), dy = Math.sin(innerAngle);
 
-      // Four vertices per face.
+        // Create a vertex.
+        var normal = new Zia.Vector3(dx, dy, 0);
+        var position = normal.clone().multiplyScalar(thickness/2);
+        var textureCoordinate = new Zia.Vector2(u, v);
 
-      // (normal - side1 - side2) * size
-      positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
+        position.applyMatrix4(transform);
+        normal.transformDirection(transform);
 
-      // (normal - side1 + side2) * size
-      positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));
+        positions.push(position);
+        normals.push(normal);
+        textureCoordinates.push(textureCoordinate);
 
-      // (normal + side1 + side2) * size
-      positions.push(normal.clone().add(side1).add(side2).multiplyScalar(size));
+        // And create indices for two triangles.
+        var nextI = (i + 1)%stride;
+        var nextJ = (j + 1)%stride;
 
-      // (normal + side1 - side2) * size
-      positions.push(normal.clone().add(side1).sub(side2).multiplyScalar(size));
+        indices.push(i*stride + j);
+        indices.push(nextI*stride + j);
+        indices.push(i*stride + nextJ);
 
-      normals.push(normal);
-      normals.push(normal);
-      normals.push(normal);
-      normals.push(normal);
-
-      texCoords.push(textureCoordinates[0]);
-      texCoords.push(textureCoordinates[1]);
-      texCoords.push(textureCoordinates[2]);
-      texCoords.push(textureCoordinates[3]);
+        indices.push(i*stride + nextJ);
+        indices.push(nextI*stride + j);
+        indices.push(nextI*stride + nextJ);
+      }
     }
 
     return {
       positions: positions,
       normals: normals,
-      textureCoordinates: texCoords,
+      textureCoordinates: textureCoordinates,
       indices: indices
     };
   };
