@@ -118,6 +118,19 @@ Zia.SharedProgramCode = {
 
     "  return result;",
     "}"
+  ].join('\n'),
+
+  lightingVertex: [
+    "void ComputeCommonVSOutputWithLighting(vec4 position, vec3 normal) {",
+    "  vec4 positionWS = uMMatrix * position;",
+    "  vec3 eyeVector = normalize(uEyePosition - positionWS.xyz);",
+    "  vec3 worldNormal = normalize(uMMatrixInverseTranspose * normal);",
+
+    "  ColorPair lightResult = ComputeLights(eyeVector, worldNormal);",
+    
+    "  vDiffuseColor = vec4(lightResult.Diffuse, uDiffuseColor.a);",
+    "  vSpecularColor = lightResult.Specular;",
+    "}"
   ].join('\n')
 
 };

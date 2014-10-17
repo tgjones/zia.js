@@ -14,8 +14,9 @@
 
     result.push("uniform vec3 uEyePosition;");
 
-    result.push("varying vec3 vPositionWS;");
-    result.push("varying vec3 vNormalWS;");
+    result.push("uniform vec3 uEmissiveColor;");
+    result.push("uniform vec3 uSpecularColor;");
+    result.push("uniform float uSpecularPower;");
 
     result.push(Zia.SharedProgramCode.lighting);
   }
@@ -48,8 +49,14 @@
     // Varyings
     result.push("varying vec4 vDiffuseColor;");
     if (options.lightingEnabled) {
-      result.push("varying vec3 vPositionWS;");
-      result.push("varying vec3 vNormalWS;");
+      if (options.perPixelLightingEnabled) {
+        result.push("varying vec3 vPositionWS;");
+        result.push("varying vec3 vNormalWS;");
+      } else {
+        result.push("varying vec3 vSpecularColor;");
+        addLighting(result);
+        result.push(Zia.SharedProgramCode.lightingVertex);
+      }
     }
     if (options.textureEnabled) {
       result.push("varying vec2 vTextureCoord;");
@@ -59,9 +66,13 @@
     result.push("void main(void) {");
     result.push("  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);");
     if (options.lightingEnabled) {
-      result.push("  vDiffuseColor = vec4(1, 1, 1, uDiffuseColor.a);");
-      result.push("  vPositionWS = (uMMatrix * vec4(aVertexPosition, 1.0)).xyz;");
-      result.push("  vNormalWS = normalize(uMMatrixInverseTranspose * aVertexNormal);");
+      if (options.perPixelLightingEnabled) {
+        result.push("  vDiffuseColor = vec4(1, 1, 1, uDiffuseColor.a);");
+        result.push("  vPositionWS = (uMMatrix * vec4(aVertexPosition, 1.0)).xyz;");
+        result.push("  vNormalWS = normalize(uMMatrixInverseTranspose * aVertexNormal);");
+      } else {
+        result.push("  ComputeCommonVSOutputWithLighting(vec4(aVertexPosition, 1.0), aVertexNormal);");
+      }
     } else {
       result.push("  vDiffuseColor = uDiffuseColor;");
     }
@@ -89,12 +100,16 @@
     }
 
     if (options.lightingEnabled) {
-      result.push("uniform vec4 uDiffuseColor;");
-      result.push("uniform vec3 uEmissiveColor;");
-      result.push("uniform vec3 uSpecularColor;");
-      result.push("uniform float uSpecularPower;");
+      if (options.perPixelLightingEnabled) {
+        result.push("uniform vec4 uDiffuseColor;");
 
-      addLighting(result);
+        result.push("varying vec3 vPositionWS;");
+        result.push("varying vec3 vNormalWS;");
+
+        addLighting(result);
+      } else {
+        result.push("varying vec3 vSpecularColor;");
+      }
     }
 
     result.push(Zia.SharedProgramCode.common);
@@ -107,11 +122,15 @@
     }
 
     if (options.lightingEnabled) {
-      result.push("  vec3 eyeVector = normalize(uEyePosition - vPositionWS);");
-      result.push("  vec3 worldNormal = normalize(vNormalWS);");
-      result.push("  ColorPair lightResult = ComputeLights(eyeVector, worldNormal);");
-      result.push("  color.rgb *= lightResult.Diffuse;");
-      result.push("  AddSpecular(color, lightResult.Specular);");
+      if (options.perPixelLightingEnabled) {
+        result.push("  vec3 eyeVector = normalize(uEyePosition - vPositionWS);");
+        result.push("  vec3 worldNormal = normalize(vNormalWS);");
+        result.push("  ColorPair lightResult = ComputeLights(eyeVector, worldNormal);");
+        result.push("  color.rgb *= lightResult.Diffuse;");
+        result.push("  AddSpecular(color, lightResult.Specular);");
+      } else {
+        result.push("  AddSpecular(color, vSpecularColor.rgb);");
+      }
     }
 
     result.push("  gl_FragColor = color;");
@@ -143,6 +162,7 @@
 
     options = Zia.ObjectUtil.reverseMerge(options || {}, {
       lightingEnabled: false,
+      perPixelLightingEnabled: true,
       textureEnabled: false,
       vertexColorEnabled: false
     });

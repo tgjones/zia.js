@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var program = new Zia.BasicProgram(graphicsDevice, {
     textureEnabled: true,
-    lightingEnabled: true
+    lightingEnabled: true,
+    perPixelLightingEnabled: true
   });
   program.enableDefaultLighting();
 
