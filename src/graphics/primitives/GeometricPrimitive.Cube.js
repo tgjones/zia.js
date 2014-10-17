@@ -93,72 +93,76 @@
     new Zia.Vector2(0, 1)
   ];
 
-  var size = 1.0;
-
-  var positions = [];
-  var normals = [];
-  var texCoords = [];
-  var indices = [];
-
-  size /= 2.0;
-
   var side1 = new Zia.Vector3();
   var side2 = new Zia.Vector3();
 
-  // Create each face in turn.
-  for (var i = 0; i < cubeFaceCount; i++) {
-    var normal = faceNormals[i];
-
-    // Get two vectors perpendicular both to the face normal and to each other.
-    var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
-
-    side1.set(normal.x, normal.y, normal.z);
-    side1.cross(basis);
-
-    side2.set(normal.x, normal.y, normal.z);
-    side2.cross(side1);
-
-    // Six indices (two triangles) per face.
-    var vbase = i * 4;
-    indices.push(vbase + 0);
-    indices.push(vbase + 2);
-    indices.push(vbase + 1);
-
-    indices.push(vbase + 0);
-    indices.push(vbase + 3);
-    indices.push(vbase + 2);
-
-    // Four vertices per face.
-
-    // (normal - side1 - side2) * size
-    positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
-
-    // (normal - side1 + side2) * size
-    positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));
-
-    // (normal + side1 + side2) * size
-    positions.push(normal.clone().add(side1).add(side2).multiplyScalar(size));
-
-    // (normal + side1 - side2) * size
-    positions.push(normal.clone().add(side1).sub(side2).multiplyScalar(size));
-
-    normals.push(normal);
-    normals.push(normal);
-    normals.push(normal);
-    normals.push(normal);
-
-    texCoords.push(textureCoordinates[0]);
-    texCoords.push(textureCoordinates[1]);
-    texCoords.push(textureCoordinates[2]);
-    texCoords.push(textureCoordinates[3]);
-  }
-
   /** A cube has six faces, each one pointing in a different direction. */
-  Zia.GeometricPrimitive.Cube = {
-    positions: positions,
-    normals: normals,
-    textureCoordinates: texCoords,
-    indices: indices
+  Zia.GeometricPrimitive.createCube = function(size) {
+    if (size === undefined) {
+      size = 1.0;
+    }
+
+    var positions = [];
+    var normals = [];
+    var texCoords = [];
+    var indices = [];
+
+    size /= 2.0;
+
+    // Create each face in turn.
+    for (var i = 0; i < cubeFaceCount; i++) {
+      var normal = faceNormals[i];
+
+      // Get two vectors perpendicular both to the face normal and to each other.
+      var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
+
+      side1.set(normal.x, normal.y, normal.z);
+      side1.cross(basis);
+
+      side2.set(normal.x, normal.y, normal.z);
+      side2.cross(side1);
+
+      // Six indices (two triangles) per face.
+      var vbase = i * 4;
+      indices.push(vbase + 0);
+      indices.push(vbase + 2);
+      indices.push(vbase + 1);
+
+      indices.push(vbase + 0);
+      indices.push(vbase + 3);
+      indices.push(vbase + 2);
+
+      // Four vertices per face.
+
+      // (normal - side1 - side2) * size
+      positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
+
+      // (normal - side1 + side2) * size
+      positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));
+
+      // (normal + side1 + side2) * size
+      positions.push(normal.clone().add(side1).add(side2).multiplyScalar(size));
+
+      // (normal + side1 - side2) * size
+      positions.push(normal.clone().add(side1).sub(side2).multiplyScalar(size));
+
+      normals.push(normal);
+      normals.push(normal);
+      normals.push(normal);
+      normals.push(normal);
+
+      texCoords.push(textureCoordinates[0]);
+      texCoords.push(textureCoordinates[1]);
+      texCoords.push(textureCoordinates[2]);
+      texCoords.push(textureCoordinates[3]);
+    }
+
+    return {
+      positions: positions,
+      normals: normals,
+      textureCoordinates: texCoords,
+      indices: indices
+    };
   };
 
 })();

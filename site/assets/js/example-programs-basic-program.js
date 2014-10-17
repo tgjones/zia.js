@@ -10,11 +10,19 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   program.enableDefaultLighting();
 
-  window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  var texture = Zia.Texture.createFromImagePath(graphicsDevice,
     '../assets/textures/UV_Grid_Sm.jpg');
+  program.texture = texture;
 
-  var cubeBuffers = Zia.GeometricPrimitive.createVertexAndIndexBuffers(
-    graphicsDevice, Zia.GeometricPrimitive.Cube);
+  var cubeModel = Zia.GeometricPrimitive.convertToModel(
+    graphicsDevice, Zia.GeometricPrimitive.createCube());
+
+  for (var i = 0; i < cubeModel.meshes.length; i++) {
+    var mesh = cubeModel.meshes[i];
+    for (var j = 0; j < mesh.meshParts.length; j++) {
+      mesh.meshParts[j].program = program;
+    }
+  }
 
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
@@ -28,13 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var lastCubeUpdateTime, cubeRotation = 0;
   var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();
-
-  program.view = viewMatrix;
-  program.projection = projectionMatrix;
   
-  graphicsDevice.setIndexBuffer(cubeBuffers.indexBuffer);
-  graphicsDevice.setVertexBuffers([cubeBuffers.vertexBuffer]);
-
   function drawScene() {
     if (graphicsDevice.resize()) {
       projectionMatrix.makePerspective(45,
@@ -48,13 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(cubeRotation));
 
-    program.texture = window.texture;
-    program.model = modelMatrix;
-    program.apply();
-
-    graphicsDevice.drawIndexedPrimitives(
-      Zia.PrimitiveType.TriangleList,
-      0, 36);
+    cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
 
     var currentTime = (new Date).getTime();
     if (lastCubeUpdateTime) {

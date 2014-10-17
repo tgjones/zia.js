@@ -1,6 +1,6 @@
 Zia.GeometricPrimitive = {
 
-  createVertexAndIndexBuffers: function(graphicsDevice, primitive) {
+  convertToModel: function(graphicsDevice, primitive) {
     var vertexData = [];
     for (var i = 0; i < primitive.positions.length; i++) {
       vertexData.push(primitive.positions[i].x);
@@ -27,11 +27,29 @@ Zia.GeometricPrimitive = {
     var indexBuffer = new Zia.IndexBuffer(graphicsDevice,
       new Uint16Array(primitive.indices));
 
-    // TODO: Create Model and ModelMesh classes.
-    return {
-      vertexBuffer: vertexBuffer,
-      indexBuffer: indexBuffer
-    };
+    var program = new Zia.BasicProgram(graphicsDevice);
+
+    var model = new Zia.Model(
+      [
+        new Zia.ModelMesh(graphicsDevice,
+          [
+            new Zia.ModelMeshPart({
+              indexBuffer: indexBuffer,
+              startIndex: 0,
+              indexCount: primitive.indices.length,
+              vertexBuffer: vertexBuffer
+            })
+          ])
+      ]);
+
+    for (var i = 0; i < model.meshes.length; i++) {
+      var mesh = model.meshes[i];
+      for (var j = 0; j < mesh.meshParts.length; j++) {
+        mesh.meshParts[j].program = program;
+      }
+    }
+
+    return model;
   }
 
 };

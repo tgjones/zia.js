@@ -94,6 +94,10 @@ Zia.GraphicsDevice.prototype = {
     this._vertexBuffers = vertexBuffers;
   },
 
+  setVertexBuffer: function(vertexBuffer) {
+    this._vertexBuffers = [vertexBuffer];
+  },
+
   drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
     var gl = this._gl;
 

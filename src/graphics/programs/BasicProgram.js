@@ -152,9 +152,9 @@
   Zia.BasicProgram = function (graphicsDevice, options) {
     this._dirtyFlags = Zia.ProgramDirtyFlags.All;
 
-    this.model = new Zia.Matrix4();
-    this.view = new Zia.Matrix4();
-    this.projection = new Zia.Matrix4();
+    this.modelMatrix = new Zia.Matrix4();
+    this.viewMatrix = new Zia.Matrix4();
+    this.projectionMatrix = new Zia.Matrix4();
     this._modelView = new Zia.Matrix4();
     this.diffuseColor = new Zia.Vector3(1, 1, 1);
     this.emissiveColor = new Zia.Vector3();
@@ -184,26 +184,26 @@
   var DF = Zia.ProgramDirtyFlags;
 
   Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
-    model: {
-      get: function() { return this._model; },
+    modelMatrix: {
+      get: function() { return this._modelMatrix; },
       set: function(v) {
-        this._model = v;
+        this._modelMatrix = v;
         this._dirtyFlags |= DF.Model | DF.ModelViewProj | DF.Fog;
       }
     },
 
-    view: {
-      get: function() { return this._view; },
+    viewMatrix: {
+      get: function() { return this._viewMatrix; },
       set: function(v) {
-        this._view = v;
+        this._viewMatrix = v;
         this._dirtyFlags |= DF.ModelViewProj | DF.EyePosition | DF.Fog;
       }
     },
 
-    projection: {
-      get: function() { return this._projection;; },
+    projectionMatrix: {
+      get: function() { return this._projectionMatrix; },
       set: function(v) {
-        this._projection = v;
+        this._projectionMatrix = v;
         this._dirtyFlags |= DF.ModelViewProj;
       }
     },
@@ -282,7 +282,7 @@
       // Recompute the model+view+projection matrix?
       this._dirtyFlags = Zia.ProgramUtil.setModelViewProj(
         this, this._dirtyFlags,
-        this._model, this._view, this._projection,
+        this._modelMatrix, this._viewMatrix, this._projectionMatrix,
         this._modelView);
       
       // Recompute the diffuse/emissive/alpha material color parameters?
@@ -298,12 +298,14 @@
       if (this._options.lightingEnabled) {
           // Recompute the world inverse transpose and eye position?
           this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
-            this, this._dirtyFlags, this._model, this._view);
+            this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
       }
 
       if (this._textureChanged) {
-        this.setUniform('uSampler', this._texture);
-        this._textureChanged = false;
+        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
+          this.setUniform('uSampler', this._texture);
+          this._textureChanged = false;
+        }
       }
 
       this._directionalLight0._apply();

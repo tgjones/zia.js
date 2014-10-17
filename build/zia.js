@@ -3862,7 +3862,7 @@ Zia.Vector4.prototype = {
 
 Zia.GeometricPrimitive = {
 
-  createVertexAndIndexBuffers: function(graphicsDevice, primitive) {
+  convertToModel: function(graphicsDevice, primitive) {
     var vertexData = [];
     for (var i = 0; i < primitive.positions.length; i++) {
       vertexData.push(primitive.positions[i].x);
@@ -3889,11 +3889,29 @@ Zia.GeometricPrimitive = {
     var indexBuffer = new Zia.IndexBuffer(graphicsDevice,
       new Uint16Array(primitive.indices));
 
-    // TODO: Create Model and ModelMesh classes.
-    return {
-      vertexBuffer: vertexBuffer,
-      indexBuffer: indexBuffer
-    };
+    var program = new Zia.BasicProgram(graphicsDevice);
+
+    var model = new Zia.Model(
+      [
+        new Zia.ModelMesh(graphicsDevice,
+          [
+            new Zia.ModelMeshPart({
+              indexBuffer: indexBuffer,
+              startIndex: 0,
+              indexCount: primitive.indices.length,
+              vertexBuffer: vertexBuffer
+            })
+          ])
+      ]);
+
+    for (var i = 0; i < model.meshes.length; i++) {
+      var mesh = model.meshes[i];
+      for (var j = 0; j < mesh.meshParts.length; j++) {
+        mesh.meshParts[j].program = program;
+      }
+    }
+
+    return model;
   }
 
 };
@@ -4320,6 +4338,10 @@ Zia.GraphicsDevice.prototype = {
     this._vertexBuffers = vertexBuffers;
   },
 
+  setVertexBuffer: function(vertexBuffer) {
+    this._vertexBuffers = [vertexBuffer];
+  },
+
   drawIndexedPrimitives: function (primitiveType, startIndex, indexCount) {
     var gl = this._gl;
 
@@ -4437,6 +4459,122 @@ Zia.IndexBuffer.prototype = {
 
   destroy: function() {
     this._gl.deleteBuffer(this._buffer);
+  }
+
+};
+
+Zia.Model = function(meshes) {
+  this.meshes = meshes;
+};
+
+Zia.Model.prototype = {
+
+  draw: function(modelMatrix, viewMatrix, projectionMatrix) {
+    for (var i = 0; i < this.meshes.length; i++) {
+      var mesh = this.meshes[i];
+
+      for (var j = 0; j < mesh.programs.length; j++) {
+        var program = mesh.programs[j];
+
+        program.modelMatrix = modelMatrix;
+        program.viewMatrix = viewMatrix;
+        program.projectionMatrix = projectionMatrix;
+      }
+
+      mesh.draw();
+    }
+  }
+
+};
+
+Zia.ModelMesh = function(graphicsDevice, meshParts) {
+  this.graphicsDevice = graphicsDevice;
+  this.meshParts = meshParts;
+
+  for (var i = 0; i < meshParts.length; i++) {
+    meshParts[i]._parent = this;
+  }
+
+  this.programs = [];
+}
+
+Zia.ModelMesh.prototype = {
+
+  draw: function() {
+
+    for (var i = 0; i < this.meshParts.length; i++) {
+
+      var meshPart = this.meshParts[i];
+      var program = meshPart.program;
+
+      if (meshPart.indexCount > 0) {
+
+        this.graphicsDevice.setVertexBuffer(meshPart.vertexBuffer);
+        this.graphicsDevice.setIndexBuffer(meshPart.indexBuffer);
+
+        program.apply();
+
+        this.graphicsDevice.drawIndexedPrimitives(
+          Zia.PrimitiveType.TriangleList,
+          meshPart.startIndex, meshPart.indexCount);
+
+      }
+
+    }
+
+  }
+
+};
+
+Zia.ModelMeshPart = function(options) {
+  options = Zia.ObjectUtil.reverseMerge(options || {}, {
+    indexBuffer: null,
+    startIndex: 0,
+    indexCount: 0,
+    vertexBuffer: null
+  });
+
+  this.indexBuffer = options.indexBuffer;
+  this.startIndex = options.startIndex;
+  this.indexCount = options.indexCount;
+  this.vertexBuffer = options.vertexBuffer;
+
+  this._program = null;
+  this._parent = null;
+};
+
+
+Zia.ModelMeshPart.prototype = {
+
+  get program() { return this._program; },
+
+  set program(value) {
+    if (value === this._program)
+      return;
+
+    if (this._program) {
+      // First check to see if any other parts are using this program.
+      var removeProgram = true;
+
+      for (var i = 0; i < this._parent.meshParts.length; i++) {
+        var meshPart = this._parent.meshParts[i];
+        if (meshPart !== this && meshPart._program === this._program) {
+          removeProgram = false;
+          break;
+        }
+      }
+
+      if (removeProgram) {
+        var programIndex = this._parent.programs.indexOf(this._program);
+        if (programIndex >= 0) {
+          this._parent.programs.splice(programIndex, 1);
+        }
+      }
+    }
+
+    // Set the new program.
+    this._program = value;
+    this._parent.programs.push(value); // TODO: Check for duplicates?
   }
 
 };
@@ -4935,72 +5073,76 @@ Zia.Viewport.prototype = {
     new Zia.Vector2(0, 1)
   ];
 
-  var size = 1.0;
-
-  var positions = [];
-  var normals = [];
-  var texCoords = [];
-  var indices = [];
-
-  size /= 2.0;
-
   var side1 = new Zia.Vector3();
   var side2 = new Zia.Vector3();
 
-  // Create each face in turn.
-  for (var i = 0; i < cubeFaceCount; i++) {
-    var normal = faceNormals[i];
-
-    // Get two vectors perpendicular both to the face normal and to each other.
-    var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
-
-    side1.set(normal.x, normal.y, normal.z);
-    side1.cross(basis);
-
-    side2.set(normal.x, normal.y, normal.z);
-    side2.cross(side1);
-
-    // Six indices (two triangles) per face.
-    var vbase = i * 4;
-    indices.push(vbase + 0);
-    indices.push(vbase + 2);
-    indices.push(vbase + 1);
-
-    indices.push(vbase + 0);
-    indices.push(vbase + 3);
-    indices.push(vbase + 2);
-
-    // Four vertices per face.
-
-    // (normal - side1 - side2) * size
-    positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
-
-    // (normal - side1 + side2) * size
-    positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));
-
-    // (normal + side1 + side2) * size
-    positions.push(normal.clone().add(side1).add(side2).multiplyScalar(size));
-
-    // (normal + side1 - side2) * size
-    positions.push(normal.clone().add(side1).sub(side2).multiplyScalar(size));
-
-    normals.push(normal);
-    normals.push(normal);
-    normals.push(normal);
-    normals.push(normal);
-
-    texCoords.push(textureCoordinates[0]);
-    texCoords.push(textureCoordinates[1]);
-    texCoords.push(textureCoordinates[2]);
-    texCoords.push(textureCoordinates[3]);
-  }
-
   /** A cube has six faces, each one pointing in a different direction. */
-  Zia.GeometricPrimitive.Cube = {
-    positions: positions,
-    normals: normals,
-    textureCoordinates: texCoords,
-    indices: indices
+  Zia.GeometricPrimitive.createCube = function(size) {
+    if (size === undefined) {
+      size = 1.0;
+    }
+
+    var positions = [];
+    var normals = [];
+    var texCoords = [];
+    var indices = [];
+
+    size /= 2.0;
+
+    // Create each face in turn.
+    for (var i = 0; i < cubeFaceCount; i++) {
+      var normal = faceNormals[i];
+
+      // Get two vectors perpendicular both to the face normal and to each other.
+      var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
+
+      side1.set(normal.x, normal.y, normal.z);
+      side1.cross(basis);
+
+      side2.set(normal.x, normal.y, normal.z);
+      side2.cross(side1);
+
+      // Six indices (two triangles) per face.
+      var vbase = i * 4;
+      indices.push(vbase + 0);
+      indices.push(vbase + 2);
+      indices.push(vbase + 1);
+
+      indices.push(vbase + 0);
+      indices.push(vbase + 3);
+      indices.push(vbase + 2);
+
+      // Four vertices per face.
+
+      // (normal - side1 - side2) * size
+      positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
+
+      // (normal - side1 + side2) * size
+      positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));
+
+      // (normal + side1 + side2) * size
+      positions.push(normal.clone().add(side1).add(side2).multiplyScalar(size));
+
+      // (normal + side1 - side2) * size
+      positions.push(normal.clone().add(side1).sub(side2).multiplyScalar(size));
+
+      normals.push(normal);
+      normals.push(normal);
+      normals.push(normal);
+      normals.push(normal);
+
+      texCoords.push(textureCoordinates[0]);
+      texCoords.push(textureCoordinates[1]);
+      texCoords.push(textureCoordinates[2]);
+      texCoords.push(textureCoordinates[3]);
+    }
+
+    return {
+      positions: positions,
+      normals: normals,
+      textureCoordinates: texCoords,
+      indices: indices
+    };
   };
 
 })();
@@ -5159,9 +5301,9 @@ Zia.Viewport.prototype = {
   Zia.BasicProgram = function (graphicsDevice, options) {
     this._dirtyFlags = Zia.ProgramDirtyFlags.All;
 
-    this.model = new Zia.Matrix4();
-    this.view = new Zia.Matrix4();
-    this.projection = new Zia.Matrix4();
+    this.modelMatrix = new Zia.Matrix4();
+    this.viewMatrix = new Zia.Matrix4();
+    this.projectionMatrix = new Zia.Matrix4();
     this._modelView = new Zia.Matrix4();
     this.diffuseColor = new Zia.Vector3(1, 1, 1);
     this.emissiveColor = new Zia.Vector3();
@@ -5191,26 +5333,26 @@ Zia.Viewport.prototype = {
   var DF = Zia.ProgramDirtyFlags;
 
   Zia.BasicProgram.prototype = Object.create(Zia.Program.prototype, {
-    model: {
-      get: function() { return this._model; },
+    modelMatrix: {
+      get: function() { return this._modelMatrix; },
       set: function(v) {
-        this._model = v;
+        this._modelMatrix = v;
         this._dirtyFlags |= DF.Model | DF.ModelViewProj | DF.Fog;
       }
     },
 
-    view: {
-      get: function() { return this._view; },
+    viewMatrix: {
+      get: function() { return this._viewMatrix; },
       set: function(v) {
-        this._view = v;
+        this._viewMatrix = v;
         this._dirtyFlags |= DF.ModelViewProj | DF.EyePosition | DF.Fog;
       }
     },
 
-    projection: {
-      get: function() { return this._projection;; },
+    projectionMatrix: {
+      get: function() { return this._projectionMatrix; },
       set: function(v) {
-        this._projection = v;
+        this._projectionMatrix = v;
         this._dirtyFlags |= DF.ModelViewProj;
       }
     },
@@ -5289,7 +5431,7 @@ Zia.Viewport.prototype = {
       // Recompute the model+view+projection matrix?
       this._dirtyFlags = Zia.ProgramUtil.setModelViewProj(
         this, this._dirtyFlags,
-        this._model, this._view, this._projection,
+        this._modelMatrix, this._viewMatrix, this._projectionMatrix,
         this._modelView);
       
       // Recompute the diffuse/emissive/alpha material color parameters?
@@ -5305,12 +5447,14 @@ Zia.Viewport.prototype = {
       if (this._options.lightingEnabled) {
           // Recompute the world inverse transpose and eye position?
           this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
-            this, this._dirtyFlags, this._model, this._view);
+            this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
       }
 
       if (this._textureChanged) {
-        this.setUniform('uSampler', this._texture);
-        this._textureChanged = false;
+        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
+          this.setUniform('uSampler', this._texture);
+          this._textureChanged = false;
+        }
       }
 
       this._directionalLight0._apply();

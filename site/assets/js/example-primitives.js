@@ -168,8 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       new Zia.Color4(0, 0, 0, 1), 1);
 
-    program.view = viewMatrix;
-    program.projection = projectionMatrix;
+    program.viewMatrix = viewMatrix;
+    program.projectionMatrix = projectionMatrix;
 
     // Draw pyramid.
 
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
     tempMatrix.makeRotationAxis(pyramidRotationAxis, Zia.Math.degToRad(rotationPyramid));
     pyramidModelMatrix.multiply(tempMatrix);
 
-    program.model = pyramidModelMatrix;
+    program.modelMatrix = pyramidModelMatrix;
     program.apply();
 
     graphicsDevice.drawPrimitives(
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
     tempMatrix.makeRotationAxis(cubeRotationAxis, Zia.Math.degToRad(rotationCube));
     cubeModelMatrix.multiply(tempMatrix);
 
-    program.model = cubeModelMatrix;
+    program.modelMatrix = cubeModelMatrix;
     program.apply();
 
     graphicsDevice.drawIndexedPrimitives(
