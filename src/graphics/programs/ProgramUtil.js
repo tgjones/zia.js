@@ -11,6 +11,9 @@ Zia.ProgramDirtyFlags = {
   Model         : 2,
   EyePosition   : 4,
   MaterialColor : 8,
+  SpecularColor : 16,
+  SpecularPower : 32,
+  Texture       : 64,
   All           : -1
 };
 

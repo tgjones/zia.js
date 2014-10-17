@@ -17,39 +17,7 @@
     result.push("varying vec3 vPositionWS;");
     result.push("varying vec3 vNormalWS;");
 
-    result.push("struct ColorPair {");
-    result.push("  vec3 Diffuse;");
-    result.push("  vec3 Specular;");
-    result.push("};");
-
-    result.push("ColorPair ComputeLights(vec3 eyeVector, vec3 worldNormal) {");
-    result.push("  mat3 lightDirections;");
-    result.push("  mat3 lightDiffuse;");
-    result.push("  mat3 lightSpecular;");
-    result.push("  mat3 halfVectors;");
-
-    result.push("  for (int i = 0; i < 3; i++) {");
-    result.push("    lightDirections[i] = mat3(uDirLight0Direction,     uDirLight1Direction,     uDirLight2Direction)    [i];");
-    result.push("    lightDiffuse[i]    = mat3(uDirLight0DiffuseColor,  uDirLight1DiffuseColor,  uDirLight2DiffuseColor) [i];");
-    result.push("    lightSpecular[i]   = mat3(uDirLight0SpecularColor, uDirLight1SpecularColor, uDirLight2SpecularColor)[i];");
-    result.push("    halfVectors[i] = normalize(eyeVector - lightDirections[i]);");
-    result.push("  }");
-
-    result.push("  vec3 dotL = worldNormal * -lightDirections;");
-    result.push("  vec3 dotH = worldNormal * halfVectors;");
-
-    result.push("  vec3 zeroL = step(vec3(0.0), dotL);");
-
-    result.push("  vec3 diffuse  = zeroL * dotL;");
-    result.push("  vec3 specular = pow(max(dotH, vec3(0.0)) * zeroL, vec3(uSpecularPower));");
-
-    result.push("  ColorPair result;");
-
-    result.push("  result.Diffuse  = (lightDiffuse * diffuse)  * uDiffuseColor.rgb + uEmissiveColor;");
-    result.push("  result.Specular = (lightSpecular * specular) * uSpecularColor;");
-
-    result.push("  return result;");
-    result.push("}");
+    result.push(Zia.SharedProgramCode.lighting);
   }
 
   function buildVertexShader(options) {
@@ -129,6 +97,8 @@
       addLighting(result);
     }
 
+    result.push(Zia.SharedProgramCode.common);
+
     result.push("void main(void) {");
     result.push("  vec4 color = vDiffuseColor;");
 
@@ -141,6 +111,7 @@
       result.push("  vec3 worldNormal = normalize(vNormalWS);");
       result.push("  ColorPair lightResult = ComputeLights(eyeVector, worldNormal);");
       result.push("  color.rgb *= lightResult.Diffuse;");
+      result.push("  AddSpecular(color, lightResult.Specular);");
     }
 
     result.push("  gl_FragColor = color;");
@@ -158,13 +129,17 @@
     this._modelView = new Zia.Matrix4();
     this.diffuseColor = new Zia.Vector3(1, 1, 1);
     this.emissiveColor = new Zia.Vector3();
-    this.ambientLightColor = new Zia.Vector3();
+    this.specularColor = new Zia.Vector3(1, 1, 1);
+    this.specularPower = 16;
     this.alpha = 1;
     this.texture = null;
+    this.ambientLightColor = new Zia.Vector3();
 
     this._directionalLight0 = new Zia.DirectionalLight(this, 0);
     this._directionalLight1 = new Zia.DirectionalLight(this, 1);
     this._directionalLight2 = new Zia.DirectionalLight(this, 2);
+
+    this._directionalLight0.enabled = true;
 
     options = Zia.ObjectUtil.reverseMerge(options || {}, {
       lightingEnabled: false,
@@ -224,11 +199,19 @@
       }
     },
 
-    ambientLightColor: {
-      get: function() { return this._ambientLightColor; },
+    specularColor: {
+      get: function() { return this._specularColor; },
       set: function(v) {
-        this._ambientLightColor = v;
-        this._dirtyFlags |= DF.MaterialColor;
+        this._specularColor = v;
+        this._dirtyFlags |= DF.SpecularColor;
+      }
+    },
+
+    specularPower: {
+      get: function() { return this._specularPower; },
+      set: function(v) {
+        this._specularPower = v;
+        this._dirtyFlags |= DF.SpecularPower;
       }
     },
 
@@ -244,7 +227,15 @@
       get: function() { return this._texture; },
       set: function(v) {
         this._texture = v;
-        this._textureChanged = true;
+        this._dirtyFlags |= DF.Texture;
+      }
+    },
+
+    ambientLightColor: {
+      get: function() { return this._ambientLightColor; },
+      set: function(v) {
+        this._ambientLightColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
       }
     },
 
@@ -295,16 +286,26 @@
         this._dirtyFlags &= ~DF.MaterialColor;
       }
 
+      if ((this._dirtyFlags & DF.SpecularColor) != 0) {
+        this.setUniform('uSpecularColor', this._specularColor);
+        this._dirtyFlags &= ~DF.SpecularColor;
+      }
+
+      if ((this._dirtyFlags & DF.SpecularPower) != 0) {
+        this.setUniform('uSpecularPower', this._specularPower);
+        this._dirtyFlags &= ~DF.SpecularPower;
+      }
+
       if (this._options.lightingEnabled) {
           // Recompute the world inverse transpose and eye position?
           this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
             this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
       }
 
-      if (this._textureChanged) {
+      if ((this._dirtyFlags & DF.Texture) != 0) {
         if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
           this.setUniform('uSampler', this._texture);
-          this._textureChanged = false;
+          this._dirtyFlags &= ~DF.Texture;
         }
       }
 
