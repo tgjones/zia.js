@@ -55,7 +55,8 @@
     <div class="col-md-2"></div>
     <div class="col-md-8">
       <h3 id="what-is-zia-js-">What is Zia.js?</h3>
-<p>Zia.js is an object-oriented, WebGL-based game framework. Right now it&#39;s
+<p>Zia.js is an <a href="http://en.wikipedia.org/wiki/Microsoft_XNA">XNA</a>-inspired,
+object-oriented, WebGL-based game framework. Right now it&#39;s
 focused on graphics. Sound, networking and general-purpose game APIs will be
 added later (if there&#39;s enough interest).</p>
 <p>Zia.js is <em>not</em> a graphics engine, and it&#39;s <em>not</em> a game engine. It could help
@@ -81,36 +82,57 @@ Direct3D, so Zia.js provides graphics APIs that are built on WebGL.</p>
 
 <span class="hljs-keyword">var</span> graphicsDevice = <span class="hljs-keyword">new</span> Zia.GraphicsDevice(canvas);
 
-<span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice);
+<span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice, {
+  lightingEnabled: <span class="hljs-literal">true</span>
+});
+program.diffuseColor = <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0.5</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0.5</span>);
+program.enableDefaultLighting();
+
+<span class="hljs-keyword">var</span> cubePrimitive = Zia.GeometricPrimitive.createCube();
+
+<span class="hljs-keyword">var</span> vertexData = Zia.GeometricPrimitive.mergeVertexData(
+  cubePrimitive.positions, cubePrimitive.normals,
+  cubePrimitive.textureCoordinates);
+<span class="hljs-keyword">var</span> vertices = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Float32Array</span>(vertexData);
 
 <span class="hljs-keyword">var</span> vertexBuffer = <span class="hljs-keyword">new</span> Zia.VertexBuffer(graphicsDevice,
-  Zia.BoxPrimitive.vertexDeclaration,
-  Zia.BoxPrimitive.vertices);
+  <span class="hljs-keyword">new</span> Zia.VertexDeclaration(
+  [
+    <span class="hljs-keyword">new</span> Zia.VertexElement(<span class="hljs-string">"aVertexPosition"</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>),
+    <span class="hljs-keyword">new</span> Zia.VertexElement(<span class="hljs-string">"aVertexNormal"</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span> * <span class="hljs-number">4</span>),
+    <span class="hljs-keyword">new</span> Zia.VertexElement(<span class="hljs-string">"aTextureCoord"</span>, <span class="hljs-number">2</span>, <span class="hljs-number">6</span> * <span class="hljs-number">4</span>)
+  ]),
+  vertices);
 
 <span class="hljs-keyword">var</span> indexBuffer = <span class="hljs-keyword">new</span> Zia.IndexBuffer(graphicsDevice,
-  Zia.BoxPrimitive.indices);
+  <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint16Array</span>(cubePrimitive.indices));
 
 <span class="hljs-keyword">var</span> projectionMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makePerspective(<span class="hljs-number">45</span>,
   graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
-<span class="hljs-keyword">var</span> viewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makeTranslation(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">4</span>);
+<span class="hljs-keyword">var</span> viewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makeLookAt(
+  <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1.5</span>),
+  <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>),
+  <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>));
 <span class="hljs-keyword">var</span> modelMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().identity();
 
-program.view = viewMatrix;
-program.projection = projectionMatrix;
-
 graphicsDevice.setIndexBuffer(indexBuffer);
-graphicsDevice.setVertexBuffers([vertexBuffer]);
+graphicsDevice.setVertexBuffer(vertexBuffer);
 
 graphicsDevice.clear(
   Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
   <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
 
-program.model = modelMatrix;
+program.viewMatrix = viewMatrix;
+program.projectionMatrix = projectionMatrix;
+program.modelMatrix = modelMatrix;
 program.apply();
 
 graphicsDevice.drawIndexedPrimitives(
   Zia.PrimitiveType.TriangleList,
   <span class="hljs-number">0</span>, <span class="hljs-number">36</span>);</pre>
+
+      <canvas id="mainCanvas" style="width:100%;height:300px"></canvas>
+      <script type="text/javascript" src="assets/js/example-hello-world.js"></script>
 
       <h3 id="why-not-use-three-js-">Why not use Three.js?</h3>
 <p>Most sensible people who want to build a game will choose one of the excellent
