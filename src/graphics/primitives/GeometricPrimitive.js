@@ -1,17 +1,32 @@
 Zia.GeometricPrimitive = {
 
-  convertToModel: function(graphicsDevice, primitive) {
+  mergeVertexData: function() {
     var vertexData = [];
-    for (var i = 0; i < primitive.positions.length; i++) {
-      vertexData.push(primitive.positions[i].x);
-      vertexData.push(primitive.positions[i].y);
-      vertexData.push(primitive.positions[i].z);
-      vertexData.push(primitive.normals[i].x);
-      vertexData.push(primitive.normals[i].y);
-      vertexData.push(primitive.normals[i].z);
-      vertexData.push(primitive.textureCoordinates[i].x);
-      vertexData.push(primitive.textureCoordinates[i].y);
+
+    if (arguments.length < 1) {
+      throw "You must pass at least one array in to mergeVertexData";
     }
+
+    var vertexCount = arguments[0].length;
+    for (var i = 1; i < arguments.length; i++) {
+      if (arguments[i].length !== vertexCount) {
+        throw "All arrays passed in must have the same length";
+      }
+    }
+
+    for (var i = 0; i < vertexCount; i++) {
+      for (var j = 0; j < arguments.length; j++) {
+        Array.prototype.push.apply(vertexData, arguments[j][i].toArray());
+      }
+    }
+
+    return vertexData;
+  },
+
+  convertToModel: function(graphicsDevice, primitive) {
+    var vertexData = Zia.GeometricPrimitive.mergeVertexData(
+      primitive.positions, primitive.normals,
+      primitive.textureCoordinates);
 
     var vertices = new Float32Array(vertexData);
 
