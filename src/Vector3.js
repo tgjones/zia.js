@@ -481,6 +481,12 @@ Zia.Vector3.prototype = {
 
   },
 
+  nearEqual: function(right, epsilon) {
+    return Zia.MathUtil.withinEpsilon(this._x, right._x, epsilon._x) &&
+      Zia.MathUtil.withinEpsilon(this._y, right._y, epsilon._y) &&
+      Zia.MathUtil.withinEpsilon(this._z, right._z, epsilon._z);
+  },
+
   dot: function ( v ) {
 
     return this._x * v._x + this._y * v._y + this._z * v._z;
