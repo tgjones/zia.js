@@ -4,20 +4,24 @@ layout: example_base.html
 
 <div class="panel">
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#output" data-toggle="tab">Output</a></li>
-    <li><a href="#source" data-toggle="tab">Source</a></li>
+    <li class="active"><a href="#example-output" data-toggle="tab">Output</a></li>
+    <li><a href="#example-html" data-toggle="tab">HTML</a></li>
+    <li><a href="#example-script" data-toggle="tab">Javascript</a></li>
   </ul>
 
   <div id="hello" class="tab-content">
-    <div class="tab-pane active" id="output">
-      <canvas id="mainCanvas" style="width:100%;height:500px"></canvas>
-
-      {{> body }}
+    <div class="tab-pane active" id="example-output">
+      {{ includeHtml page.basename }}
     </div>
-    <div class="tab-pane" id="source">
+    <div class="tab-pane" id="example-html">
+      {{ exampleHtml page.basename }}
+    </div>
+    <div class="tab-pane" id="example-script">
       {{ exampleCode page.basename }}
     </div>
   </div>
 </div>
+
+{{> body }}
 
 <script type="text/javascript" src="{{assets}}/js/example-{{page.basename}}.js"></script>

@@ -174,7 +174,7 @@ module.exports = function(grunt) {
         tasks: [ "karma:dev:run"]
       },
       assemble: {
-        files: ['site/{helpers,layouts,pages}/**/*.*'],
+        files: ['site/{helpers,includes,layouts,pages}/**/*.*'],
         tasks: ['assemble'],
         options: { livereload: true }
       },

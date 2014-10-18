@@ -1,5 +1,4 @@
 var glob = require('handlebars-helpers/lib/utils/glob');
-var utils = require('handlebars-helpers/lib/utils/utils');
 var hljs = require("highlight.js");
 
 module.exports.register = function (Handlebars, options, params)  { 

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
   program.texture = texture;
 
   var cubeModel = Zia.GeometricPrimitive.convertToModel(
-    graphicsDevice, Zia.GeometricPrimitive.createCylinder());
+    graphicsDevice, Zia.GeometricPrimitive.createTeapot());
 
   for (var i = 0; i < cubeModel.meshes.length; i++) {
     var mesh = cubeModel.meshes[i];
