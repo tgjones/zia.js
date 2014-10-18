@@ -12,7 +12,7 @@ describe('Zia.GeometricPrimitive.createCylinder', function() {
     expect(result.normals[0].z).toBe(1);
     expect(result.textureCoordinates.length).toBe(130);
     expect(result.textureCoordinates[0].x).toBe(0);
-    expect(result.textureCoordinates[0].y).toBe(0);
+    expect(result.textureCoordinates[0].y).toBe(1);
     expect(result.indices.length).toBe(378);
     expect(result.indices[0]).toBe(0);
   });
