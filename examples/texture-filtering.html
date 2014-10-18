@@ -84,37 +84,19 @@
 
 <div class="panel">
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#output" data-toggle="tab">Output</a></li>
-    <li><a href="#source" data-toggle="tab">Source</a></li>
+    <li class="active"><a href="#example-output" data-toggle="tab">Output</a></li>
+    <li><a href="#example-html" data-toggle="tab">HTML</a></li>
+    <li><a href="#example-script" data-toggle="tab">Javascript</a></li>
   </ul>
 
   <div id="hello" class="tab-content">
-    <div class="tab-pane active" id="output">
+    <div class="tab-pane active" id="example-output">
       <canvas id="mainCanvas" style="width:100%;height:500px"></canvas>
-
-      
-
-<form class="form-inline" role="form">
-  <div class="form-group">
-    <label for="texture-filter">Filter</label>
-    <select id="texture-filter" class="form-control">
-      <option>MinMagMipNearest</option>
-      <option>MinMagNearestMipLinear</option>
-      <option>MinNearestMagLinearMipNearest</option>
-      <option>MinNearestMagMipLinear</option>
-      <option>MinLinearMagMipNearest</option>
-      <option>MinLinearMagNearestMipLinear</option>
-      <option>MinMagLinearMipNearest</option>
-      <option>MinMagMipLinear</option>
-      <option>MinMagNearest</option>
-      <option>MinNearestMagLinear</option>
-      <option>MinLinearMagNearest</option>
-      <option>MinMagLinear</option>
-    </select>
-  </div>
-</form>
     </div>
-    <div class="tab-pane" id="source">
+    <div class="tab-pane" id="example-html">
+      <pre class="hljs"><span class="hljs-tag">&lt;<span class="hljs-title">canvas</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"mainCanvas"</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">"width:100%;height:500px"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">canvas</span>&gt;</span></pre>
+    </div>
+    <div class="tab-pane" id="example-script">
       <pre class="hljs"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
     
   <span class="hljs-keyword">var</span> canvas = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'mainCanvas'</span>);
@@ -196,6 +178,28 @@
     </div>
   </div>
 </div>
+
+
+
+<form class="form-inline" role="form">
+  <div class="form-group">
+    <label for="texture-filter">Filter</label>
+    <select id="texture-filter" class="form-control">
+      <option>MinMagMipNearest</option>
+      <option>MinMagNearestMipLinear</option>
+      <option>MinNearestMagLinearMipNearest</option>
+      <option>MinNearestMagMipLinear</option>
+      <option>MinLinearMagMipNearest</option>
+      <option>MinLinearMagNearestMipLinear</option>
+      <option>MinMagLinearMipNearest</option>
+      <option>MinMagMipLinear</option>
+      <option>MinMagNearest</option>
+      <option>MinNearestMagLinear</option>
+      <option>MinLinearMagNearest</option>
+      <option>MinMagLinear</option>
+    </select>
+  </div>
+</form>
 
 <script type="text/javascript" src="../assets/js/example-texture-filtering.js"></script>
   </div>

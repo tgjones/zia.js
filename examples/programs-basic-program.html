@@ -84,17 +84,19 @@
 
 <div class="panel">
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#output" data-toggle="tab">Output</a></li>
-    <li><a href="#source" data-toggle="tab">Source</a></li>
+    <li class="active"><a href="#example-output" data-toggle="tab">Output</a></li>
+    <li><a href="#example-html" data-toggle="tab">HTML</a></li>
+    <li><a href="#example-script" data-toggle="tab">Javascript</a></li>
   </ul>
 
   <div id="hello" class="tab-content">
-    <div class="tab-pane active" id="output">
+    <div class="tab-pane active" id="example-output">
       <canvas id="mainCanvas" style="width:100%;height:500px"></canvas>
-
-      
     </div>
-    <div class="tab-pane" id="source">
+    <div class="tab-pane" id="example-html">
+      <pre class="hljs"><span class="hljs-tag">&lt;<span class="hljs-title">canvas</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"mainCanvas"</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">"width:100%;height:500px"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">canvas</span>&gt;</span></pre>
+    </div>
+    <div class="tab-pane" id="example-script">
       <pre class="hljs"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
     
   <span class="hljs-keyword">var</span> canvas = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'mainCanvas'</span>);
@@ -103,7 +105,8 @@
 
   <span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice, {
     textureEnabled: <span class="hljs-literal">true</span>,
-    lightingEnabled: <span class="hljs-literal">true</span>
+    lightingEnabled: <span class="hljs-literal">true</span>,
+    perPixelLightingEnabled: <span class="hljs-literal">true</span>
   });
   program.enableDefaultLighting();
 
@@ -112,7 +115,7 @@
   program.texture = texture;
 
   <span class="hljs-keyword">var</span> cubeModel = Zia.GeometricPrimitive.convertToModel(
-    graphicsDevice, Zia.GeometricPrimitive.createCube());
+    graphicsDevice, Zia.GeometricPrimitive.createTeapot());
 
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; cubeModel.meshes.length; i++) {
     <span class="hljs-keyword">var</span> mesh = cubeModel.meshes[i];
@@ -125,7 +128,7 @@
     graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
 
   <span class="hljs-keyword">var</span> viewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makeLookAt(
-    <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">2</span>),
+    <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>),
     <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>),
     <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>));
 
@@ -153,7 +156,7 @@
     <span class="hljs-keyword">if</span> (lastCubeUpdateTime) {
       <span class="hljs-keyword">var</span> delta = currentTime - lastCubeUpdateTime;
       
-      cubeRotation += (<span class="hljs-number">30</span> * delta) / <span class="hljs-number">1000.0</span>;
+      cubeRotation += (<span class="hljs-number">10</span> * delta) / <span class="hljs-number">1000.0</span>;
     }
     
     lastCubeUpdateTime = currentTime;
@@ -167,6 +170,8 @@
     </div>
   </div>
 </div>
+
+
 
 <script type="text/javascript" src="../assets/js/example-programs-basic-program.js"></script>
   </div>
