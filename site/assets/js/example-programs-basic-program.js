@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
 
   var viewMatrix = new Zia.Matrix4().makeLookAt(
-    new Zia.Vector3(0, 1, -1),
+    new Zia.Vector3(1, 1, -1),
     new Zia.Vector3(0, 0, 0),
     new Zia.Vector3(0, 1, 0));
 

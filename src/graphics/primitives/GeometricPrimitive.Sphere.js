@@ -75,78 +75,79 @@
 
 (function() {
 
-  /** Creates a torus primitive. */
-  Zia.GeometricPrimitive.createTorus = function(diameter, thickness, tessellation) {
-    if (diameter === undefined) {
-      diameter = 1.0;
-    }
-    if (thickness === undefined) {
-      thickness = 0.33;
-    }
-    if (tessellation === undefined) {
-      tessellation = 32;
+  /** Creates a sphere primitive. */
+  Zia.GeometricPrimitive.createSphere = function(diameter, tessellation) {
+    diameter = (diameter !== undefined) ? diameter : 1.0;
+    tessellation = (tessellation !== undefined) ? tessellation : 16;
+
+    if (tessellation < 3) {
+      throw "tessellation must be >= 3";
     }
 
-    if (tessellation < 3)
-      throw "tessellation parameter out of range";
+    var verticalSegments = tessellation;
+    var horizontalSegments = tessellation * 2;
 
-    var positions = [];
-    var normals = [];
-    var textureCoordinates = [];
-    var indices = [];
+    var positions = new Array((verticalSegments + 1) * (horizontalSegments + 1));
+    var normals = new Array((verticalSegments + 1) * (horizontalSegments + 1));
+    var texCoords = new Array((verticalSegments + 1) * (horizontalSegments + 1));
+    var indices = new Array((verticalSegments) * (horizontalSegments + 1) * 6);
 
-    var stride = tessellation + 1;
+    var radius = diameter / 2;
 
-    var translateTransform = new Zia.Matrix4().makeTranslation(diameter/2, 0, 0);
-    var transform = new Zia.Matrix4();
+    // Create rings of vertices at progressively higher latitudes.
+    var vertexCount = 0;
+    for (var i = 0; i <= verticalSegments; i++) {
+      var v = 1.0 - i / verticalSegments;
 
-    // First we loop around the main ring of the torus.
-    for (var i = 0; i <= tessellation; i++) {
-      var u = i/tessellation;
+      var latitude = ((i * Math.PI / verticalSegments) - Math.PI / 2.0);
+      var dy = Math.sin(latitude);
+      var dxz = Math.cos(latitude);
 
-      var outerAngle = i*Zia.MathUtil.TWO_PI/tessellation - Zia.MathUtil.PI_OVER_TWO;
+      // Create a single ring of vertices at this latitude.
+      for (var j = 0; j <= horizontalSegments; j++) {
+        var u = j / horizontalSegments;
 
-      // Create a transform matrix that will align geometry to
-      // slice perpendicularly though the current ring position.
-      transform.makeRotationY(outerAngle).multiply(translateTransform);
+        var longitude = j * 2.0 * Math.PI / horizontalSegments;
+        var dx = Math.sin(longitude);
+        var dz = Math.cos(longitude);
 
-      // Now we loop along the other axis, around the side of the tube.
-      for (var j = 0; j <= tessellation; j++) {
-        var v = 1 - j/tessellation;
+        dx *= dxz;
+        dz *= dxz;
 
-        var innerAngle = j*Zia.MathUtil.TWO_PI/tessellation + Math.PI;
-        var dx = Math.cos(innerAngle), dy = Math.sin(innerAngle);
-
-        // Create a vertex.
-        var normal = new Zia.Vector3(dx, dy, 0);
-        var position = normal.clone().multiplyScalar(thickness/2);
+        var normal = new Zia.Vector3(dx, dy, dz);
         var textureCoordinate = new Zia.Vector2(u, 1 - v);
 
-        position.applyMatrix4(transform);
-        normal.transformDirection(transform);
+        positions[vertexCount] = normal.clone().multiplyScalar(radius);
+        normals[vertexCount] = normal;
+        texCoords[vertexCount] = textureCoordinate;
 
-        positions.push(position);
-        normals.push(normal);
-        textureCoordinates.push(textureCoordinate);
+        vertexCount++;
+      }
+    }
 
-        // And create indices for two triangles.
-        var nextI = (i + 1)%stride;
-        var nextJ = (j + 1)%stride;
+    // Fill the index buffer with triangles joining each pair of latitude rings.
+    var stride = horizontalSegments + 1;
 
-        indices.push(i*stride + j);
-        indices.push(nextI*stride + j);
-        indices.push(i*stride + nextJ);
+    var indexCount = 0;
+    for (var i = 0; i < verticalSegments; i++) {
+      for (var j = 0; j <= horizontalSegments; j++) {
+        var nextI = i + 1;
+        var nextJ = (j + 1) % stride;
 
-        indices.push(i*stride + nextJ);
-        indices.push(nextI*stride + j);
-        indices.push(nextI*stride + nextJ);
+        indices[indexCount++] = (i * stride + j);
+        indices[indexCount++] = (i * stride + nextJ);
+        indices[indexCount++] = (nextI * stride + j);
+
+        indices[indexCount++] = (i * stride + nextJ);
+        indices[indexCount++] = (nextI * stride + nextJ);
+        indices[indexCount++] = (nextI * stride + j);
       }
     }
 
     return {
       positions: positions,
       normals: normals,
-      textureCoordinates: textureCoordinates,
+      textureCoordinates: texCoords,
       indices: indices
     };
   };

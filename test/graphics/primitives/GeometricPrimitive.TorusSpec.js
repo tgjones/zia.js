@@ -12,7 +12,7 @@ describe('Zia.GeometricPrimitive.createTorus', function() {
     expect(result.normals[0].z).toBeCloseTo(-1.00, 2);
     expect(result.textureCoordinates.length).toBe(1089);
     expect(result.textureCoordinates[0].x).toBe(0);
-    expect(result.textureCoordinates[0].y).toBe(1);
+    expect(result.textureCoordinates[0].y).toBe(0);
     expect(result.indices.length).toBe(6534);
     expect(result.indices[0]).toBe(0);
   });
