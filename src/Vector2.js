@@ -81,7 +81,7 @@ Zia.Vector2.prototype = {
     return this;
   },
 
-  add: function (v, w) {
+  add: function (v) {
     this._x += v._x;
     this._y += v._y;
     this._onChangeCallback();
