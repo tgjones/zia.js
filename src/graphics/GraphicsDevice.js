@@ -147,6 +147,10 @@ Zia.GraphicsDevice.prototype = {
     return false;
   },
 
+  toggleFullScreen: function() {
+    Zia.HtmlUtil.toggleFullScreen(this._canvas);
+  },
+
   _bindVertexAttributes: function (gl) {
     var enabledAttributeLocations = [];
     for (var i = 0; i < this._currentProgram._attributes.length; i++) {

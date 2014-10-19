@@ -16,9 +16,9 @@ $(function() {
 
   var model;
 
-  function loadModel(primitiveFunc) {
+  function loadModel(primitive) {
     model = Zia.GeometricPrimitive.convertToModel(
-      graphicsDevice, Zia.GeometricPrimitive[primitiveFunc]());
+      graphicsDevice, Zia.GeometricPrimitive['create' + primitive]());
 
     for (var i = 0; i < model.meshes.length; i++) {
       var mesh = model.meshes[i];
@@ -28,7 +28,7 @@ $(function() {
     }
   }
 
-  loadModel('createTeapot');
+  loadModel('Teapot');
 
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
@@ -43,7 +43,14 @@ $(function() {
   var rotationAxis = new Zia.Vector3(0, 1, 0);
   var rotationAngle = 0;
 
+  var stats = new Stats();
+  stats.domElement.style.position = 'absolute';
+  stats.domElement.style.top = '0px';
+  canvas.parentElement.appendChild(stats.domElement);
+
   function drawScene() {
+    stats.begin();
+
     if (graphicsDevice.resize()) {
       projectionMatrix.makePerspective(45,
         graphicsDevice.viewport.aspectRatio,
@@ -52,10 +59,12 @@ $(function() {
 
     graphicsDevice.clear(
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
-      new Zia.Color4(0, 0, 0, 1), 1);
+      new Zia.Color4(0.7, 0.7, 0.7, 1), 1);
 
     modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(rotationAngle));
     model.draw(modelMatrix, viewMatrix, projectionMatrix);
+
+    stats.end();
   }
 
   var lastTime = 0;
@@ -75,10 +84,30 @@ $(function() {
     animate();
   }
 
-  tick();
+  var controls = {
+    primitive: 'Teapot',
+    toggleFullScreen: function() {
+      Zia.HtmlUtil.toggleFullScreen(canvas.parentElement);
+    }
+  };
 
-  $('.primitive-types input').change(function() {
-    loadModel($(this).val());
+  var gui = new dat.GUI({ autoPlace: false });
+  canvas.parentElement.appendChild(gui.domElement);
+
+  var filterController = gui.add(controls, 'primitive', [
+    'Cube',
+    'Cylinder',
+    'Plane',
+    'Sphere',
+    'Teapot',
+    'Torus'
+  ]).name('Primitive');
+  filterController.onChange(function(value) {
+    loadModel(value);
   });
+
+  gui.add(controls, 'toggleFullScreen').name('Fullscreen');
+
+  tick();
 
 });

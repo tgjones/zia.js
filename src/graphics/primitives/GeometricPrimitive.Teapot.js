@@ -386,7 +386,7 @@
         // Compute the texture coordinate.
         var mirroredU = isMirrored ? 1 - u : u;
 
-        var textureCoordinate = new Zia.Vector2(mirroredU, v);
+        var textureCoordinate = new Zia.Vector2(mirroredU, 1 - v);
 
         // Output this vertex.
         positions.push(position);

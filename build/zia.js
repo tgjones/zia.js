@@ -4426,6 +4426,10 @@ Zia.GraphicsDevice.prototype = {
     return false;
   },
 
+  toggleFullScreen: function() {
+    Zia.HtmlUtil.toggleFullScreen(this._canvas);
+  },
+
   _bindVertexAttributes: function (gl) {
     var enabledAttributeLocations = [];
     for (var i = 0; i < this._currentProgram._attributes.length; i++) {
@@ -6070,7 +6074,7 @@ Zia.Viewport.prototype = {
         // Compute the texture coordinate.
         var mirroredU = isMirrored ? 1 - u : u;
 
-        var textureCoordinate = new Zia.Vector2(mirroredU, v);
+        var textureCoordinate = new Zia.Vector2(mirroredU, 1 - v);
 
         // Output this vertex.
         positions.push(position);
@@ -6885,6 +6889,38 @@ Zia.EnumUtil = {
   hasFlag: function (value, flag) {
     return (value & flag) === flag;
   }
+};
+
+Zia.HtmlUtil = {
+
+  toggleFullScreen: function(element) {
+    element = (element !== undefined) ? element : document.documentElement;
+    if (!document.fullscreenElement &&
+        !document.mozFullScreenElement &&
+        !document.webkitFullscreenElement &&
+        !document.msFullscreenElement ) {
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  }
+
 };
 
 Zia.ObjectUtil = {
