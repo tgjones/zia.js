@@ -103,6 +103,10 @@ hr {
     position: absolute;
     top: 0;
     right: 0;
+
+    .selector {
+      width: 124px !important;
+    }
   }
 
   .controls-overlay {
