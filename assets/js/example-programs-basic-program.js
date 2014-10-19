@@ -4,7 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
   
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
-  var program = new Zia.BasicProgram(graphicsDevice);
+  var program = new Zia.BasicProgram(graphicsDevice, {
+    lightingEnabled: true
+  });
+  program.enableDefaultLighting();
 
   var texture = Zia.Texture.createFromImagePath(graphicsDevice,
     '../assets/textures/UV_Grid_Sm.jpg');
@@ -80,14 +83,13 @@ document.addEventListener('DOMContentLoaded', function () {
     diffuseColor: vector3ToColorArray(program.diffuseColor),
     specularColor: vector3ToColorArray(program.specularColor),
     specularPower: program.specularPower,
+    emissiveColor: vector3ToColorArray(program.emissiveColor),
+    ambientLightColor: vector3ToColorArray(program.ambientLightColor),
 
     toggleFullScreen: function() {
       Zia.HtmlUtil.toggleFullScreen(canvas.parentElement);
     }
   };
-
-  // diffuse color, specular color, specular power, emissive color
-  // ambient light color
 
   function createProgram() {
     if (program !== null) {
@@ -105,6 +107,8 @@ document.addEventListener('DOMContentLoaded', function () {
     program.diffuseColor = colorArrayToVector3(controls.diffuseColor);
     program.specularColor = colorArrayToVector3(controls.specularColor);
     program.specularPower = controls.specularPower;
+    program.emissiveColor = colorArrayToVector3(controls.emissiveColor);
+    program.ambientLightColor = colorArrayToVector3(controls.ambientLightColor);
 
     for (var i = 0; i < cubeModel.meshes.length; i++) {
       var mesh = cubeModel.meshes[i];
@@ -140,10 +144,18 @@ document.addEventListener('DOMContentLoaded', function () {
   f2.add(controls, 'specularPower', 1, 64).
     name('Specular power').
     onChange(createProgram);
+  f2.addColor(controls, 'emissiveColor').
+    name('Emissive color').
+    onChange(createProgram);
 
-  var f3 = gui.addFolder('Misc');
-  f3.add(controls, 'toggleFullScreen').name('Fullscreen');
-  f3.open();
+  var f3 = gui.addFolder('Lighting');
+  f3.addColor(controls, 'ambientLightColor').
+    name('Ambient light color').
+    onChange(createProgram);
+
+  var f4 = gui.addFolder('Misc');
+  f4.add(controls, 'toggleFullScreen').name('Fullscreen');
+  f4.open();
 
   requestAnimationFrame(drawScene);
 

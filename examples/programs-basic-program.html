@@ -104,7 +104,10 @@
   
   <span class="hljs-keyword">var</span> graphicsDevice = <span class="hljs-keyword">new</span> Zia.GraphicsDevice(canvas);
 
-  <span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice);
+  <span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice, {
+    lightingEnabled: <span class="hljs-literal">true</span>
+  });
+  program.enableDefaultLighting();
 
   <span class="hljs-keyword">var</span> texture = Zia.Texture.createFromImagePath(graphicsDevice,
     <span class="hljs-string">'../assets/textures/UV_Grid_Sm.jpg'</span>);
@@ -180,14 +183,13 @@
     diffuseColor: vector3ToColorArray(program.diffuseColor),
     specularColor: vector3ToColorArray(program.specularColor),
     specularPower: program.specularPower,
+    emissiveColor: vector3ToColorArray(program.emissiveColor),
+    ambientLightColor: vector3ToColorArray(program.ambientLightColor),
 
     toggleFullScreen: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
       Zia.HtmlUtil.toggleFullScreen(canvas.parentElement);
     }
   };
-
-  <span class="hljs-comment">// diffuse color, specular color, specular power, emissive color</span>
-  <span class="hljs-comment">// ambient light color</span>
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createProgram</span><span class="hljs-params">()</span> </span>{
     <span class="hljs-keyword">if</span> (program !== <span class="hljs-literal">null</span>) {
@@ -205,6 +207,8 @@
     program.diffuseColor = colorArrayToVector3(controls.diffuseColor);
     program.specularColor = colorArrayToVector3(controls.specularColor);
     program.specularPower = controls.specularPower;
+    program.emissiveColor = colorArrayToVector3(controls.emissiveColor);
+    program.ambientLightColor = colorArrayToVector3(controls.ambientLightColor);
 
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; cubeModel.meshes.length; i++) {
       <span class="hljs-keyword">var</span> mesh = cubeModel.meshes[i];
@@ -240,10 +244,18 @@
   f2.add(controls, <span class="hljs-string">'specularPower'</span>, <span class="hljs-number">1</span>, <span class="hljs-number">64</span>).
     name(<span class="hljs-string">'Specular power'</span>).
     onChange(createProgram);
+  f2.addColor(controls, <span class="hljs-string">'emissiveColor'</span>).
+    name(<span class="hljs-string">'Emissive color'</span>).
+    onChange(createProgram);
 
-  <span class="hljs-keyword">var</span> f3 = gui.addFolder(<span class="hljs-string">'Misc'</span>);
-  f3.add(controls, <span class="hljs-string">'toggleFullScreen'</span>).name(<span class="hljs-string">'Fullscreen'</span>);
-  f3.open();
+  <span class="hljs-keyword">var</span> f3 = gui.addFolder(<span class="hljs-string">'Lighting'</span>);
+  f3.addColor(controls, <span class="hljs-string">'ambientLightColor'</span>).
+    name(<span class="hljs-string">'Ambient light color'</span>).
+    onChange(createProgram);
+
+  <span class="hljs-keyword">var</span> f4 = gui.addFolder(<span class="hljs-string">'Misc'</span>);
+  f4.add(controls, <span class="hljs-string">'toggleFullScreen'</span>).name(<span class="hljs-string">'Fullscreen'</span>);
+  f4.open();
 
   requestAnimationFrame(drawScene);
 
