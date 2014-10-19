@@ -58,6 +58,42 @@ hr {
     text-transform: uppercase;
     margin-bottom: 0; }
 
+.canvas-container {
+  position: relative; }
+  .canvas-container #mainCanvas {
+    width: 100%;
+    height: 500px; }
+  .canvas-container .dg.main {
+    position: absolute;
+    top: 0;
+    right: 0; }
+    .canvas-container .dg.main .selector {
+      width: 124px !important; }
+  .canvas-container .controls-overlay {
+    bottom: 0;
+    width: auto;
+    padding: 5px; }
+    .canvas-container .controls-overlay .radio-container {
+      margin-left: 25px; }
+
+:fullscreen {
+  width: 100%;
+  height: 100%; }
+  :fullscreen #mainCanvas {
+    height: 100%; }
+
+:-webkit-full-screen {
+  width: 100%;
+  height: 100%; }
+  :-webkit-full-screen #mainCanvas {
+    height: 100%; }
+
+:-moz-full-screen {
+  width: 100%;
+  height: 100%; }
+  :-moz-full-screen #mainCanvas {
+    height: 100%; }
+
 .footer-container {
   margin-top: 60px;
   margin-bottom: 40px; }

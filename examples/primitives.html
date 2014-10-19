@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="../assets/css/site.css" media="screen">
     <script type="text/javascript" src="../assets/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../assets/js/jquery.fs.selector.min.js"></script>
+    <script type="text/javascript" src="../assets/js/stats.min.js"></script>
+    <script type="text/javascript" src="../assets/js/dat.gui.min.js"></script>
     <script type="text/javascript" src="../assets/js/zia.js"></script>
     <script type="text/javascript" src="../assets/js/site.js"></script>
   </head>
@@ -85,76 +88,14 @@
 <div class="panel">
   <ul class="nav nav-tabs">
     <li class="active"><a href="#example-output" data-toggle="tab">Output</a></li>
-    <li><a href="#example-html" data-toggle="tab">HTML</a></li>
     <li><a href="#example-script" data-toggle="tab">Javascript</a></li>
   </ul>
 
   <div id="hello" class="tab-content">
     <div class="tab-pane active" id="example-output">
-      <div class="row">
-  <div class="col-xs-9">
-    <canvas id="mainCanvas" style="width:100%;height:500px"></canvas>
-  </div>
-  <div class="col-xs-3 primitive-types">
-    <div class="radio">
-      <input name="primitive-type" type="radio" id="primitive-type-cube" value="createCube">
-      <label for="primitive-type-cube">Cube</label>
-    </div>
-    <div class="radio">
-      <input name="primitive-type" type="radio" id="primitive-type-cylinder" value="createCylinder">
-      <label for="primitive-type-cylinder">Cylinder</label>
-    </div>
-    <div class="radio">
-      <input name="primitive-type" type="radio" id="primitive-type-plane" value="createPlane">
-      <label for="primitive-type-plane">Plane</label>
-    </div>
-    <div class="radio">
-      <input name="primitive-type" type="radio" id="primitive-type-sphere" value="createSphere">
-      <label for="primitive-type-sphere">Sphere</label>
-    </div>
-    <div class="radio">
-      <input name="primitive-type" type="radio" id="primitive-type-teapot" value="createTeapot" checked>
-      <label for="primitive-type-teapot">Teapot</label>
-    </div>
-    <div class="radio">
-      <input name="primitive-type" type="radio" id="primitive-type-torus" value="createTorus">
-      <label for="primitive-type-torus">Torus</label>
-    </div>
-  </div>
-</div>
-    </div>
-    <div class="tab-pane" id="example-html">
-      <pre class="hljs"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"row"</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-xs-9"</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">canvas</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"mainCanvas"</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">"width:100%;height:500px"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">canvas</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-xs-3 primitive-types"</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"radio"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"primitive-type"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"radio"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"primitive-type-cube"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"createCube"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"primitive-type-cube"</span>&gt;</span>Cube<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"radio"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"primitive-type"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"radio"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"primitive-type-cylinder"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"createCylinder"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"primitive-type-cylinder"</span>&gt;</span>Cylinder<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"radio"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"primitive-type"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"radio"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"primitive-type-plane"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"createPlane"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"primitive-type-plane"</span>&gt;</span>Plane<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"radio"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"primitive-type"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"radio"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"primitive-type-sphere"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"createSphere"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"primitive-type-sphere"</span>&gt;</span>Sphere<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"radio"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"primitive-type"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"radio"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"primitive-type-teapot"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"createTeapot"</span> <span class="hljs-attribute">checked</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"primitive-type-teapot"</span>&gt;</span>Teapot<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"radio"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"primitive-type"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"radio"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"primitive-type-torus"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"createTorus"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"primitive-type-torus"</span>&gt;</span>Torus<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span></pre>
+      <div class="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+      </div>
     </div>
     <div class="tab-pane" id="example-script">
       <pre class="hljs">$(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
@@ -175,9 +116,9 @@
 
   <span class="hljs-keyword">var</span> model;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadModel</span><span class="hljs-params">(primitiveFunc)</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadModel</span><span class="hljs-params">(primitive)</span> </span>{
     model = Zia.GeometricPrimitive.convertToModel(
-      graphicsDevice, Zia.GeometricPrimitive[primitiveFunc]());
+      graphicsDevice, Zia.GeometricPrimitive[<span class="hljs-string">'create'</span> + primitive]());
 
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; model.meshes.length; i++) {
       <span class="hljs-keyword">var</span> mesh = model.meshes[i];
@@ -187,7 +128,7 @@
     }
   }
 
-  loadModel(<span class="hljs-string">'createTeapot'</span>);
+  loadModel(<span class="hljs-string">'Teapot'</span>);
 
   <span class="hljs-keyword">var</span> projectionMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makePerspective(<span class="hljs-number">45</span>,
     graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
@@ -202,7 +143,14 @@
   <span class="hljs-keyword">var</span> rotationAxis = <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
   <span class="hljs-keyword">var</span> rotationAngle = <span class="hljs-number">0</span>;
 
+  <span class="hljs-keyword">var</span> stats = <span class="hljs-keyword">new</span> Stats();
+  stats.domElement.style.position = <span class="hljs-string">'absolute'</span>;
+  stats.domElement.style.top = <span class="hljs-string">'0px'</span>;
+  canvas.parentElement.appendChild(stats.domElement);
+
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawScene</span><span class="hljs-params">()</span> </span>{
+    stats.begin();
+
     <span class="hljs-keyword">if</span> (graphicsDevice.resize()) {
       projectionMatrix.makePerspective(<span class="hljs-number">45</span>,
         graphicsDevice.viewport.aspectRatio,
@@ -211,10 +159,12 @@
 
     graphicsDevice.clear(
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
-      <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
+      <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0.7</span>, <span class="hljs-number">0.7</span>, <span class="hljs-number">0.7</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
 
     modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(rotationAngle));
     model.draw(modelMatrix, viewMatrix, projectionMatrix);
+
+    stats.end();
   }
 
   <span class="hljs-keyword">var</span> lastTime = <span class="hljs-number">0</span>;
@@ -234,11 +184,31 @@
     animate();
   }
 
-  tick();
+  <span class="hljs-keyword">var</span> controls = {
+    primitive: <span class="hljs-string">'Teapot'</span>,
+    toggleFullScreen: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+      Zia.HtmlUtil.toggleFullScreen(canvas.parentElement);
+    }
+  };
 
-  $(<span class="hljs-string">'.primitive-types input'</span>).change(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-    loadModel($(<span class="hljs-keyword">this</span>).val());
+  <span class="hljs-keyword">var</span> gui = <span class="hljs-keyword">new</span> dat.GUI({ autoPlace: <span class="hljs-literal">false</span> });
+  canvas.parentElement.appendChild(gui.domElement);
+
+  <span class="hljs-keyword">var</span> filterController = gui.add(controls, <span class="hljs-string">'primitive'</span>, [
+    <span class="hljs-string">'Cube'</span>,
+    <span class="hljs-string">'Cylinder'</span>,
+    <span class="hljs-string">'Plane'</span>,
+    <span class="hljs-string">'Sphere'</span>,
+    <span class="hljs-string">'Teapot'</span>,
+    <span class="hljs-string">'Torus'</span>
+  ]).name(<span class="hljs-string">'Primitive'</span>);
+  filterController.onChange(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(value)</span> </span>{
+    loadModel(value);
   });
+
+  gui.add(controls, <span class="hljs-string">'toggleFullScreen'</span>).name(<span class="hljs-string">'Fullscreen'</span>);
+
+  tick();
 
 });</pre>
     </div>

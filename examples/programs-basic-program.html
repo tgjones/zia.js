@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="../assets/css/site.css" media="screen">
     <script type="text/javascript" src="../assets/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../assets/js/jquery.fs.selector.min.js"></script>
+    <script type="text/javascript" src="../assets/js/stats.min.js"></script>
+    <script type="text/javascript" src="../assets/js/dat.gui.min.js"></script>
     <script type="text/javascript" src="../assets/js/zia.js"></script>
     <script type="text/javascript" src="../assets/js/site.js"></script>
   </head>
@@ -85,16 +88,14 @@
 <div class="panel">
   <ul class="nav nav-tabs">
     <li class="active"><a href="#example-output" data-toggle="tab">Output</a></li>
-    <li><a href="#example-html" data-toggle="tab">HTML</a></li>
     <li><a href="#example-script" data-toggle="tab">Javascript</a></li>
   </ul>
 
   <div id="hello" class="tab-content">
     <div class="tab-pane active" id="example-output">
-      <canvas id="mainCanvas" style="width:100%;height:500px"></canvas>
-    </div>
-    <div class="tab-pane" id="example-html">
-      <pre class="hljs"><span class="hljs-tag">&lt;<span class="hljs-title">canvas</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"mainCanvas"</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">"width:100%;height:500px"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">canvas</span>&gt;</span></pre>
+      <div class="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+      </div>
     </div>
     <div class="tab-pane" id="example-script">
       <pre class="hljs"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
@@ -103,26 +104,13 @@
   
   <span class="hljs-keyword">var</span> graphicsDevice = <span class="hljs-keyword">new</span> Zia.GraphicsDevice(canvas);
 
-  <span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice, {
-    textureEnabled: <span class="hljs-literal">true</span>,
-    lightingEnabled: <span class="hljs-literal">true</span>,
-    perPixelLightingEnabled: <span class="hljs-literal">true</span>
-  });
-  program.enableDefaultLighting();
+  <span class="hljs-keyword">var</span> program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice);
 
   <span class="hljs-keyword">var</span> texture = Zia.Texture.createFromImagePath(graphicsDevice,
     <span class="hljs-string">'../assets/textures/UV_Grid_Sm.jpg'</span>);
-  program.texture = texture;
 
   <span class="hljs-keyword">var</span> cubeModel = Zia.GeometricPrimitive.convertToModel(
     graphicsDevice, Zia.GeometricPrimitive.createTeapot());
-
-  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; cubeModel.meshes.length; i++) {
-    <span class="hljs-keyword">var</span> mesh = cubeModel.meshes[i];
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; mesh.meshParts.length; j++) {
-      mesh.meshParts[j].program = program;
-    }
-  }
 
   <span class="hljs-keyword">var</span> projectionMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makePerspective(<span class="hljs-number">45</span>,
     graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
@@ -134,10 +122,16 @@
 
   <span class="hljs-keyword">var</span> modelMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().identity();
 
-  <span class="hljs-keyword">var</span> lastCubeUpdateTime, cubeRotation = <span class="hljs-number">0</span>;
-  <span class="hljs-keyword">var</span> rotationAxis = <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>).normalize();
+  <span class="hljs-keyword">var</span> lastCubeUpdateTime, rotationAngle = <span class="hljs-number">0</span>;
+
+  <span class="hljs-keyword">var</span> stats = <span class="hljs-keyword">new</span> Stats();
+  stats.domElement.style.position = <span class="hljs-string">'absolute'</span>;
+  stats.domElement.style.top = <span class="hljs-string">'0px'</span>;
+  canvas.parentElement.appendChild(stats.domElement);
   
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawScene</span><span class="hljs-params">()</span> </span>{
+    stats.begin();
+
     <span class="hljs-keyword">if</span> (graphicsDevice.resize()) {
       projectionMatrix.makePerspective(<span class="hljs-number">45</span>,
         graphicsDevice.viewport.aspectRatio,
@@ -146,23 +140,110 @@
 
     graphicsDevice.clear(
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
-      <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
+      <span class="hljs-keyword">new</span> Zia.Color4(<span class="hljs-number">0.4</span>, <span class="hljs-number">0.4</span>, <span class="hljs-number">0.4</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>);
 
-    modelMatrix.makeRotationAxis(rotationAxis, Zia.Math.degToRad(cubeRotation));
+    modelMatrix.makeRotationY(Zia.Math.degToRad(rotationAngle));
 
     cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
 
     <span class="hljs-keyword">var</span> currentTime = (<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>).getTime();
     <span class="hljs-keyword">if</span> (lastCubeUpdateTime) {
       <span class="hljs-keyword">var</span> delta = currentTime - lastCubeUpdateTime;
-      
-      cubeRotation += (<span class="hljs-number">10</span> * delta) / <span class="hljs-number">1000.0</span>;
+      rotationAngle += (<span class="hljs-number">10</span> * delta) / <span class="hljs-number">1000.0</span>;
     }
     
     lastCubeUpdateTime = currentTime;
 
+    stats.end();
+
     requestAnimationFrame(drawScene);
   }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">vector3ToColorArray</span><span class="hljs-params">(v)</span> </span>{
+    <span class="hljs-keyword">return</span> v.toArray().map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(x)</span> </span>{
+      <span class="hljs-keyword">return</span> x * <span class="hljs-number">255.0</span>;
+    });
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">colorArrayToVector3</span><span class="hljs-params">(c)</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Zia.Vector3(
+      c[<span class="hljs-number">0</span>] / <span class="hljs-number">255.0</span>,
+      c[<span class="hljs-number">1</span>] / <span class="hljs-number">255.0</span>,
+      c[<span class="hljs-number">2</span>] / <span class="hljs-number">255.0</span>);
+  }
+
+  <span class="hljs-keyword">var</span> controls = {
+    textureEnabled: <span class="hljs-literal">true</span>,
+    lightingEnabled: <span class="hljs-literal">true</span>,
+    perPixelLightingEnabled: <span class="hljs-literal">true</span>,
+
+    diffuseColor: vector3ToColorArray(program.diffuseColor),
+    specularColor: vector3ToColorArray(program.specularColor),
+    specularPower: program.specularPower,
+
+    toggleFullScreen: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+      Zia.HtmlUtil.toggleFullScreen(canvas.parentElement);
+    }
+  };
+
+  <span class="hljs-comment">// diffuse color, specular color, specular power, emissive color</span>
+  <span class="hljs-comment">// ambient light color</span>
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createProgram</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">if</span> (program !== <span class="hljs-literal">null</span>) {
+      program.destroy();
+    }
+    program = <span class="hljs-keyword">new</span> Zia.BasicProgram(graphicsDevice, {
+      textureEnabled: controls.textureEnabled,
+      lightingEnabled: controls.lightingEnabled,
+      perPixelLightingEnabled: controls.perPixelLightingEnabled
+    });
+    <span class="hljs-keyword">if</span> (controls.lightingEnabled) {
+      program.enableDefaultLighting();
+    }
+    program.texture = texture;
+    program.diffuseColor = colorArrayToVector3(controls.diffuseColor);
+    program.specularColor = colorArrayToVector3(controls.specularColor);
+    program.specularPower = controls.specularPower;
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; cubeModel.meshes.length; i++) {
+      <span class="hljs-keyword">var</span> mesh = cubeModel.meshes[i];
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; mesh.meshParts.length; j++) {
+        mesh.meshParts[j].program = program;
+      }
+    }
+  }
+
+  createProgram();
+
+  <span class="hljs-keyword">var</span> gui = <span class="hljs-keyword">new</span> dat.GUI({ autoPlace: <span class="hljs-literal">false</span> });
+  canvas.parentElement.appendChild(gui.domElement);
+
+  <span class="hljs-keyword">var</span> f1 = gui.addFolder(<span class="hljs-string">'Basic parameters'</span>);
+  f1.add(controls, <span class="hljs-string">'textureEnabled'</span>).
+    name(<span class="hljs-string">'Texture'</span>).
+    onChange(createProgram);
+  f1.add(controls, <span class="hljs-string">'lightingEnabled'</span>).
+    name(<span class="hljs-string">'Lighting'</span>).
+    onChange(createProgram);
+  f1.add(controls, <span class="hljs-string">'perPixelLightingEnabled'</span>).
+    name(<span class="hljs-string">'Per-pixel lighting'</span>).
+    onChange(createProgram);
+
+  <span class="hljs-keyword">var</span> f2 = gui.addFolder(<span class="hljs-string">'Colors'</span>);
+  f2.addColor(controls, <span class="hljs-string">'diffuseColor'</span>).
+    name(<span class="hljs-string">'Diffuse color'</span>).
+    onChange(createProgram);
+  f2.addColor(controls, <span class="hljs-string">'specularColor'</span>).
+    name(<span class="hljs-string">'Specular color'</span>).
+    onChange(createProgram);
+  f2.add(controls, <span class="hljs-string">'specularPower'</span>, <span class="hljs-number">1</span>, <span class="hljs-number">64</span>).
+    name(<span class="hljs-string">'Specular power'</span>).
+    onChange(createProgram);
+
+  <span class="hljs-keyword">var</span> f3 = gui.addFolder(<span class="hljs-string">'Misc'</span>);
+  f3.add(controls, <span class="hljs-string">'toggleFullScreen'</span>).name(<span class="hljs-string">'Fullscreen'</span>);
+  f3.open();
 
   requestAnimationFrame(drawScene);
 
