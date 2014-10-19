@@ -91,6 +91,23 @@ hr {
   }
 }
 
+.canvas-container {
+  position: relative;
+
+  .controls-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    padding: 5px;
+
+    .radio-container {
+      margin-left: 25px;
+    }
+  }
+}
+
 .footer-container {
   margin-top: 60px;
   margin-bottom: 40px;

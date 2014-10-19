@@ -5,12 +5,20 @@ Zia.CullMode = {
   None: 3
 };
 
-Zia.RasterizerState = function () {
-  this.cullMode = Zia.CullMode.Back;
-  this.isFrontClockwise = false;
-  this.isPolygonOffsetEnabled = false;
-  this.polygonOffsetFactor = 0.0;
-  this.polygonOffsetUnits = 0.0;
+Zia.RasterizerState = function (options) {
+  options = Zia.ObjectUtil.reverseMerge(options || {}, {
+    cullMode: Zia.CullMode.Back,
+    isFrontClockwise: false,
+    isPolygonOffsetEnabled: false,
+    polygonOffsetFactor: 0.0,
+    polygonOffsetUnits: 0.0
+  });
+
+  this.cullMode = options.cullMode;
+  this.isFrontClockwise = options.isFrontClockwise;
+  this.isPolygonOffsetEnabled = options.isPolygonOffsetEnabled;
+  this.polygonOffsetFactor = options.polygonOffsetFactor;
+  this.polygonOffsetUnits = options.polygonOffsetUnits;
 };
 
 Zia.RasterizerState.prototype = {
