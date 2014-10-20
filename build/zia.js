@@ -4519,19 +4519,21 @@ Zia.Model = function(meshes) {
 
 Zia.Model.prototype = {
 
-  draw: function(modelMatrix, viewMatrix, projectionMatrix) {
+  draw: function(modelMatrix, viewMatrix, projectionMatrix, programOverride) {
+    programOverride = (programOverride !== undefined) ? programOverride : null;
+
     for (var i = 0; i < this.meshes.length; i++) {
       var mesh = this.meshes[i];
 
       for (var j = 0; j < mesh.programs.length; j++) {
-        var program = mesh.programs[j];
+        var program = programOverride || mesh.programs[j];
 
         program.modelMatrix = modelMatrix;
         program.viewMatrix = viewMatrix;
         program.projectionMatrix = projectionMatrix;
       }
 
-      mesh.draw();
+      mesh.draw(programOverride);
     }
   }
 
@@ -4550,12 +4552,13 @@ Zia.ModelMesh = function(graphicsDevice, meshParts) {
 
 Zia.ModelMesh.prototype = {
 
-  draw: function() {
+  draw: function(programOverride) {
+    programOverride = (programOverride !== undefined) ? programOverride : null;
 
     for (var i = 0; i < this.meshParts.length; i++) {
 
       var meshPart = this.meshParts[i];
-      var program = meshPart.program;
+      var program = programOverride || meshPart.program;
 
       if (meshPart.indexCount > 0) {
 
@@ -4750,13 +4753,13 @@ Zia.Texture = function (graphicsDevice, options, textureType) {
 
 Zia.Texture.prototype = {
 
-  _setData: function (setImageDataCallback) {
+  _setData: function (setImageDataCallback, flipY) {
     var gl = this._gl;
     var textureType = this._textureType;
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(textureType, this._texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
 
     setImageDataCallback(gl);
 
@@ -4795,7 +4798,7 @@ Zia.Texture2D.prototype.setData = function(data) {
       0, gl.RGBA,
       gl.UNSIGNED_BYTE,
       data);
-  });
+  }, true);
   this._generateMipmap();
 };
 
@@ -4809,7 +4812,7 @@ Zia.Texture2D.createFromImagePath = function (graphicsDevice, imagePath, options
       gl.texImage2D(
         gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
         gl.UNSIGNED_BYTE, image);
-    });
+    }, true);
     result._generateMipmap();
     result.width = image.naturalWidth;
     result.height = image.naturalHeight;
@@ -4882,7 +4885,7 @@ Zia.TextureCube.prototype.setData = function(cubeMapFace, data) {
       0, gl.RGBA,
       gl.UNSIGNED_BYTE,
       data);
-  });
+  }, false);
 };
 
 Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, options) {
@@ -4905,7 +4908,7 @@ Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, opt
             0, gl.RGBA, gl.RGBA,
             gl.UNSIGNED_BYTE,
             image);
-        });
+        }, false);
 
         if (image.naturalWidth != image.naturalHeight) {
           throw "Must use square textures for TextureCube";

@@ -14,7 +14,7 @@ Zia.Texture2D.prototype.setData = function(data) {
       0, gl.RGBA,
       gl.UNSIGNED_BYTE,
       data);
-  });
+  }, true);
   this._generateMipmap();
 };
 
@@ -28,7 +28,7 @@ Zia.Texture2D.createFromImagePath = function (graphicsDevice, imagePath, options
       gl.texImage2D(
         gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
         gl.UNSIGNED_BYTE, image);
-    });
+    }, true);
     result._generateMipmap();
     result.width = image.naturalWidth;
     result.height = image.naturalHeight;

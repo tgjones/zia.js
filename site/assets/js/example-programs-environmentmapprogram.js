@@ -20,6 +20,41 @@ document.addEventListener('DOMContentLoaded', function () {
   var model = Zia.GeometricPrimitive.convertToModel(
     graphicsDevice, Zia.GeometricPrimitive.createTeapot());
 
+  var skybox = Zia.GeometricPrimitive.convertToModel(
+    graphicsDevice, Zia.GeometricPrimitive.createCube(50));
+
+  var skyboxRasterizerState = new Zia.RasterizerState({
+    isFrontClockwise: true
+  });
+
+  var skyboxProgram = new Zia.Program(graphicsDevice,
+    new Zia.VertexShader(graphicsDevice, [
+      "precision mediump float;",
+
+      "uniform mat4 uMVPMatrix;",
+      "uniform mat4 uMMatrix;",
+
+      "attribute vec3 aVertexPosition;",
+
+      "varying vec3 vPositionWS;",
+
+      "void main() {",
+      "  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);",
+      "  vPositionWS = (uMMatrix * vec4(aVertexPosition, 1.0)).xyz;",
+      "}"
+    ].join('\n')),
+    new Zia.FragmentShader(graphicsDevice, [
+      "precision mediump float;",
+      
+      "uniform samplerCube uCubeSampler;",
+
+      "varying vec3 vPositionWS;",
+
+      "void main() {",
+      "  gl_FragColor = textureCube(uCubeSampler, vPositionWS);",
+      "}"
+    ].join('\n')));
+
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
 
@@ -32,6 +67,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var lastCubeUpdateTime, rotationAngle = 0;
   var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();
+
+  var identityMatrix = new Zia.Matrix4();
+  var skyboxMVPMatrix = new Zia.Matrix4();
 
   var stats = new Stats();
   stats.domElement.style.position = 'absolute';
@@ -52,12 +90,30 @@ document.addEventListener('DOMContentLoaded', function () {
       new Zia.Color4(0.4, 0.4, 0.4, 1), 1);
 
     cameraPositionMatrix.makeRotationY(Zia.Math.degToRad(rotationAngle));
-    cameraPosition.set(0, 1, -1.5).applyMatrix4(cameraPositionMatrix);
+    cameraPosition.set(0, 0.5, -1.5).applyMatrix4(cameraPositionMatrix);
 
     viewMatrix.makeLookAt(
       cameraPosition,
       cameraTarget,
       cameraUp);
+
+    var tempRasterizerState = graphicsDevice.rasterizerState;
+    graphicsDevice.rasterizerState = skyboxRasterizerState;
+
+    skyboxProgram.apply();
+    skyboxProgram.setUniform('uCubeSampler', environmentMap);
+    skyboxMVPMatrix.multiplyMatrices(projectionMatrix, viewMatrix);
+    skyboxMVPMatrix.multiply(identityMatrix);
+    skyboxProgram.setUniform('uMMatrix', identityMatrix);
+    skyboxProgram.setUniform('uMVPMatrix', skyboxMVPMatrix);
+
+    skybox.draw(
+      identityMatrix,
+      viewMatrix,
+      projectionMatrix,
+      skyboxProgram);
+
+    graphicsDevice.rasterizerState = tempRasterizerState;
 
     model.draw(modelMatrix, viewMatrix, projectionMatrix);
 

@@ -26,13 +26,13 @@ Zia.Texture = function (graphicsDevice, options, textureType) {
 
 Zia.Texture.prototype = {
 
-  _setData: function (setImageDataCallback) {
+  _setData: function (setImageDataCallback, flipY) {
     var gl = this._gl;
     var textureType = this._textureType;
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(textureType, this._texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
 
     setImageDataCallback(gl);
 

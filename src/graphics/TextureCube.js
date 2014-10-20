@@ -43,7 +43,7 @@ Zia.TextureCube.prototype.setData = function(cubeMapFace, data) {
       0, gl.RGBA,
       gl.UNSIGNED_BYTE,
       data);
-  });
+  }, false);
 };
 
 Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, options) {
@@ -66,7 +66,7 @@ Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, opt
             0, gl.RGBA, gl.RGBA,
             gl.UNSIGNED_BYTE,
             image);
-        });
+        }, false);
 
         if (image.naturalWidth != image.naturalHeight) {
           throw "Must use square textures for TextureCube";

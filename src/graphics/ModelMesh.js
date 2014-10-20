@@ -11,12 +11,13 @@ Zia.ModelMesh = function(graphicsDevice, meshParts) {
 
 Zia.ModelMesh.prototype = {
 
-  draw: function() {
+  draw: function(programOverride) {
+    programOverride = (programOverride !== undefined) ? programOverride : null;
 
     for (var i = 0; i < this.meshParts.length; i++) {
 
       var meshPart = this.meshParts[i];
-      var program = meshPart.program;
+      var program = programOverride || meshPart.program;
 
       if (meshPart.indexCount > 0) {
 
