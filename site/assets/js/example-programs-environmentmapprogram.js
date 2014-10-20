@@ -4,15 +4,21 @@ document.addEventListener('DOMContentLoaded', function () {
   
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
-  var program = new Zia.BasicProgram(graphicsDevice, {
-    lightingEnabled: true
-  });
+  var program = new Zia.EnvironmentMapProgram(graphicsDevice);
   program.enableDefaultLighting();
 
-  var texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  var texture = Zia.Texture2D.createFromImagePath(graphicsDevice,
     '../assets/textures/UV_Grid_Sm.jpg');
 
-  var cubeModel = Zia.GeometricPrimitive.convertToModel(
+  var environmentMap = Zia.TextureCube.createFromImagePaths(graphicsDevice, [
+    '../assets/textures/cube/posx.jpg',
+    '../assets/textures/cube/negx.jpg',
+    '../assets/textures/cube/posy.jpg',
+    '../assets/textures/cube/negy.jpg',
+    '../assets/textures/cube/posz.jpg',
+    '../assets/textures/cube/negz.jpg']);
+
+  var model = Zia.GeometricPrimitive.convertToModel(
     graphicsDevice, Zia.GeometricPrimitive.createTeapot());
 
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
@@ -47,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     modelMatrix.makeRotationY(Zia.Math.degToRad(rotationAngle));
 
-    cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
+    model.draw(modelMatrix, viewMatrix, projectionMatrix);
 
     var currentTime = (new Date).getTime();
     if (lastCubeUpdateTime) {
@@ -76,13 +82,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var controls = {
-    textureEnabled: true,
-    lightingEnabled: true,
-    perPixelLightingEnabled: true,
+    // textureEnabled: true,
+    // lightingEnabled: true,
+    // perPixelLightingEnabled: true,
 
     diffuseColor: vector3ToColorArray(program.diffuseColor),
-    specularColor: vector3ToColorArray(program.specularColor),
-    specularPower: program.specularPower,
+    //specularColor: vector3ToColorArray(program.specularColor),
+    //specularPower: program.specularPower,
     emissiveColor: vector3ToColorArray(program.emissiveColor),
     ambientLightColor: vector3ToColorArray(program.ambientLightColor),
 
@@ -95,23 +101,22 @@ document.addEventListener('DOMContentLoaded', function () {
     if (program !== null) {
       program.destroy();
     }
-    program = new Zia.BasicProgram(graphicsDevice, {
-      textureEnabled: controls.textureEnabled,
-      lightingEnabled: controls.lightingEnabled,
-      perPixelLightingEnabled: controls.perPixelLightingEnabled
+    program = new Zia.EnvironmentMapProgram(graphicsDevice, {
+      //textureEnabled: controls.textureEnabled,
+      // lightingEnabled: controls.lightingEnabled,
+      // perPixelLightingEnabled: controls.perPixelLightingEnabled
     });
-    if (controls.lightingEnabled) {
-      program.enableDefaultLighting();
-    }
+    program.enableDefaultLighting();
     program.texture = texture;
+    program.environmentMap = environmentMap;
     program.diffuseColor = colorArrayToVector3(controls.diffuseColor);
-    program.specularColor = colorArrayToVector3(controls.specularColor);
-    program.specularPower = controls.specularPower;
+    // program.specularColor = colorArrayToVector3(controls.specularColor);
+    // program.specularPower = controls.specularPower;
     program.emissiveColor = colorArrayToVector3(controls.emissiveColor);
     program.ambientLightColor = colorArrayToVector3(controls.ambientLightColor);
 
-    for (var i = 0; i < cubeModel.meshes.length; i++) {
-      var mesh = cubeModel.meshes[i];
+    for (var i = 0; i < model.meshes.length; i++) {
+      var mesh = model.meshes[i];
       for (var j = 0; j < mesh.meshParts.length; j++) {
         mesh.meshParts[j].program = program;
       }
@@ -124,26 +129,26 @@ document.addEventListener('DOMContentLoaded', function () {
   canvas.parentElement.appendChild(gui.domElement);
 
   var f1 = gui.addFolder('Basic parameters');
-  f1.add(controls, 'textureEnabled').
-    name('Texture').
-    onChange(createProgram);
-  f1.add(controls, 'lightingEnabled').
-    name('Lighting').
-    onChange(createProgram);
-  f1.add(controls, 'perPixelLightingEnabled').
-    name('Per-pixel lighting').
-    onChange(createProgram);
+  // f1.add(controls, 'textureEnabled').
+  //   name('Texture').
+  //   onChange(createProgram);
+  // f1.add(controls, 'lightingEnabled').
+  //   name('Lighting').
+  //   onChange(createProgram);
+  // f1.add(controls, 'perPixelLightingEnabled').
+  //   name('Per-pixel lighting').
+  //   onChange(createProgram);
 
   var f2 = gui.addFolder('Colors');
   f2.addColor(controls, 'diffuseColor').
     name('Diffuse color').
     onChange(createProgram);
-  f2.addColor(controls, 'specularColor').
-    name('Specular color').
-    onChange(createProgram);
-  f2.add(controls, 'specularPower', 1, 64).
-    name('Specular power').
-    onChange(createProgram);
+  // f2.addColor(controls, 'specularColor').
+  //   name('Specular color').
+  //   onChange(createProgram);
+  // f2.add(controls, 'specularPower', 1, 64).
+  //   name('Specular power').
+  //   onChange(createProgram);
   f2.addColor(controls, 'emissiveColor').
     name('Emissive color').
     onChange(createProgram);

@@ -13,56 +13,33 @@ Zia.TextureFilter = {
   MinLinearMagNearest: 10,
   MinMagLinear: 11,
 
-  _apply: function(gl, filter) {
+  // Returns an array containing [MinFilter, MagFilter]
+  _map: function(gl, filter) {
     switch (filter) {
       case Zia.TextureFilter.MinMagMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.NEAREST_MIPMAP_NEAREST, gl.NEAREST ];
       case Zia.TextureFilter.MinMagNearestMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.NEAREST_MIPMAP_LINEAR, gl.NEAREST ];
       case Zia.TextureFilter.MinNearestMagLinearMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.NEAREST_MIPMAP_NEAREST, gl.LINEAR ];
       case Zia.TextureFilter.MinNearestMagMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.NEAREST_MIPMAP_LINEAR, gl.LINEAR ];
       case Zia.TextureFilter.MinLinearMagMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.LINEAR_MIPMAP_NEAREST, gl.NEAREST ];
       case Zia.TextureFilter.MinLinearMagNearestMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.LINEAR_MIPMAP_LINEAR, gl.NEAREST ];
       case Zia.TextureFilter.MinMagLinearMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.LINEAR_MIPMAP_NEAREST, gl.LINEAR ];
       case Zia.TextureFilter.MinMagMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR ];
       case Zia.TextureFilter.MinMagNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.NEAREST, gl.NEAREST ];
       case Zia.TextureFilter.MinNearestMagLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.NEAREST, gl.LINEAR ];
       case Zia.TextureFilter.MinLinearMagNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.LINEAR, gl.NEAREST ];
       case Zia.TextureFilter.MinMagLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.LINEAR, gl.LINEAR ];
       default :
         throw "Invalid value: " + filter;
     }

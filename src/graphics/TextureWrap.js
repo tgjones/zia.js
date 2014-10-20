@@ -3,25 +3,14 @@ Zia.TextureWrap = {
   ClampToEdge: 1,
   MirroredRepeat: 2,
 
-  _applyS: function(gl, wrap) {
-    Zia.TextureWrap._apply(gl, gl.TEXTURE_WRAP_S, wrap);
-  },
-
-  _applyT: function(gl, wrap) {
-    Zia.TextureWrap._apply(gl, gl.TEXTURE_WRAP_T, wrap);
-  },
-
-  _apply: function(gl, which, wrap) {
+  _map: function(gl, wrap) {
     switch (wrap) {
       case Zia.TextureWrap.Repeat:
-        gl.texParameteri(gl.TEXTURE_2D, which, gl.REPEAT);
-        break;
+        return gl.REPEAT;
       case Zia.TextureWrap.ClampToEdge:
-        gl.texParameteri(gl.TEXTURE_2D, which, gl.CLAMP_TO_EDGE);
-        break;
+        return gl.CLAMP_TO_EDGE;
       case Zia.TextureWrap.MirroredRepeat:
-        gl.texParameteri(gl.TEXTURE_2D, which, gl.MIRRORED_REPEAT);
-        break;
+        return gl.MIRRORED_REPEAT;
       default :
         throw "Invalid value: " + filter;
     }

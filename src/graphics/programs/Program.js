@@ -120,6 +120,13 @@ Zia.Program.prototype = {
             gl.uniform1i(uniform.location, 0); // TODO
           }
           break;
+        case gl.SAMPLER_CUBE :
+          if (value !== null && value._ready === true) {
+            gl.activeTexture(gl.TEXTURE1); // TODO
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, value._texture);
+            gl.uniform1i(uniform.location, 1); // TODO
+          }
+          break;
         default :
           throw "Not implemented for type: " + uniform.type;
       }

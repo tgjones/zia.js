@@ -4,7 +4,7 @@ body {
 }
 
 h1 {
-  font-size: 40px;
+  font-size: 36px;
 }
 
 h2 {
@@ -63,6 +63,8 @@ hr {
     }
 
     a {
+      font-size: 12px;
+
       &.active {
         color: #666;
       }

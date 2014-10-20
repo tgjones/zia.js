@@ -7,14 +7,18 @@
 //-----------------------------------------------------------------------------
 
 Zia.ProgramDirtyFlags = {
-  ModelViewProj : 1,
-  Model         : 2,
-  EyePosition   : 4,
-  MaterialColor : 8,
-  SpecularColor : 16,
-  SpecularPower : 32,
-  Texture       : 64,
-  All           : -1
+  ModelViewProj          : 1,
+  Model                  : 2,
+  EyePosition            : 4,
+  MaterialColor          : 8,
+  SpecularColor          : 16,
+  SpecularPower          : 32,
+  Texture                : 64,
+  EnvironmentMap         : 128,
+  EnvironmentMapAmount   : 256,
+  EnvironmentMapSpecular : 512,
+  FresnelFactor          : 1024,
+  All                    : -1
 };
 
 Zia.ProgramUtil = {

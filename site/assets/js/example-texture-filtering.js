@@ -85,7 +85,7 @@ $(function() {
     'MinMagLinear'
   ]).name('Filter');
   filterController.onChange(function(value) {
-    window.texture = Zia.Texture.createFromImagePath(graphicsDevice,
+    window.texture = Zia.Texture2D.createFromImagePath(graphicsDevice,
       '../assets/textures/texture6.jpg',
       { filter: Zia.TextureFilter[value] });
   });
