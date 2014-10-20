@@ -11,6 +11,7 @@
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-gh-pages": "^0.9.1",
+    "grunt-jsdoc": "^0.6.1",
     "grunt-karma": "^0.8.3",
     "grunt-newer": "^0.7.0",
     "handlebars-helpers": "^0.5.8",

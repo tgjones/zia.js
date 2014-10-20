@@ -93,6 +93,17 @@ module.exports = function(grunt) {
       }
     },
 
+    jsdoc : {
+      dist : {
+        src: ['src/**/*.js'],
+        options: {
+          destination: 'dist/site/docs/api',
+          template: "site/jsdoc",
+          configure: "site/jsdoc/jsdoc.conf.json"
+        }
+      }
+    },
+
     karma: {
       options: {
         browsers: ['Chrome'],
@@ -196,10 +207,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-gh-pages');
+  grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks('grunt-newer');
 
-  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "assemble" ]);
+  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "assemble", "jsdoc" ]);
   grunt.registerTask("default", [ "build", "karma:dev:start", "watch" ]);
   grunt.registerTask("deploy",  [ "build", "gh-pages" ]);
 };

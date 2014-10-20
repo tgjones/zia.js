@@ -35,6 +35,10 @@
     return result;
   }
 
+  /**
+   * A wrapper for a WebGL Program object.
+   * @constructor
+   */
   Zia.Program = function (graphicsDevice, vertexShader, fragmentShader) {
     this._graphicsDevice = graphicsDevice;
     var gl = this._gl = graphicsDevice._gl;

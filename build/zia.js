@@ -2022,6 +2022,10 @@ Zia.Matrix3.prototype = {
  * THE SOFTWARE.
  */
 
+/**
+ * A 4x4 matrix.
+ * @constructor
+ */
 Zia.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
   this.elements = new Float32Array( 16 );
@@ -2846,23 +2850,31 @@ Zia.Matrix4.prototype = {
       te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
     ];
 
-  },
+  }
+};
 
-  clone: function () {
-
-    var te = this.elements;
-
-    return new Zia.Matrix4(
-
-      te[ 0 ], te[ 4 ], te[ 8 ], te[ 12 ],
-      te[ 1 ], te[ 5 ], te[ 9 ], te[ 13 ],
-      te[ 2 ], te[ 6 ], te[ 10 ], te[ 14 ],
-      te[ 3 ], te[ 7 ], te[ 11 ], te[ 15 ]
-
-    );
-
+/**
+ * Duplicates the current Matrix4 instance.
+ * @method
+ *
+ * @param {Zia.Matrix4} [result] The object in which to store the result.
+ * @returns {Zia.Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
+ */
+Zia.Matrix4.prototype.clone = function(result) {
+  if (result === undefined) {
+    result = new Zia.Matrix4();
   }
 
+  var te = this.elements;
+
+  result.set(
+    te[ 0 ], te[ 4 ], te[ 8 ], te[ 12 ],
+    te[ 1 ], te[ 5 ], te[ 9 ], te[ 13 ],
+    te[ 2 ], te[ 6 ], te[ 10 ], te[ 14 ],
+    te[ 3 ], te[ 7 ], te[ 11 ], te[ 15 ]
+  );
+
+  return result;
 };
 
 /**
@@ -3985,6 +3997,10 @@ Zia.GeometricPrimitive = {
     return result;
   }
 
+  /**
+   * A wrapper for a WebGL Program object.
+   * @constructor
+   */
   Zia.Program = function (graphicsDevice, vertexShader, fragmentShader) {
     this._graphicsDevice = graphicsDevice;
     var gl = this._gl = graphicsDevice._gl;
