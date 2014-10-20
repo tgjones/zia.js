@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Programs - Basic Program - Zia.js</title>
+    <title>Programs - BasicProgram - Zia.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="../assets/css/bootstrap.css" media="screen">
@@ -64,9 +64,16 @@
           </li>
           
           <li>
-            <a href="programs-basic-program.html"
+            <a href="programs-basicprogram.html"
               class="active">
-              Programs - Basic Program
+              Programs - BasicProgram
+            </a>
+          </li>
+          
+          <li>
+            <a href="programs-environmentmapprogram.html"
+              class="">
+              Programs - EnvironmentMapProgram
             </a>
           </li>
           
@@ -82,7 +89,7 @@
     
   </div>
   <div class="col-md-9">
-    <h1>Programs - Basic Program</h1>
+    <h1>Programs - BasicProgram</h1>
     
 
 <div class="panel">
@@ -109,7 +116,7 @@
   });
   program.enableDefaultLighting();
 
-  <span class="hljs-keyword">var</span> texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  <span class="hljs-keyword">var</span> texture = Zia.Texture2D.createFromImagePath(graphicsDevice,
     <span class="hljs-string">'../assets/textures/UV_Grid_Sm.jpg'</span>);
 
   <span class="hljs-keyword">var</span> cubeModel = Zia.GeometricPrimitive.convertToModel(
@@ -266,7 +273,7 @@
 
 
 
-<script type="text/javascript" src="../assets/js/example-programs-basic-program.js"></script>
+<script type="text/javascript" src="../assets/js/example-programs-basicprogram.js"></script>
   </div>
 </div>
 </div>

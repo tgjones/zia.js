@@ -64,9 +64,16 @@
           </li>
           
           <li>
-            <a href="programs-basic-program.html"
+            <a href="programs-basicprogram.html"
               class="">
-              Programs - Basic Program
+              Programs - BasicProgram
+            </a>
+          </li>
+          
+          <li>
+            <a href="programs-environmentmapprogram.html"
+              class="">
+              Programs - EnvironmentMapProgram
             </a>
           </li>
           
@@ -185,7 +192,7 @@
     <span class="hljs-string">'MinMagLinear'</span>
   ]).name(<span class="hljs-string">'Filter'</span>);
   filterController.onChange(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(value)</span> </span>{
-    <span class="hljs-built_in">window</span>.texture = Zia.Texture.createFromImagePath(graphicsDevice,
+    <span class="hljs-built_in">window</span>.texture = Zia.Texture2D.createFromImagePath(graphicsDevice,
       <span class="hljs-string">'../assets/textures/texture6.jpg'</span>,
       { filter: Zia.TextureFilter[value] });
   });

@@ -3,7 +3,7 @@ body {
   background: #F1F1F1; }
 
 h1 {
-  font-size: 40px; }
+  font-size: 36px; }
 
 h2 {
   font-size: 30px; }
@@ -40,8 +40,10 @@ hr {
   .sidebar-nav .sidebar-nav-section h3 {
     text-transform: uppercase;
     font-size: 14px; }
-  .sidebar-nav .sidebar-nav-section a.active {
-    color: #666; }
+  .sidebar-nav .sidebar-nav-section a {
+    font-size: 12px; }
+    .sidebar-nav .sidebar-nav-section a.active {
+      color: #666; }
 
 .hljs {
   word-wrap: normal;

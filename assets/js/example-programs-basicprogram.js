@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   program.enableDefaultLighting();
 
-  var texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  var texture = Zia.Texture2D.createFromImagePath(graphicsDevice,
     '../assets/textures/UV_Grid_Sm.jpg');
 
   var cubeModel = Zia.GeometricPrimitive.convertToModel(

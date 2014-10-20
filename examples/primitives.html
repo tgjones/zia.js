@@ -64,9 +64,16 @@
           </li>
           
           <li>
-            <a href="programs-basic-program.html"
+            <a href="programs-basicprogram.html"
               class="">
-              Programs - Basic Program
+              Programs - BasicProgram
+            </a>
+          </li>
+          
+          <li>
+            <a href="programs-environmentmapprogram.html"
+              class="">
+              Programs - EnvironmentMapProgram
             </a>
           </li>
           
@@ -110,7 +117,7 @@
   });
   program.enableDefaultLighting();
 
-  <span class="hljs-keyword">var</span> texture = Zia.Texture.createFromImagePath(graphicsDevice,
+  <span class="hljs-keyword">var</span> texture = Zia.Texture2D.createFromImagePath(graphicsDevice,
     <span class="hljs-string">'../assets/textures/UV_Grid_Sm.jpg'</span>);
   program.texture = texture;
 

@@ -4070,6 +4070,13 @@ Zia.Program.prototype = {
             gl.uniform1i(uniform.location, 0); // TODO
           }
           break;
+        case gl.SAMPLER_CUBE :
+          if (value !== null && value._ready === true) {
+            gl.activeTexture(gl.TEXTURE1); // TODO
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, value._texture);
+            gl.uniform1i(uniform.location, 1); // TODO
+          }
+          break;
         default :
           throw "Not implemented for type: " + uniform.type;
       }
@@ -4096,14 +4103,18 @@ Zia.Program.prototype = {
 //-----------------------------------------------------------------------------
 
 Zia.ProgramDirtyFlags = {
-  ModelViewProj : 1,
-  Model         : 2,
-  EyePosition   : 4,
-  MaterialColor : 8,
-  SpecularColor : 16,
-  SpecularPower : 32,
-  Texture       : 64,
-  All           : -1
+  ModelViewProj          : 1,
+  Model                  : 2,
+  EyePosition            : 4,
+  MaterialColor          : 8,
+  SpecularColor          : 16,
+  SpecularPower          : 32,
+  Texture                : 64,
+  EnvironmentMap         : 128,
+  EnvironmentMapAmount   : 256,
+  EnvironmentMapSpecular : 512,
+  FresnelFactor          : 1024,
+  All                    : -1
 };
 
 Zia.ProgramUtil = {
@@ -4508,19 +4519,21 @@ Zia.Model = function(meshes) {
 
 Zia.Model.prototype = {
 
-  draw: function(modelMatrix, viewMatrix, projectionMatrix) {
+  draw: function(modelMatrix, viewMatrix, projectionMatrix, programOverride) {
+    programOverride = (programOverride !== undefined) ? programOverride : null;
+
     for (var i = 0; i < this.meshes.length; i++) {
       var mesh = this.meshes[i];
 
       for (var j = 0; j < mesh.programs.length; j++) {
-        var program = mesh.programs[j];
+        var program = programOverride || mesh.programs[j];
 
         program.modelMatrix = modelMatrix;
         program.viewMatrix = viewMatrix;
         program.projectionMatrix = projectionMatrix;
       }
 
-      mesh.draw();
+      mesh.draw(programOverride);
     }
   }
 
@@ -4539,12 +4552,13 @@ Zia.ModelMesh = function(graphicsDevice, meshParts) {
 
 Zia.ModelMesh.prototype = {
 
-  draw: function() {
+  draw: function(programOverride) {
+    programOverride = (programOverride !== undefined) ? programOverride : null;
 
     for (var i = 0; i < this.meshParts.length; i++) {
 
       var meshPart = this.meshParts[i];
-      var program = meshPart.program;
+      var program = programOverride || meshPart.program;
 
       if (meshPart.indexCount > 0) {
 
@@ -4711,9 +4725,10 @@ Zia.VertexShader = function (graphicsDevice, source) {
 
 Zia.VertexShader.prototype = Object.create(Zia.Shader.prototype);
 
-Zia.Texture = function (graphicsDevice, options) {
-  this._gl = graphicsDevice._gl;
+Zia.Texture = function (graphicsDevice, options, textureType) {
+  var gl = this._gl = graphicsDevice._gl;
   this._texture = this._gl.createTexture();
+  this._textureType = textureType;
   this._ready = false;
 
   this._options = Zia.ObjectUtil.reverseMerge(options || {}, {
@@ -4721,69 +4736,202 @@ Zia.Texture = function (graphicsDevice, options) {
     wrapS: Zia.TextureWrap.Repeat,
     wrapT: Zia.TextureWrap.Repeat
   });
+
+  gl.bindTexture(textureType, this._texture);
+
+  gl.texParameteri(textureType, gl.TEXTURE_WRAP_S,
+    Zia.TextureWrap._map(gl, this._options.wrapS));
+  gl.texParameteri(textureType, gl.TEXTURE_WRAP_T,
+    Zia.TextureWrap._map(gl, this._options.wrapT));
+
+  var mappedFilterValues = Zia.TextureFilter._map(gl, this._options.filter);
+  gl.texParameteri(textureType, gl.TEXTURE_MIN_FILTER, mappedFilterValues[0]);
+  gl.texParameteri(textureType, gl.TEXTURE_MAG_FILTER, mappedFilterValues[1]);
+  
+  gl.bindTexture(textureType, null);
 };
 
-Zia.Texture.createFromImagePath = function (graphicsDevice, imagePath, options) {
-  var result = new Zia.Texture(graphicsDevice, options);
+Zia.Texture.prototype = {
+
+  _setData: function (setImageDataCallback, flipY) {
+    var gl = this._gl;
+    var textureType = this._textureType;
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(textureType, this._texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
+
+    setImageDataCallback(gl);
+
+    gl.bindTexture(textureType, null);
+  },
+
+  _generateMipmap: function() {
+    var gl = this._gl;
+    var textureType = this._textureType;
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(textureType, this._texture);
+    gl.generateMipmap(textureType);
+    gl.bindTexture(textureType, null);
+  },
+
+  destroy: function () {
+    this._gl.deleteTexture(this._texture);
+  }
+
+};
+
+Zia.Texture2D = function(graphicsDevice, options) {
+  Zia.Texture.call(this, graphicsDevice, options,
+    graphicsDevice._gl.TEXTURE_2D);
+};
+
+Zia.Texture2D.prototype = Object.create(Zia.Texture.prototype);
+
+Zia.Texture2D.prototype.setData = function(data) {
+  var width = this.width, height = this.height;
+  this._setData(function(gl) {
+    gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA,
+      width, height,
+      0, gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      data);
+  }, true);
+  this._generateMipmap();
+};
+
+Zia.Texture2D.createFromImagePath = function (graphicsDevice, imagePath, options) {
+  var result = new Zia.Texture2D(graphicsDevice, options);
 
   var gl = graphicsDevice._gl;
   var image = new Image();
-  image.onload = (function(scope) {
-    return function () {
-      result._handleImageLoad(function () {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-      });
-    };
-  })(this);
+  image.onload = function() {
+    result._setData(function() {
+      gl.texImage2D(
+        gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
+        gl.UNSIGNED_BYTE, image);
+    }, true);
+    result._generateMipmap();
+    result.width = image.naturalWidth;
+    result.height = image.naturalHeight;
+    result._ready = true;
+  };
   image.src = imagePath;
 
   return result;
 };
 
-Zia.Texture.createFromImageData = function (graphicsDevice, imageData, width, height, options) {
-  var result = new Zia.Texture(graphicsDevice, options);
+Zia.Texture2D.createFromImageData = function (graphicsDevice, imageData, width, height, options) {
+  var result = new Zia.Texture2D(graphicsDevice, options);
+  result.width = width;
+  result.height = height;
 
   var gl = graphicsDevice._gl;
-  result._handleImageLoad(function () {
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA,
-      gl.UNSIGNED_BYTE, imageData);
-  });
+  result.setData(imageData);
+  result._ready = true;
 
   return result;
 };
 
-Zia.Texture.createWhiteTexture = function (engine) {
+Zia.Texture2D.createWhiteTexture = function (graphicsDevice) {
   var whitePixel = new Uint8Array([255, 255, 255, 255]);
-  return Zia.Texture.createFromImageData(graphicsDevice, whitePixel, 1, 1);
+  return Zia.Texture2D.createFromImageData(graphicsDevice, whitePixel, 1, 1);
 };
 
-Zia.Texture.prototype = {
+Zia.CubeMapFace = {
+  PositiveX: 0,
+  NegativeX: 1,
+  PositiveY: 2,
+  NegativeY: 3,
+  PositiveZ: 4,
+  NegativeZ: 5,
 
-  _handleImageLoad: function (setImageDataCallback) {
-    var gl = this._gl;
+  _map: function(gl, face) {
+    switch (face) {
+      case Zia.CubeMapFace.NegativeX:
+        return gl.TEXTURE_CUBE_MAP_NEGATIVE_X;
+      case Zia.CubeMapFace.NegativeY:
+        return gl.TEXTURE_CUBE_MAP_NEGATIVE_Y;
+      case Zia.CubeMapFace.NegativeZ:
+        return gl.TEXTURE_CUBE_MAP_NEGATIVE_Z;
+      case Zia.CubeMapFace.PositiveX:
+        return gl.TEXTURE_CUBE_MAP_POSITIVE_X;
+      case Zia.CubeMapFace.PositiveY:
+        return gl.TEXTURE_CUBE_MAP_POSITIVE_Y;
+      case Zia.CubeMapFace.PositiveZ:
+        return gl.TEXTURE_CUBE_MAP_POSITIVE_Z;
+      default :
+        throw "Invalid face: " + face;
+    }
+  }
+};
 
-    gl.bindTexture(gl.TEXTURE_2D, this._texture);
+Zia.TextureCube = function(graphicsDevice, options) {
+  Zia.Texture.call(this, graphicsDevice, options,
+    graphicsDevice._gl.TEXTURE_CUBE_MAP);
+};
 
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    setImageDataCallback();
+Zia.TextureCube.prototype = Object.create(Zia.Texture.prototype);
 
-    Zia.TextureWrap._applyS(gl, this._options.wrapS);
-    Zia.TextureWrap._applyT(gl, this._options.wrapT);
+Zia.TextureCube.prototype.setData = function(cubeMapFace, data) {
+  var size = this.size;
+  this._setData(function(gl) {
+    gl.texImage2D(
+      Zia.CubeMapFace._map(gl, cubeMapFace),
+      0, gl.RGBA,
+      size, size,
+      0, gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      data);
+  }, false);
+};
 
-    Zia.TextureFilter._apply(gl, this._options.filter);
-
-    gl.generateMipmap(gl.TEXTURE_2D);
-    
-    gl.bindTexture(gl.TEXTURE_2D, null);
-
-    this._ready = true;
-  },
-
-  unload: function () {
-    this._gl.deleteTexture(this._texture);
+Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, options) {
+  if (imagePaths.length !== 6) {
+    throw "Must pass an array of 6 URLs";
   }
 
+  var result = new Zia.TextureCube(graphicsDevice, options);
+
+  var gl = graphicsDevice._gl;
+  var loaded = 0;
+  for (var i = 0; i < imagePaths.length; i++) {
+    var imagePath = imagePaths[i];
+    (function(localI) {
+      var image = new Image();
+      image.onload = function() {
+        result._setData(function() {
+          gl.texImage2D(
+            Zia.CubeMapFace._map(gl, localI),
+            0, gl.RGBA, gl.RGBA,
+            gl.UNSIGNED_BYTE,
+            image);
+        }, false);
+
+        if (image.naturalWidth != image.naturalHeight) {
+          throw "Must use square textures for TextureCube";
+        }
+
+        if (loaded === 0) {
+          result.size = image.naturalWidth;
+        } else if (image.naturalWidth !== result.size) {
+          throw "All 6 textures must have the same dimensions";
+        }
+
+        loaded++;
+
+        if (loaded === 6) {
+          result._generateMipmap();
+          result._ready = true;
+        }
+      };
+      image.src = imagePath;
+    })(i);
+  }
+
+  return result;
 };
 
 Zia.TextureFilter = {
@@ -4801,56 +4949,33 @@ Zia.TextureFilter = {
   MinLinearMagNearest: 10,
   MinMagLinear: 11,
 
-  _apply: function(gl, filter) {
+  // Returns an array containing [MinFilter, MagFilter]
+  _map: function(gl, filter) {
     switch (filter) {
       case Zia.TextureFilter.MinMagMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.NEAREST_MIPMAP_NEAREST, gl.NEAREST ];
       case Zia.TextureFilter.MinMagNearestMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.NEAREST_MIPMAP_LINEAR, gl.NEAREST ];
       case Zia.TextureFilter.MinNearestMagLinearMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.NEAREST_MIPMAP_NEAREST, gl.LINEAR ];
       case Zia.TextureFilter.MinNearestMagMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.NEAREST_MIPMAP_LINEAR, gl.LINEAR ];
       case Zia.TextureFilter.MinLinearMagMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.LINEAR_MIPMAP_NEAREST, gl.NEAREST ];
       case Zia.TextureFilter.MinLinearMagNearestMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.LINEAR_MIPMAP_LINEAR, gl.NEAREST ];
       case Zia.TextureFilter.MinMagLinearMipNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.LINEAR_MIPMAP_NEAREST, gl.LINEAR ];
       case Zia.TextureFilter.MinMagMipLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR ];
       case Zia.TextureFilter.MinMagNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.NEAREST, gl.NEAREST ];
       case Zia.TextureFilter.MinNearestMagLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.NEAREST, gl.LINEAR ];
       case Zia.TextureFilter.MinLinearMagNearest:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        break;
+        return [ gl.LINEAR, gl.NEAREST ];
       case Zia.TextureFilter.MinMagLinear:
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        break;
+        return [ gl.LINEAR, gl.LINEAR ];
       default :
         throw "Invalid value: " + filter;
     }
@@ -4862,25 +4987,14 @@ Zia.TextureWrap = {
   ClampToEdge: 1,
   MirroredRepeat: 2,
 
-  _applyS: function(gl, wrap) {
-    Zia.TextureWrap._apply(gl, gl.TEXTURE_WRAP_S, wrap);
-  },
-
-  _applyT: function(gl, wrap) {
-    Zia.TextureWrap._apply(gl, gl.TEXTURE_WRAP_T, wrap);
-  },
-
-  _apply: function(gl, which, wrap) {
+  _map: function(gl, wrap) {
     switch (wrap) {
       case Zia.TextureWrap.Repeat:
-        gl.texParameteri(gl.TEXTURE_2D, which, gl.REPEAT);
-        break;
+        return gl.REPEAT;
       case Zia.TextureWrap.ClampToEdge:
-        gl.texParameteri(gl.TEXTURE_2D, which, gl.CLAMP_TO_EDGE);
-        break;
+        return gl.CLAMP_TO_EDGE;
       case Zia.TextureWrap.MirroredRepeat:
-        gl.texParameteri(gl.TEXTURE_2D, which, gl.MIRRORED_REPEAT);
-        break;
+        return gl.MIRRORED_REPEAT;
       default :
         throw "Invalid value: " + filter;
     }
@@ -6725,6 +6839,356 @@ Zia.DirectionalLight.prototype = {
   }
 
 };
+
+(function () {
+  function addLighting(result) {
+    result.push("uniform vec3 uDirLight0Direction;");
+    result.push("uniform vec3 uDirLight0DiffuseColor;");
+    result.push("#define uDirLight0SpecularColor vec3(0,0,0)");
+
+    result.push("uniform vec3 uDirLight1Direction;");
+    result.push("uniform vec3 uDirLight1DiffuseColor;");
+    result.push("#define uDirLight1SpecularColor vec3(0,0,0)");
+
+    result.push("uniform vec3 uDirLight2Direction;");
+    result.push("uniform vec3 uDirLight2DiffuseColor;");
+    result.push("#define uDirLight2SpecularColor vec3(0,0,0)");
+
+    result.push("uniform vec3 uEyePosition;");
+
+    result.push("uniform vec3 uEmissiveColor;");
+    result.push("#define uSpecularColor vec3(0,0,0)");
+    result.push("#define uSpecularPower 0");
+
+    result.push(Zia.SharedProgramCode.lighting);
+  }
+
+  function buildVertexShader(options) {
+    var result = [];
+
+    result.push("precision mediump float;");
+
+    // Attributes
+    result.push("attribute vec3 aVertexPosition;");
+    result.push("attribute vec3 aVertexNormal;");
+    result.push("attribute vec2 aTextureCoord;");
+
+    // Uniforms
+    result.push("uniform mat4 uMVPMatrix;");
+    result.push("uniform mat4 uMMatrix;");
+    result.push("uniform mat3 uMMatrixInverseTranspose;");
+    result.push("uniform vec4 uDiffuseColor;");
+    result.push("uniform float uEnvironmentMapAmount;");
+    result.push("uniform float uFresnelFactor;");
+
+    result.push("uniform vec3 uDirLight0Direction;");
+    result.push("uniform vec3 uDirLight0DiffuseColor;");
+    result.push("#define uDirLight0SpecularColor vec3(0,0,0)");
+
+    result.push("uniform vec3 uDirLight1Direction;");
+    result.push("uniform vec3 uDirLight1DiffuseColor;");
+    result.push("#define uDirLight1SpecularColor vec3(0,0,0)");
+
+    result.push("uniform vec3 uDirLight2Direction;");
+    result.push("uniform vec3 uDirLight2DiffuseColor;");
+    result.push("#define uDirLight2SpecularColor vec3(0,0,0)");
+
+    result.push("uniform vec3 uEyePosition;");
+
+    result.push("uniform vec3 uEmissiveColor;");
+    result.push("#define uSpecularColor vec3(0,0,0)");
+    result.push("#define uSpecularPower 0");
+
+    result.push(Zia.SharedProgramCode.lighting);
+
+    // Varyings
+    result.push("varying vec4 vDiffuseColor;");
+    result.push("varying vec3 vSpecularColor;");
+    result.push("varying vec2 vTextureCoord;");
+    result.push("varying vec3 vEnvCoord;");
+
+    // Code
+
+    result.push("float ComputeFresnelFactor(vec3 eyeVector, vec3 worldNormal) {");
+    result.push("  float viewAngle = dot(eyeVector, worldNormal);");
+    result.push("  return pow(max(1.0 - abs(viewAngle), 0.0), uFresnelFactor) * uEnvironmentMapAmount;");
+    result.push("}");
+
+    result.push("void main(void) {");
+    result.push("  gl_Position = uMVPMatrix * vec4(aVertexPosition, 1.0);");
+
+    result.push("  vec4 positionWS = uMMatrix * vec4(aVertexPosition, 1.0);");
+    result.push("  vec3 eyeVector = normalize(uEyePosition - positionWS.xyz);");
+    result.push("  vec3 worldNormal = normalize(uMMatrixInverseTranspose * aVertexNormal);");
+
+    result.push("  ColorPair lightResult = ComputeLights(eyeVector, worldNormal);");
+    
+    result.push("  vDiffuseColor = vec4(lightResult.Diffuse, uDiffuseColor.a);");
+    
+    if (options.fresnelEnabled) {
+      result.push("  vSpecularColor.rgb = vec3(ComputeFresnelFactor(eyeVector, worldNormal));");
+    } else {
+      result.push("  vSpecularColor.rgb = vec3(uEnvironmentMapAmount);");
+    }
+    
+    result.push("  vTextureCoord = aTextureCoord;");
+    result.push("  vEnvCoord = reflect(-eyeVector, worldNormal);");
+    result.push("}");
+    
+    return result.join('\n');
+  }
+
+  function buildFragmentShader(options) {
+    var result = [];
+
+    result.push("precision mediump float;");
+
+    result.push("varying vec4 vDiffuseColor;");
+    result.push("varying vec3 vSpecularColor;");
+
+    result.push("varying vec2 vTextureCoord;");
+    result.push("uniform sampler2D uSampler;");
+
+    result.push("varying vec3 vEnvCoord;");
+    result.push("uniform samplerCube uEnvironmentMapSampler;");
+
+    result.push("uniform vec3 uEnvironmentMapSpecular;");
+
+    result.push("void main(void) {");
+    result.push("  vec4 color = vDiffuseColor;");
+    result.push("  color *= texture2D(uSampler, vTextureCoord);");
+    result.push("  vec4 envmap = textureCube(uEnvironmentMapSampler, vEnvCoord) * color.a;");
+
+    result.push("  color.rgb = mix(color.rgb, envmap.rgb, vSpecularColor.rgb);");
+
+    if (options.environmentMapSpecularEnabled) {
+      result.push("  color.rgb += uEnvironmentMapSpecular * envmap.a;");
+    }
+
+    result.push("  gl_FragColor = color;");
+    result.push("}");
+
+    return result.join('\n');
+  }
+
+  Zia.EnvironmentMapProgram = function (graphicsDevice, options) {
+    this._dirtyFlags = Zia.ProgramDirtyFlags.All;
+
+    this.modelMatrix = new Zia.Matrix4();
+    this.viewMatrix = new Zia.Matrix4();
+    this.projectionMatrix = new Zia.Matrix4();
+    this._modelView = new Zia.Matrix4();
+    this.diffuseColor = new Zia.Vector3(1, 1, 1);
+    this.emissiveColor = new Zia.Vector3();
+    this.alpha = 1;
+    this.texture = null;
+    this.ambientLightColor = new Zia.Vector3();
+    this._environmentMap = null;
+    this.environmentMapAmount = 1;
+    this.environmentMapSpecular = new Zia.Vector3();
+    this.fresnelFactor = 1;
+
+    this._directionalLight0 = new Zia.DirectionalLight(this, 0);
+    this._directionalLight1 = new Zia.DirectionalLight(this, 1);
+    this._directionalLight2 = new Zia.DirectionalLight(this, 2);
+
+    this._directionalLight0.enabled = true;
+
+    options = Zia.ObjectUtil.reverseMerge(options || {}, {
+      environmentMapSpecularEnabled: false,
+      fresnelEnabled: true
+    });
+    this._options = options;
+
+    var vertexShader = new Zia.VertexShader(graphicsDevice, buildVertexShader(options));
+    var fragmentShader = new Zia.FragmentShader(graphicsDevice, buildFragmentShader(options));
+
+    Zia.Program.call(this, graphicsDevice, vertexShader, fragmentShader);
+  };
+})();
+
+(function() {
+  var DF = Zia.ProgramDirtyFlags;
+
+  Zia.EnvironmentMapProgram.prototype = Object.create(Zia.Program.prototype, {
+    modelMatrix: {
+      get: function() { return this._modelMatrix; },
+      set: function(v) {
+        this._modelMatrix = v;
+        this._dirtyFlags |= DF.Model | DF.ModelViewProj | DF.Fog;
+      }
+    },
+
+    viewMatrix: {
+      get: function() { return this._viewMatrix; },
+      set: function(v) {
+        this._viewMatrix = v;
+        this._dirtyFlags |= DF.ModelViewProj | DF.EyePosition | DF.Fog;
+      }
+    },
+
+    projectionMatrix: {
+      get: function() { return this._projectionMatrix; },
+      set: function(v) {
+        this._projectionMatrix = v;
+        this._dirtyFlags |= DF.ModelViewProj;
+      }
+    },
+
+    diffuseColor: {
+      get: function() { return this._diffuseColor; },
+      set: function(v) {
+        this._diffuseColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    emissiveColor: {
+      get: function() { return this._emissiveColor; },
+      set: function(v) {
+        this._emissiveColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    alpha: {
+      get: function() { return this._alpha; },
+      set: function(v) {
+        this._alpha = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    ambientLightColor: {
+      get: function() { return this._ambientLightColor; },
+      set: function(v) {
+        this._ambientLightColor = v;
+        this._dirtyFlags |= DF.MaterialColor;
+      }
+    },
+
+    directionalLight0: {
+      get: function() { return this._directionalLight0; }
+    },
+
+    directionalLight1: {
+      get: function() { return this._directionalLight1; }
+    },
+
+    directionalLight2: {
+      get: function() { return this._directionalLight2; }
+    },
+
+    texture: {
+      get: function() { return this._texture; },
+      set: function(v) {
+        this._texture = v;
+        this._dirtyFlags |= DF.Texture;
+      }
+    },
+
+    environmentMap: {
+      get: function() { return this._environmentMap; },
+      set: function(v) {
+        this._environmentMap = v;
+        this._dirtyFlags |= DF.EnvironmentMap;
+      }
+    },
+
+    environmentMapAmount: {
+      get: function() { return this._environmentMapAmount; },
+      set: function(v) {
+        this._environmentMapAmount = v;
+        this._dirtyFlags |= DF.EnvironmentMapAmount;
+      }
+    },
+
+    environmentMapSpecular: {
+      get: function() { return this._environmentMapSpecular; },
+      set: function(v) {
+        this._environmentMapSpecular = v;
+        this._dirtyFlags |= DF.EnvironmentMapSpecular;
+      }
+    },
+
+    fresnelFactor: {
+      get: function() { return this._fresnelFactor; },
+      set: function(v) {
+        this._fresnelFactor = v;
+        this._dirtyFlags |= DF.FresnelFactor;
+      }
+    }
+  });
+
+  Zia.EnvironmentMapProgram.prototype.enableDefaultLighting = function() {
+    this.ambientLightColor = Zia.ProgramUtil.enableDefaultLighting(
+      this._directionalLight0,
+      this._directionalLight1,
+      this._directionalLight2);
+  };
+
+  Zia.EnvironmentMapProgram.prototype._onApply = (function() {
+    var modelViewProjectionMatrix = new Zia.Matrix4();
+    
+    var diffuseColor = new Zia.Vector4();
+
+    return function() {
+
+      // Recompute the model+view+projection matrix?
+      this._dirtyFlags = Zia.ProgramUtil.setModelViewProj(
+        this, this._dirtyFlags,
+        this._modelMatrix, this._viewMatrix, this._projectionMatrix,
+        this._modelView);
+      
+      // Recompute the diffuse/emissive/alpha material color parameters?
+      if ((this._dirtyFlags & DF.MaterialColor) != 0) {
+        Zia.ProgramUtil.setMaterialColor(
+          this, this._options.lightingEnabled,
+          this._alpha, this._diffuseColor, this._emissiveColor,
+          this._ambientLightColor);
+
+        this._dirtyFlags &= ~DF.MaterialColor;
+      }
+
+      if ((this._dirtyFlags & DF.EnvironmentMap) != 0) {
+        if ((this._environmentMap !== null && this._environmentMap._ready === true) || this._environmentMap === null) {
+          this.setUniform('uEnvironmentMapSampler', this._environmentMap);
+          this._dirtyFlags &= ~DF.EnvironmentMap;
+        }
+      }
+
+      if ((this._dirtyFlags & DF.EnvironmentMapAmount) != 0) {
+        this.setUniform('uEnvironmentMapAmount', this._environmentMapAmount);
+        this._dirtyFlags &= ~DF.EnvironmentMapAmount;
+      }
+
+      if ((this._dirtyFlags & DF.EnvironmentMapSpecular) != 0) {
+        this.setUniform('uEnvironmentMapSpecular', this._environmentMapSpecular);
+        this._dirtyFlags &= ~DF.EnvironmentMapSpecular;
+      }
+
+      if ((this._dirtyFlags & DF.FresnelFactor) != 0) {
+        this.setUniform('uFresnelFactor', this._fresnelFactor);
+        this._dirtyFlags &= ~DF.FresnelFactor;
+      }
+
+      // Recompute the world inverse transpose and eye position?
+      this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
+        this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
+
+      if ((this._dirtyFlags & DF.Texture) != 0) {
+        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
+          this.setUniform('uSampler', this._texture);
+          this._dirtyFlags &= ~DF.Texture;
+        }
+      }
+
+      this._directionalLight0._apply();
+      this._directionalLight1._apply();
+      this._directionalLight2._apply();
+    };
+  })();
+})();
 
 // Copyright (c) 2010-2014 SharpDX - Alexandre Mutel
 // 
