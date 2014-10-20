@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var program = new Zia.EnvironmentMapProgram(graphicsDevice);
   program.enableDefaultLighting();
 
-  var texture = Zia.Texture2D.createFromImagePath(graphicsDevice,
-    '../assets/textures/UV_Grid_Sm.jpg');
+  var texture = Zia.Texture2D.createWhiteTexture(graphicsDevice);
 
   var environmentMap = Zia.TextureCube.createFromImagePaths(graphicsDevice, [
     '../assets/textures/cube/posx.jpg',
@@ -24,14 +23,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var projectionMatrix = new Zia.Matrix4().makePerspective(45,
     graphicsDevice.viewport.aspectRatio, 0.1, 100);
 
-  var viewMatrix = new Zia.Matrix4().makeLookAt(
-    new Zia.Vector3(1, 1, -1),
-    new Zia.Vector3(0, 0, 0),
-    new Zia.Vector3(0, 1, 0));
-
+  var cameraPositionMatrix = new Zia.Matrix4();
+  var cameraPosition = new Zia.Vector3();
+  var cameraTarget = new Zia.Vector3(0, 0, 0);
+  var cameraUp = new Zia.Vector3(0, 1, 0);
+  var viewMatrix = new Zia.Matrix4();
   var modelMatrix = new Zia.Matrix4().identity();
 
   var lastCubeUpdateTime, rotationAngle = 0;
+  var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();
 
   var stats = new Stats();
   stats.domElement.style.position = 'absolute';
@@ -51,7 +51,13 @@ document.addEventListener('DOMContentLoaded', function () {
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       new Zia.Color4(0.4, 0.4, 0.4, 1), 1);
 
-    modelMatrix.makeRotationY(Zia.Math.degToRad(rotationAngle));
+    cameraPositionMatrix.makeRotationY(Zia.Math.degToRad(rotationAngle));
+    cameraPosition.set(0, 1, -1.5).applyMatrix4(cameraPositionMatrix);
+
+    viewMatrix.makeLookAt(
+      cameraPosition,
+      cameraTarget,
+      cameraUp);
 
     model.draw(modelMatrix, viewMatrix, projectionMatrix);
 

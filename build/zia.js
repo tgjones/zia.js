@@ -4832,7 +4832,7 @@ Zia.Texture2D.createFromImageData = function (graphicsDevice, imageData, width, 
   return result;
 };
 
-Zia.Texture2D.createWhiteTexture = function (engine) {
+Zia.Texture2D.createWhiteTexture = function (graphicsDevice) {
   var whitePixel = new Uint8Array([255, 255, 255, 255]);
   return Zia.Texture2D.createFromImageData(graphicsDevice, whitePixel, 1, 1);
 };
