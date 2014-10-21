@@ -1,4 +1,27 @@
-var Zia = {};
+/**
+ * The root Zia namespace.
+ * @namespace
+ */
+var Zia = {
+
+  /**
+   * Returns a if not undefined, otherwise b.
+   * Useful for setting a default value for a parameter.
+   *
+   * @param {Object} a - The parameter value.
+   * @param {Object} b - The default value.
+   *
+   * @example
+   * param = Zia.defaultValue(param, 'defaultValue');
+   */
+  defaultValue: function(a, b) {
+    if (a !== undefined) {
+      return a;
+    }
+    return b;
+  }
+
+};
 
 /**
  * Original code from three.js project. https://github.com/mrdoob/three.js
@@ -2042,6 +2065,30 @@ Zia.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, 
 
 };
 
+/**
+ * Creates a translation matrix.
+ *
+ * @param {Zia.Vector3} translation - Amounts to translate by on the x, y and z axes.
+ * @param {Zia.Matrix4} [result] - The object in which to store the result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter, or a new Matrix4 instance if none was supplied.
+ *
+ * @example
+ * var result = Zia.Matrix4.createTranslation(new Zia.Vector3(1, 2, -5));
+ */
+Zia.Matrix4.createTranslation = function(translation, result) {
+  if (result === undefined) {
+    result = new Zia.Matrix4();
+  }
+  result.set(
+    1, 0, 0, translation.x,
+    0, 1, 0, translation.y,
+    0, 0, 1, translation.z,
+    0, 0, 0, 1
+  );
+  return result;
+};
+
 Zia.Matrix4.prototype = {
 
   constructor: Zia.Matrix4,
@@ -2611,21 +2658,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  makeTranslation: function ( x, y, z ) {
-
-    this.set(
-
-      1, 0, 0, x,
-      0, 1, 0, y,
-      0, 0, 1, z,
-      0, 0, 0, 1
-
-    );
-
-    return this;
-
-  },
-
   makeRotationX: function ( theta ) {
 
     var c = Math.cos( theta ), s = Math.sin( theta );
@@ -2857,8 +2889,8 @@ Zia.Matrix4.prototype = {
  * Duplicates the current Matrix4 instance.
  * @method
  *
- * @param {Zia.Matrix4} [result] The object in which to store the result.
- * @returns {Zia.Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
+ * @param {Zia.Matrix4} [result] - The object in which to store the result.
+ * @returns {Zia.Matrix4} The modified result parameter, or a new Matrix4 instance if none was supplied.
  */
 Zia.Matrix4.prototype.clone = function(result) {
   if (result === undefined) {
@@ -6369,8 +6401,9 @@ Zia.Viewport.prototype = {
       tessellation = 32;
     }
 
-    if (tessellation < 3)
+    if (tessellation < 3) {
       throw "tessellation parameter out of range";
+    }
 
     var positions = [];
     var normals = [];
@@ -6379,7 +6412,7 @@ Zia.Viewport.prototype = {
 
     var stride = tessellation + 1;
 
-    var translateTransform = new Zia.Matrix4().makeTranslation(diameter/2, 0, 0);
+    var translateTransform = Zia.Matrix4.createTranslation(new Zia.Vector3(diameter/2, 0, 0));
     var transform = new Zia.Matrix4();
 
     // First we loop around the main ring of the torus.

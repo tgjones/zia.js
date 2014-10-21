@@ -189,7 +189,7 @@ describe('Zia.Matrix4', function() {
       new Zia.Matrix4().makeScale( 1/8, 1/2, 1/3 ),
       new Zia.Matrix4().makeFrustum( -1, 1, -1, 1, 1, 1000 ),
       new Zia.Matrix4().makeFrustum( -16, 16, -9, 9, 0.1, 10000 ),
-      new Zia.Matrix4().makeTranslation( 1, 2, 3 )
+      Zia.Matrix4.createTranslation(new Zia.Vector3(1, 2, 3))
       ];
 
     for( var i = 0, il = testMatrices.length; i < il; i ++ ) {

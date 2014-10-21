@@ -87,8 +87,9 @@
       tessellation = 32;
     }
 
-    if (tessellation < 3)
+    if (tessellation < 3) {
       throw "tessellation parameter out of range";
+    }
 
     var positions = [];
     var normals = [];
@@ -97,7 +98,7 @@
 
     var stride = tessellation + 1;
 
-    var translateTransform = new Zia.Matrix4().makeTranslation(diameter/2, 0, 0);
+    var translateTransform = Zia.Matrix4.createTranslation(new Zia.Vector3(diameter/2, 0, 0));
     var transform = new Zia.Matrix4();
 
     // First we loop around the main ring of the torus.

@@ -194,6 +194,11 @@ module.exports = function(grunt) {
         files: ['**/*'],
         tasks: ['copy']
       },
+      jsdoc: {
+        files: ['site/jsdoc/**/*.*'],
+        tasks: ['jsdoc'],
+        options: { livereload: true }
+      }
     },
   });
 
