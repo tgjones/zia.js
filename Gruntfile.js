@@ -195,7 +195,7 @@ module.exports = function(grunt) {
         tasks: ['copy']
       },
       jsdoc: {
-        files: ['site/jsdoc/**/*.*'],
+        files: [srcFiles, 'site/jsdoc/**/*.*'],
         tasks: ['jsdoc'],
         options: { livereload: true }
       }

@@ -112,7 +112,7 @@ describe('Zia.Matrix4', function() {
     expect(a).toEqualMatrix4(b);
   });
 
-  it( "multiplyScalar", function() {
+  it( "multiplyByScalar", function() {
     var b = new Zia.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
     expect( b.elements[0] ).toBe(0 );
     expect( b.elements[1] ).toBe(4 );
@@ -131,7 +131,7 @@ describe('Zia.Matrix4', function() {
     expect( b.elements[14]).toBe( 11 );
     expect( b.elements[15]).toBe( 15 );
 
-    b.multiplyScalar( 2 );
+    Zia.Matrix4.multiplyByScalar(b, 2, b);
     expect( b.elements[0] ).toBe(0*2 );
     expect( b.elements[1] ).toBe(4*2 );
     expect( b.elements[2] ).toBe(8*2 );
@@ -165,7 +165,7 @@ describe('Zia.Matrix4', function() {
     expect( a.determinant()).toBe(76);
   });
 
-  it( "getInverse", function() {
+  it( "invert", function() {
     var identity = new Zia.Matrix4();
 
     var a = new Zia.Matrix4();
@@ -173,31 +173,31 @@ describe('Zia.Matrix4', function() {
     var c = new Zia.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
     expect(a).not.toEqualMatrix4(b);
-    b.getInverse( a, false );
+    Zia.Matrix4.invert(b, a);
     expect(b).toEqualMatrix4(new Zia.Matrix4());
 
-    expect(function() { b.getInverse(c, true); }).toThrow();
+    expect(function() { Zia.Matrix4.invert(b, c); }).toThrow();
 
     var testMatrices = [
-      new Zia.Matrix4().makeRotationX( 0.3 ),
-      new Zia.Matrix4().makeRotationX( -0.3 ),
-      new Zia.Matrix4().makeRotationY( 0.3 ),
-      new Zia.Matrix4().makeRotationY( -0.3 ),
-      new Zia.Matrix4().makeRotationZ( 0.3 ),
-      new Zia.Matrix4().makeRotationZ( -0.3 ),
-      new Zia.Matrix4().makeScale( 1, 2, 3 ),
-      new Zia.Matrix4().makeScale( 1/8, 1/2, 1/3 ),
+      Zia.Matrix4.createRotationX( 0.3, new Zia.Matrix4()),
+      Zia.Matrix4.createRotationX(-0.3, new Zia.Matrix4()),
+      Zia.Matrix4.createRotationY( 0.3, new Zia.Matrix4()),
+      Zia.Matrix4.createRotationY(-0.3, new Zia.Matrix4()),
+      Zia.Matrix4.createRotationZ( 0.3, new Zia.Matrix4()),
+      Zia.Matrix4.createRotationZ(-0.3, new Zia.Matrix4()),
+      Zia.Matrix4.createScale(new Zia.Vector3(1, 2, 3), new Zia.Matrix4()),
+      Zia.Matrix4.createScale(new Zia.Vector3(1/8, 1/2, 1/3), new Zia.Matrix4()),
       new Zia.Matrix4().makeFrustum( -1, 1, -1, 1, 1, 1000 ),
       new Zia.Matrix4().makeFrustum( -16, 16, -9, 9, 0.1, 10000 ),
-      Zia.Matrix4.createTranslation(new Zia.Vector3(1, 2, 3))
+      Zia.Matrix4.createTranslation(new Zia.Vector3(1, 2, 3), new Zia.Matrix4())
       ];
 
     for( var i = 0, il = testMatrices.length; i < il; i ++ ) {
       var m = testMatrices[i];
 
-      var mInverse = new Zia.Matrix4().getInverse( m );
+      var mInverse = Zia.Matrix4.invert(m, new Zia.Matrix4());
       var mSelfInverse = m.clone();
-      mSelfInverse.getInverse( mSelfInverse );
+      Zia.Matrix4.invert(mSelfInverse, mSelfInverse);
 
 
       // self-inverse should the same as inverse
@@ -206,7 +206,7 @@ describe('Zia.Matrix4', function() {
       // the determinant of the inverse should be the reciprocal
       expect(Math.abs( m.determinant() * mInverse.determinant() - 1 )).toBeLessThan(0.0001);
 
-      var mProduct = new Zia.Matrix4().multiplyMatrices( m, mInverse );
+      var mProduct = Zia.Matrix4.multiply(m, mInverse, new Zia.Matrix4());
 
       // the determinant of the identity matrix is 1
       expect( Math.abs( mProduct.determinant() - 1 )).toBeLessThan(0.0001);

@@ -189,7 +189,7 @@ describe('Zia.Quaternion', function() {
     var m2 = new Zia.Matrix4().makeRotationFromEuler( angles[1], "XYZ" );
     var m3 = new Zia.Matrix4().makeRotationFromEuler( angles[2], "XYZ" );
 
-    var m = new Zia.Matrix4().multiplyMatrices( m1, m2 ).multiply( m3 );
+    var m = m1.multiply(m2).multiply(m3);
 
     var qFromM = new Zia.Quaternion().setFromRotationMatrix( m );
 

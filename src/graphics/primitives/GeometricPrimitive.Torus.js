@@ -98,7 +98,9 @@
 
     var stride = tessellation + 1;
 
-    var translateTransform = Zia.Matrix4.createTranslation(new Zia.Vector3(diameter/2, 0, 0));
+    var translateTransform = Zia.Matrix4.createTranslation(
+      new Zia.Vector3(diameter/2, 0, 0),
+      new Zia.Matrix4());
     var transform = new Zia.Matrix4();
 
     // First we loop around the main ring of the torus.
@@ -109,7 +111,7 @@
 
       // Create a transform matrix that will align geometry to
       // slice perpendicularly though the current ring position.
-      transform.makeRotationY(outerAngle).multiply(translateTransform);
+      Zia.Matrix4.createRotationY(outerAngle, transform).multiply(translateTransform);
 
       // Now we loop along the other axis, around the side of the tube.
       for (var j = 0; j <= tessellation; j++) {

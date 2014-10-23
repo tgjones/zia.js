@@ -2046,7 +2046,7 @@ Zia.Matrix3.prototype = {
  */
 
 /**
- * A 4x4 matrix.
+ * Represents a 4x4 matrix.
  * @constructor
  */
 Zia.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
@@ -2066,26 +2066,306 @@ Zia.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, 
 };
 
 /**
- * Creates a translation matrix.
+ * Creates a matrix that can be used to translate vectors.
  *
  * @param {Zia.Vector3} translation - Amounts to translate by on the x, y and z axes.
- * @param {Zia.Matrix4} [result] - The object in which to store the result.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
  * 
- * @returns {Zia.Matrix4} The modified result parameter, or a new Matrix4 instance if none was supplied.
+ * @returns {Zia.Matrix4} The modified result parameter.
  *
  * @example
- * var result = Zia.Matrix4.createTranslation(new Zia.Vector3(1, 2, -5));
+ * var result = Zia.Matrix4.createTranslation(
+ *   new Zia.Vector3(1, 2, -5),
+ *   new Zia.Matrix4());
  */
 Zia.Matrix4.createTranslation = function(translation, result) {
-  if (result === undefined) {
-    result = new Zia.Matrix4();
-  }
-  result.set(
+  return result.set(
     1, 0, 0, translation.x,
     0, 1, 0, translation.y,
     0, 0, 1, translation.z,
     0, 0, 0, 1
   );
+};
+
+/**
+ * Creates a matrix that can be used to rotate vectors around the x-axis.
+ *
+ * @param {Number} angle - The amount, in radians, by which to rotate around the x-axis.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4());
+ */
+Zia.Matrix4.createRotationX = function(angle, result) {
+  var c = Math.cos(angle), s = Math.sin(angle);
+
+  return result.set(
+    1, 0,  0, 0,
+    0, c, -s, 0,
+    0, s,  c, 0,
+    0, 0,  0, 1
+  )
+};
+
+/**
+ * Creates a matrix that can be used to rotate vectors around the y-axis.
+ *
+ * @param {Number} angle - The amount, in radians, by which to rotate around the y-axis.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createRotationY(Math.PI, new Zia.Matrix4());
+ */
+Zia.Matrix4.createRotationY = function(angle, result) {
+  var c = Math.cos(angle), s = Math.sin(angle);
+
+  return result.set(
+    c, 0, s, 0,
+    0, 1, 0, 0,
+   -s, 0, c, 0,
+    0, 0, 0, 1
+  )
+};
+
+/**
+ * Creates a matrix that can be used to rotate vectors around the z-axis.
+ *
+ * @param {Number} angle - The amount, in radians, by which to rotate around the z-axis.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createRotationZ(Math.PI, new Zia.Matrix4());
+ */
+Zia.Matrix4.createRotationZ = function(angle, result) {
+  var c = Math.cos(angle), s = Math.sin(angle);
+
+  return result.set(
+    c, -s, 0, 0,
+    s,  c, 0, 0,
+    0,  0, 1, 0,
+    0,  0, 0, 1
+  )
+};
+
+/**
+ * Creates a matrix that can be used to rotate vectors around an arbitrary axis.
+ *
+ * @param {Zia.Vector3} axis - The axis to rotate around.
+ * @param {Number} angle - The amount, in radians, by which to rotate around the vector.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createFromAxisAngle(
+ *   new Zia.Vector3(1, 0, 1).normalize(), Math.PI,
+ *   new Zia.Matrix4());
+ */
+Zia.Matrix4.createFromAxisAngle = function(axis, angle, result) {
+  // Based on http://www.gamedev.net/reference/articles/article1199.asp
+
+  var c = Math.cos(angle);
+  var s = Math.sin(angle);
+  var t = 1 - c;
+  var x = axis.x, y = axis.y, z = axis.z;
+  var tx = t * x, ty = t * y;
+
+  return result.set(
+    tx * x + c,     tx * y - s * z, tx * z + s * y, 0,
+    tx * y + s * z, ty * y + c,     ty * z - s * x, 0,
+    tx * z - s * y, ty * z + s * x, t * z * z + c,  0,
+    0, 0, 0, 1
+  );
+};
+
+/**
+ * Creates a scaling matrix.
+ *
+ * @param {Zia.Vector3} scale - Amounts to scale by on the x, y and z axes.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createScale(
+ *   new Zia.Vector3(1.5, 1, 2),
+ *   new Zia.Matrix4());
+ */
+Zia.Matrix4.createScale = function(scale, result) {
+  return result.set(
+    scale.x, 0,       0,       0,
+    0,       scale.y, 0,       0,
+    0,       0,       scale.z, 0,
+    0, 0, 0, 1
+  );
+};
+
+/**
+ * Creates a uniform scaling matrix.
+ *
+ * @param {Number} scale - Amount to scale by on all axes.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createUniformScale(2, new Zia.Matrix4());
+ */
+Zia.Matrix4.createUniformScale = function(scale, result) {
+  return result.set(
+    scale, 0,     0,     0,
+    0,     scale, 0,     0,
+    0,     0,     scale, 0,
+    0, 0, 0, 1
+  );
+};
+
+/**
+ * Multiplies a matrix by another matrix.
+ *
+ * @param {Zia.Matrix4} left - The first matrix.
+ * @param {Zia.Matrix4} right - The second matrix.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.multiply(
+ *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()),
+ *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4(),
+ *   new Zia.Matrix4());
+ */
+Zia.Matrix4.multiply = function(left, right, result) {
+  var ae = left.elements;
+  var be = right.elements;
+  var te = result.elements;
+
+  var a11 = ae[ 0 ], a12 = ae[ 4 ], a13 = ae[ 8 ], a14 = ae[ 12 ];
+  var a21 = ae[ 1 ], a22 = ae[ 5 ], a23 = ae[ 9 ], a24 = ae[ 13 ];
+  var a31 = ae[ 2 ], a32 = ae[ 6 ], a33 = ae[ 10 ], a34 = ae[ 14 ];
+  var a41 = ae[ 3 ], a42 = ae[ 7 ], a43 = ae[ 11 ], a44 = ae[ 15 ];
+
+  var b11 = be[ 0 ], b12 = be[ 4 ], b13 = be[ 8 ], b14 = be[ 12 ];
+  var b21 = be[ 1 ], b22 = be[ 5 ], b23 = be[ 9 ], b24 = be[ 13 ];
+  var b31 = be[ 2 ], b32 = be[ 6 ], b33 = be[ 10 ], b34 = be[ 14 ];
+  var b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
+
+  te[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+  te[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+  te[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+  te[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+
+  te[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+  te[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+  te[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+  te[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+
+  te[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+  te[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+  te[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+  te[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+
+  te[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+  te[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+  te[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+  te[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+  return result;
+};
+
+/**
+ * Multiplies a matrix by a scalar value.
+ *
+ * @param {Zia.Matrix4} matrix - The matrix.
+ * @param {Number} scalar - The scalar value.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.multiplyByScalar(
+ *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()), 0.5,
+ *   new Zia.Matrix4());
+ */
+Zia.Matrix4.multiplyByScalar = function(matrix, scalar, result) {
+  var te = matrix.elements;
+  var re = result.elements;
+
+  re[0] = te[0] * scalar;
+  re[1] = te[1] * scalar;
+  re[2] = te[2] * scalar;
+  re[3] = te[3] * scalar;
+  re[4] = te[4] * scalar;
+  re[5] = te[5] * scalar;
+  re[6] = te[6] * scalar;
+  re[7] = te[7] * scalar;
+  re[8] = te[8] * scalar;
+  re[9] = te[9] * scalar;
+  re[10] = te[10] * scalar;
+  re[11] = te[11] * scalar;
+  re[12] = te[12] * scalar;
+  re[13] = te[13] * scalar;
+  re[14] = te[14] * scalar;
+  re[15] = te[15] * scalar;
+
+  return result;
+};
+
+/**
+ * Inverts a matrix. If the determinant is zero, then the matrix cannot be
+ * inverted and an exception will be thrown.
+ *
+ * @param {Zia.Matrix4} matrix - The matrix to invert.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.invert(
+ *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()),
+ *   new Zia.Matrix4());
+ */
+Zia.Matrix4.invert = function(matrix, result) {
+  // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+  var te = matrix.elements;
+  var me = result.elements;
+
+  var n11 = me[ 0 ], n12 = me[ 4 ], n13 = me[ 8 ], n14 = me[ 12 ];
+  var n21 = me[ 1 ], n22 = me[ 5 ], n23 = me[ 9 ], n24 = me[ 13 ];
+  var n31 = me[ 2 ], n32 = me[ 6 ], n33 = me[ 10 ], n34 = me[ 14 ];
+  var n41 = me[ 3 ], n42 = me[ 7 ], n43 = me[ 11 ], n44 = me[ 15 ];
+
+  te[ 0 ] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
+  te[ 4 ] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
+  te[ 8 ] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
+  te[ 12 ] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+  te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
+  te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
+  te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
+  te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
+  te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
+  te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
+  te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
+  te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
+  te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
+  te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
+  te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
+  te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
+
+  var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
+
+  if (det === 0) {
+    throw new Error("Matrix4.getInverse(): can't invert matrix, determinant is 0");
+  }
+
+  Zia.Matrix4.multiplyByScalar(result, 1 / det, result);
+
   return result;
 };
 
@@ -2367,50 +2647,8 @@ Zia.Matrix4.prototype = {
 
   }(),
 
-  multiply: function ( m) {
-
-    return this.multiplyMatrices( this, m );
-
-  },
-
-  multiplyMatrices: function ( a, b ) {
-
-    var ae = a.elements;
-    var be = b.elements;
-    var te = this.elements;
-
-    var a11 = ae[ 0 ], a12 = ae[ 4 ], a13 = ae[ 8 ], a14 = ae[ 12 ];
-    var a21 = ae[ 1 ], a22 = ae[ 5 ], a23 = ae[ 9 ], a24 = ae[ 13 ];
-    var a31 = ae[ 2 ], a32 = ae[ 6 ], a33 = ae[ 10 ], a34 = ae[ 14 ];
-    var a41 = ae[ 3 ], a42 = ae[ 7 ], a43 = ae[ 11 ], a44 = ae[ 15 ];
-
-    var b11 = be[ 0 ], b12 = be[ 4 ], b13 = be[ 8 ], b14 = be[ 12 ];
-    var b21 = be[ 1 ], b22 = be[ 5 ], b23 = be[ 9 ], b24 = be[ 13 ];
-    var b31 = be[ 2 ], b32 = be[ 6 ], b33 = be[ 10 ], b34 = be[ 14 ];
-    var b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
-
-    te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
-    te[ 4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
-    te[ 8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
-    te[ 12 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
-
-    te[ 1 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
-    te[ 5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
-    te[ 9 ] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
-    te[ 13 ] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
-
-    te[ 2 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
-    te[ 6 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
-    te[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
-    te[ 14 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
-
-    te[ 3 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
-    te[ 7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
-    te[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
-    te[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
-
-    return this;
-
+  multiply: function(m) {
+    return Zia.Matrix4.multiply(this, m, this);
   },
 
   multiplyToArray: function ( a, b, r ) {
@@ -2423,19 +2661,6 @@ Zia.Matrix4.prototype = {
     r[ 4 ] = te[ 4 ]; r[ 5 ] = te[ 5 ]; r[ 6 ] = te[ 6 ]; r[ 7 ] = te[ 7 ];
     r[ 8 ]  = te[ 8 ]; r[ 9 ]  = te[ 9 ]; r[ 10 ] = te[ 10 ]; r[ 11 ] = te[ 11 ];
     r[ 12 ] = te[ 12 ]; r[ 13 ] = te[ 13 ]; r[ 14 ] = te[ 14 ]; r[ 15 ] = te[ 15 ];
-
-    return this;
-
-  },
-
-  multiplyScalar: function ( s ) {
-
-    var te = this.elements;
-
-    te[ 0 ] *= s; te[ 4 ] *= s; te[ 8 ] *= s; te[ 12 ] *= s;
-    te[ 1 ] *= s; te[ 5 ] *= s; te[ 9 ] *= s; te[ 13 ] *= s;
-    te[ 2 ] *= s; te[ 6 ] *= s; te[ 10 ] *= s; te[ 14 ] *= s;
-    te[ 3 ] *= s; te[ 7 ] *= s; te[ 11 ] *= s; te[ 15 ] *= s;
 
     return this;
 
@@ -2577,61 +2802,6 @@ Zia.Matrix4.prototype = {
 
   },
 
-  getInverse: function ( m, throwOnNonInvertible ) {
-
-    // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-    var te = this.elements;
-    var me = m.elements;
-
-    var n11 = me[ 0 ], n12 = me[ 4 ], n13 = me[ 8 ], n14 = me[ 12 ];
-    var n21 = me[ 1 ], n22 = me[ 5 ], n23 = me[ 9 ], n24 = me[ 13 ];
-    var n31 = me[ 2 ], n32 = me[ 6 ], n33 = me[ 10 ], n34 = me[ 14 ];
-    var n41 = me[ 3 ], n42 = me[ 7 ], n43 = me[ 11 ], n44 = me[ 15 ];
-
-    te[ 0 ] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
-    te[ 4 ] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
-    te[ 8 ] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
-    te[ 12 ] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
-    te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
-    te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
-    te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
-    te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
-    te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
-    te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
-    te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
-    te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
-    te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
-    te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
-    te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
-    te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
-
-    var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
-
-    if ( det == 0 ) {
-
-      var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
-
-      if ( throwOnNonInvertible || false ) {
-
-        throw new Error( msg );
-
-      } else {
-
-        console.warn( msg );
-
-      }
-
-      this.identity();
-
-      return this;
-    }
-
-    this.multiplyScalar( 1 / det );
-
-    return this;
-
-  },
-
   scale: function ( v ) {
 
     var te = this.elements;
@@ -2655,95 +2825,6 @@ Zia.Matrix4.prototype = {
     var scaleZSq = te[ 8 ] * te[ 8 ] + te[ 9 ] * te[ 9 ] + te[ 10 ] * te[ 10 ];
 
     return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
-
-  },
-
-  makeRotationX: function ( theta ) {
-
-    var c = Math.cos( theta ), s = Math.sin( theta );
-
-    this.set(
-
-      1, 0,  0, 0,
-      0, c, - s, 0,
-      0, s,  c, 0,
-      0, 0,  0, 1
-
-    );
-
-    return this;
-
-  },
-
-  makeRotationY: function ( theta ) {
-
-    var c = Math.cos( theta ), s = Math.sin( theta );
-
-    this.set(
-
-       c, 0, s, 0,
-       0, 1, 0, 0,
-      - s, 0, c, 0,
-       0, 0, 0, 1
-
-    );
-
-    return this;
-
-  },
-
-  makeRotationZ: function ( theta ) {
-
-    var c = Math.cos( theta ), s = Math.sin( theta );
-
-    this.set(
-
-      c, - s, 0, 0,
-      s,  c, 0, 0,
-      0,  0, 1, 0,
-      0,  0, 0, 1
-
-    );
-
-    return this;
-
-  },
-
-  makeRotationAxis: function ( axis, angle ) {
-
-    // Based on http://www.gamedev.net/reference/articles/article1199.asp
-
-    var c = Math.cos( angle );
-    var s = Math.sin( angle );
-    var t = 1 - c;
-    var x = axis.x, y = axis.y, z = axis.z;
-    var tx = t * x, ty = t * y;
-
-    this.set(
-
-      tx * x + c, tx * y - s * z, tx * z + s * y, 0,
-      tx * y + s * z, ty * y + c, ty * z - s * x, 0,
-      tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
-      0, 0, 0, 1
-
-    );
-
-     return this;
-
-  },
-
-  makeScale: function ( x, y, z ) {
-
-    this.set(
-
-      x, 0, 0, 0,
-      0, y, 0, 0,
-      0, 0, z, 0,
-      0, 0, 0, 1
-
-    );
-
-    return this;
 
   },
 
@@ -6412,7 +6493,9 @@ Zia.Viewport.prototype = {
 
     var stride = tessellation + 1;
 
-    var translateTransform = Zia.Matrix4.createTranslation(new Zia.Vector3(diameter/2, 0, 0));
+    var translateTransform = Zia.Matrix4.createTranslation(
+      new Zia.Vector3(diameter/2, 0, 0),
+      new Zia.Matrix4());
     var transform = new Zia.Matrix4();
 
     // First we loop around the main ring of the torus.
@@ -6423,7 +6506,7 @@ Zia.Viewport.prototype = {
 
       // Create a transform matrix that will align geometry to
       // slice perpendicularly though the current ring position.
-      transform.makeRotationY(outerAngle).multiply(translateTransform);
+      Zia.Matrix4.createRotationY(outerAngle, transform).multiply(translateTransform);
 
       // Now we loop along the other axis, around the side of the tube.
       for (var j = 0; j <= tessellation; j++) {
