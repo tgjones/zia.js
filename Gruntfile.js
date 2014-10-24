@@ -80,7 +80,12 @@ module.exports = function(grunt) {
       api: {
         options: {
           pages: apiPages,
-          layout: 'api.html'
+          layout: 'api.html',
+          collections: [
+            {
+              name: "api_types"
+            }
+          ]
         },
         files: {
           'dist/site/docs/api/': []

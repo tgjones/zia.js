@@ -5,8 +5,9 @@ layout: default.html
 <div class="container">
   <div class="row">
     <div class="col-md-3 sidebar-nav">
+      {{#each api_types}}
       <div class="sidebar-nav-section">
-        <h3>Classes</h3>
+        <h3>{{api_type}}</h3>
         <ul class="list-unstyled">
           {{#each pages}}
           <li>
@@ -18,17 +19,20 @@ layout: default.html
           {{/each}}
         </ul>
       </div>
+      {{/each}}
     </div>
     <div class="col-md-9 api-reference">
       <h1>{{title}}</h1>
       {{> body }}
 
+      {{#gt page.data.methods 0}}
       <h4>Methods</h4>
       <ul>
         {{#each page.data.methods}}
           <li><a href="#{{name}}">{{name}}</a></li>
         {{/each}}        
       </ul>
+      {{/gt}}
 
       {{#each page.data.methods}}
         <hr />
