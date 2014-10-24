@@ -25,78 +25,77 @@ layout: default.html
       <h1>{{title}}</h1>
       {{> body }}
 
-      {{#gt page.data.methods 0}}
+      {{#gt page.data.methods.length 0}}
       <h4>Methods</h4>
       <ul>
         {{#each page.data.methods}}
-          <li><a href="#{{name}}">{{name}}</a></li>
+          <li><code><a href="#{{name}}">{{name}}</a></code></li>
         {{/each}}        
       </ul>
+      <hr />
       {{/gt}}
 
       {{#each page.data.methods}}
-        <hr />
-        <a name="{{name}}"></a>
-        <h3 class="member-title">
-          {{name}}
-          <small>
-            ({{#each parameters}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})
-            → {{returns.type}}
+      <div class="panel panel-default api-member-details">
+        <div class="panel-heading">
+          <a name="{{name}}"></a>
+          <h3 class="panel-title member-title">
+            <code>{{name}}
+            <small>
+              ({{#each parameters}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})
+              → {{returns.type}}
+            </small></code>
             {{#each attribs}}
-            <span class="label label-default">{{this}}</span>
+            <span class="label label-default pull-right">{{this}}</span>
             {{/each}}
-          </small>
-        </h3>
-
-        <span class="defined-in">
-          Defined in
-          <a href="https://github.com/tgjones/zia.js/blob/master/src/{{filename}}#L{{line}}">{{filename}}:{{line}}</a>
-        </span>
-
-        <div class="description">
-        {{{description}}}
+          </h3>
         </div>
+        <div class="panel-body">
+          <span class="defined-in">
+            Defined in
+            <a href="https://github.com/tgjones/zia.js/blob/master/src/{{filename}}#L{{line}}">{{filename}}:{{line}}</a>
+          </span>
 
-        <h4>Parameters</h4>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each parameters}}
-            <tr>
-              <td><code>{{name}}</code></td>
-              <td>{{type}}</td>
-              <td>{{{description}}}</td>
-            </tr>
-            {{/each}}
-          </tbody>
-        </table>
+          <div class="description">
+          {{{description}}}
+          </div>
 
-        <h4>Returns</h4>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{returns.type}}</td>
-              <td>{{{returns.description}}}</td>
-            </tr>
-          </tbody>
-        </table>
+          {{#if parameters}}
+          <h4>Parameters</h4>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each parameters}}
+              <tr>
+                <td><code>{{name}}</code></td>
+                <td>{{apiTypeLink type}}</td>
+                <td>{{{description}}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+          {{/if}}
 
-        {{#gt examples.length 0}}
-        <h4>Example</h4>
-        {{inlineCode examples.[0]}}
-        {{/gt}}
+          {{#if returns}}
+          <h4>Returns</h4>
+          <div class="member-returns">
+            <p>{{apiTypeLink returns.type}} -</p>
+            {{{returns.description}}}
+          </div>
+          {{/if}}
+
+          {{#gt examples.length 0}}
+          <h4>Example</h4>
+          {{inlineCode examples.[0]}}
+          {{/gt}}
+        </div>
+      </div>
       {{/each}}
     </div>
   </div>

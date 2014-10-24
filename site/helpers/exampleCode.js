@@ -13,4 +13,15 @@ module.exports.register = function (Handlebars, options, params)  {
     var highlighted = hljs.highlight('js', code).value;
     return new Handlebars.SafeString('<pre class="hljs">' + highlighted + "</pre>");
   });
+
+  Handlebars.registerHelper('apiTypeLink', function (type) { 
+    var filename = type.replace(/\./, "-") + ".html";
+    for (var i = 0; i < params.assemble.options.pages.length; i++) {
+      var page = params.assemble.options.pages[i];
+      if (page.filename === filename) {
+        return new Handlebars.SafeString('<code><a href="' + page.filename + '">' + type + "</a></code>");
+      }
+    }
+    return new Handlebars.SafeString("<code>" + type + "</code>");
+  });
 };
