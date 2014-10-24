@@ -26,24 +26,45 @@
  */
 
 /**
- * Represents a 4x4 matrix.
+ * Constructs a new 4x4 matrix. Parameters are supplied in row-major order
+ * to aid readability. If called with no parameters, the matrix is initialised
+ * to the identity matrix. If called with any parameters, make sure you call
+ * it with all 16 values.
+ * 
  * @constructor
+ *
+ * @classdesc
+ * Represents a 4x4 matrix. The elements are stored in a Float32Array
+ * in column-major order to optimise passing to WebGL.
  */
-Zia.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
-
-  this.elements = new Float32Array( 16 );
-
-  // TODO: if n11 is undefined, then just set to identity, otherwise copy all other values into matrix
-  //   we should not support semi specification of Matrix4, it is just weird.
-
-  var te = this.elements;
-
-  te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 4 ] = n12 || 0; te[ 8 ] = n13 || 0; te[ 12 ] = n14 || 0;
-  te[ 1 ] = n21 || 0; te[ 5 ] = ( n22 !== undefined ) ? n22 : 1; te[ 9 ] = n23 || 0; te[ 13 ] = n24 || 0;
-  te[ 2 ] = n31 || 0; te[ 6 ] = n32 || 0; te[ 10 ] = ( n33 !== undefined ) ? n33 : 1; te[ 14 ] = n34 || 0;
-  te[ 3 ] = n41 || 0; te[ 7 ] = n42 || 0; te[ 11 ] = n43 || 0; te[ 15 ] = ( n44 !== undefined ) ? n44 : 1;
-
+Zia.Matrix4 = function(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) {
+  if (n11 == undefined) {
+    this.elements = new Float32Array([
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1
+    ]);
+  } else {
+    this.elements = new Float32Array([
+      n11, n21, n31, n41,
+      n12, n22, n32, n42,
+      n13, n23, n33, n43,
+      n14, n24, n34, n44
+    ]);
+  }
 };
+
+Zia.Matrix4.compose = (function() {
+  var temp = new Zia.Matrix4();
+
+  return function(scale, rotation, translation, result) {
+    Zia.Matrix4.createFromQuaternion(rotation, result);
+    result.multiply(Zia.Matrix4.createScale(scale, temp));
+    result.setTranslation(translation);
+    return result;
+  };
+})();
 
 /**
  * Creates a matrix that can be used to translate vectors.
@@ -130,7 +151,7 @@ Zia.Matrix4.createRotationZ = function(angle, result) {
     s,  c, 0, 0,
     0,  0, 1, 0,
     0,  0, 0, 1
-  )
+  );
 };
 
 /**
@@ -162,6 +183,128 @@ Zia.Matrix4.createFromAxisAngle = function(axis, angle, result) {
     tx * z - s * y, ty * z + s * x, t * z * z + c,  0,
     0, 0, 0, 1
   );
+};
+
+Zia.Matrix4.createFromQuaternion = function(quaternion, result) {
+  var te = result.elements;
+
+  var x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
+  var x2 = x + x, y2 = y + y, z2 = z + z;
+  var xx = x * x2, xy = x * y2, xz = x * z2;
+  var yy = y * y2, yz = y * z2, zz = z * z2;
+  var wx = w * x2, wy = w * y2, wz = w * z2;
+
+  te[ 0 ] = 1 - ( yy + zz );
+  te[ 4 ] = xy - wz;
+  te[ 8 ] = xz + wy;
+
+  te[ 1 ] = xy + wz;
+  te[ 5 ] = 1 - ( xx + zz );
+  te[ 9 ] = yz - wx;
+
+  te[ 2 ] = xz - wy;
+  te[ 6 ] = yz + wx;
+  te[ 10 ] = 1 - ( xx + yy );
+
+  // last column
+  te[ 3 ] = 0;
+  te[ 7 ] = 0;
+  te[ 11 ] = 0;
+
+  // bottom row
+  te[ 12 ] = 0;
+  te[ 13 ] = 0;
+  te[ 14 ] = 0;
+  te[ 15 ] = 1;
+
+  return result;
+};
+
+Zia.Matrix4.createLookAt = (function() {
+  var x = new Zia.Vector3();
+  var y = new Zia.Vector3();
+  var z = new Zia.Vector3();
+
+  return function(eye, target, up, result) {
+    var te = this.elements;
+
+    z.subVectors(eye, target).normalize();
+    x.crossVectors(up, z).normalize();
+    y.crossVectors(z, x);
+
+    var translateX = x.dot(eye);
+    var translateY = y.dot(eye);
+    var translateZ = z.dot(eye);
+
+    te[0] = x.x; te[4] = x.y; te[8] = x.z;  te[12] = -translateX;
+    te[1] = y.x; te[5] = y.y; te[9] = y.z;  te[13] = -translateY;
+    te[2] = z.x; te[6] = z.y; te[10] = z.z; te[14] = -translateZ;
+    te[3] = 0;   te[7] = 0;   te[11] = 0;   te[15] = 1;
+
+    return result;
+  };
+})();
+
+/**
+ * Creates an orthographic projection matrix.
+ *
+ * @param {Number} left - The minimum x value of the view volume.
+ * @param {Number} right - The maximum x value of the view volume.
+ * @param {Number} bottom - The minimum y value of the view volume.
+ * @param {Number} top - The maximum y value of the view volume.
+ * @param {Number} near - The minimum z value of the view volume.
+ * @param {Number} far - The maximum z value of the view volume.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createOrthographicOffCenter(
+ *   -100, 100, -40, 40, -100, 100,
+ *   new Zia.Matrix4());
+ */
+Zia.Matrix4.createOrthographicOffCenter = function(left, right, bottom, top, near, far, result) {
+  var te = result.elements;
+  var w = right - left;
+  var h = top - bottom;
+  var p = far - near;
+
+  var x = ( right + left ) / w;
+  var y = ( top + bottom ) / h;
+  var z = ( far + near ) / p;
+
+  te[ 0 ] = 2 / w;  te[ 4 ] = 0;  te[ 8 ] = 0;  te[ 12 ] = -x;
+  te[ 1 ] = 0;  te[ 5 ] = 2 / h;  te[ 9 ] = 0;  te[ 13 ] = -y;
+  te[ 2 ] = 0;  te[ 6 ] = 0;  te[ 10 ] = -2 / p; te[ 14 ] = -z;
+  te[ 3 ] = 0;  te[ 7 ] = 0;  te[ 11 ] = 0; te[ 15 ] = 1;
+
+  return result;
+};
+
+Zia.Matrix4.createPerspectiveOffCenter = function(left, right, bottom, top, near, far, result) {
+  var te = result.elements;
+  var x = 2 * near / ( right - left );
+  var y = 2 * near / ( top - bottom );
+
+  var a = ( right + left ) / ( right - left );
+  var b = ( top + bottom ) / ( top - bottom );
+  var c = - ( far + near ) / ( far - near );
+  var d = - 2 * far * near / ( far - near );
+
+  te[ 0 ] = x;  te[ 4 ] = 0;  te[ 8 ] = a;  te[ 12 ] = 0;
+  te[ 1 ] = 0;  te[ 5 ] = y;  te[ 9 ] = b;  te[ 13 ] = 0;
+  te[ 2 ] = 0;  te[ 6 ] = 0;  te[ 10 ] = c; te[ 14 ] = d;
+  te[ 3 ] = 0;  te[ 7 ] = 0;  te[ 11 ] = - 1; te[ 15 ] = 0;
+
+  return result;
+};
+
+Zia.Matrix4.createPerspectiveFieldOfView = function (fieldOfView, aspectRatio, near, far, result) {
+  var ymax = near * Math.tan(fieldOfView * 0.5);
+  var ymin = -ymax;
+  var xmin = ymin * aspectRatio;
+  var xmax = ymax * aspectRatio;
+  return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, result);
 };
 
 /**
@@ -202,6 +345,25 @@ Zia.Matrix4.createUniformScale = function(scale, result) {
     scale, 0,     0,     0,
     0,     scale, 0,     0,
     0,     0,     scale, 0,
+    0, 0, 0, 1
+  );
+};
+
+/**
+ * Creates an identity matrix.
+ *
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.createIdentity(new Zia.Matrix4());
+ */
+Zia.Matrix4.createIdentity = function(result) {
+  return result.set(
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
     0, 0, 0, 1
   );
 };
@@ -349,623 +511,305 @@ Zia.Matrix4.invert = function(matrix, result) {
   return result;
 };
 
-Zia.Matrix4.prototype = {
+/**
+ * Transposes a matrix (flips values across the diagonal).
+ *
+ * @param {Zia.Matrix4} matrix - The matrix to transpose.
+ * @param {Zia.Matrix4} result - The object in which to place the calculated result.
+ * 
+ * @returns {Zia.Matrix4} The modified result parameter.
+ *
+ * @example
+ * var result = Zia.Matrix4.transpose(
+ *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4()),
+ *   new Zia.Matrix4());
+ */
+Zia.Matrix4.transpose = function(matrix, result) {
+  var te = matrix.elements;
+  var re = result.elements;
+  var tmp;
+
+  tmp = te[ 1 ]; re[ 1 ] = te[ 4 ]; re[ 4 ] = tmp;
+  tmp = te[ 2 ]; re[ 2 ] = te[ 8 ]; re[ 8 ] = tmp;
+  tmp = te[ 6 ]; re[ 6 ] = te[ 9 ]; re[ 9 ] = tmp;
+
+  tmp = te[ 3 ]; re[ 3 ] = te[ 12 ]; re[ 12 ] = tmp;
+  tmp = te[ 7 ]; re[ 7 ] = te[ 13 ]; re[ 13 ] = tmp;
+  tmp = te[ 11 ]; re[ 11 ] = te[ 14 ]; re[ 14 ] = tmp;
+
+  return result;
+};
+
+Zia.Matrix4.prototype.constructor = Zia.Matrix4;
+
+Zia.Matrix4.prototype.getTranslation = function(result) {
+  var te = this.elements;
+  result.x = te[12];
+  result.y = te[13];
+  result.z = te[14];
+  return result;
+};
+
+Zia.Matrix4.prototype.setTranslation = function(translation) {
+  var te = this.elements;
+  te[12] = translation.x;
+  te[13] = translation.y;
+  te[14] = translation.z;
+};
+
+Zia.Matrix4.prototype.set = function (n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) {
+  var te = this.elements;
+  te[ 0 ] = n11; te[ 4 ] = n12; te[ 8 ] = n13; te[ 12 ] = n14;
+  te[ 1 ] = n21; te[ 5 ] = n22; te[ 9 ] = n23; te[ 13 ] = n24;
+  te[ 2 ] = n31; te[ 6 ] = n32; te[ 10 ] = n33; te[ 14 ] = n34;
+  te[ 3 ] = n41; te[ 7 ] = n42; te[ 11 ] = n43; te[ 15 ] = n44;
+  return this;
+};
+
+Zia.Matrix4.prototype.makeRotationFromEuler = function(euler) {
+  var te = this.elements;
+
+  var x = euler.x, y = euler.y, z = euler.z;
+  var a = Math.cos( x ), b = Math.sin( x );
+  var c = Math.cos( y ), d = Math.sin( y );
+  var e = Math.cos( z ), f = Math.sin( z );
+
+  if ( euler.order === 'XYZ' ) {
+
+    var ae = a * e, af = a * f, be = b * e, bf = b * f;
+
+    te[ 0 ] = c * e;
+    te[ 4 ] = - c * f;
+    te[ 8 ] = d;
+
+    te[ 1 ] = af + be * d;
+    te[ 5 ] = ae - bf * d;
+    te[ 9 ] = - b * c;
+
+    te[ 2 ] = bf - ae * d;
+    te[ 6 ] = be + af * d;
+    te[ 10 ] = a * c;
+
+  } else if ( euler.order === 'YXZ' ) {
+
+    var ce = c * e, cf = c * f, de = d * e, df = d * f;
+
+    te[ 0 ] = ce + df * b;
+    te[ 4 ] = de * b - cf;
+    te[ 8 ] = a * d;
+
+    te[ 1 ] = a * f;
+    te[ 5 ] = a * e;
+    te[ 9 ] = - b;
+
+    te[ 2 ] = cf * b - de;
+    te[ 6 ] = df + ce * b;
+    te[ 10 ] = a * c;
+
+  } else if ( euler.order === 'ZXY' ) {
+
+    var ce = c * e, cf = c * f, de = d * e, df = d * f;
+
+    te[ 0 ] = ce - df * b;
+    te[ 4 ] = - a * f;
+    te[ 8 ] = de + cf * b;
 
-  constructor: Zia.Matrix4,
+    te[ 1 ] = cf + de * b;
+    te[ 5 ] = a * e;
+    te[ 9 ] = df - ce * b;
 
-  set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+    te[ 2 ] = - a * d;
+    te[ 6 ] = b;
+    te[ 10 ] = a * c;
 
-    var te = this.elements;
+  } else if ( euler.order === 'ZYX' ) {
 
-    te[ 0 ] = n11; te[ 4 ] = n12; te[ 8 ] = n13; te[ 12 ] = n14;
-    te[ 1 ] = n21; te[ 5 ] = n22; te[ 9 ] = n23; te[ 13 ] = n24;
-    te[ 2 ] = n31; te[ 6 ] = n32; te[ 10 ] = n33; te[ 14 ] = n34;
-    te[ 3 ] = n41; te[ 7 ] = n42; te[ 11 ] = n43; te[ 15 ] = n44;
+    var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-    return this;
+    te[ 0 ] = c * e;
+    te[ 4 ] = be * d - af;
+    te[ 8 ] = ae * d + bf;
 
-  },
+    te[ 1 ] = c * f;
+    te[ 5 ] = bf * d + ae;
+    te[ 9 ] = af * d - be;
 
-  identity: function () {
+    te[ 2 ] = - d;
+    te[ 6 ] = b * c;
+    te[ 10 ] = a * c;
 
-    this.set(
+  } else if ( euler.order === 'YZX' ) {
 
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1
+    var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-    );
+    te[ 0 ] = c * e;
+    te[ 4 ] = bd - ac * f;
+    te[ 8 ] = bc * f + ad;
 
-    return this;
+    te[ 1 ] = f;
+    te[ 5 ] = a * e;
+    te[ 9 ] = - b * e;
 
-  },
+    te[ 2 ] = - d * e;
+    te[ 6 ] = ad * f + bc;
+    te[ 10 ] = ac - bd * f;
 
-  copy: function ( m ) {
+  } else if ( euler.order === 'XZY' ) {
 
-    this.elements.set( m.elements );
+    var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-    return this;
+    te[ 0 ] = c * e;
+    te[ 4 ] = - f;
+    te[ 8 ] = d * e;
 
-  },
+    te[ 1 ] = ac * f + bd;
+    te[ 5 ] = a * e;
+    te[ 9 ] = ad * f - bc;
 
-  copyPosition: function ( m ) {
-
-    var te = this.elements;
-    var me = m.elements;
-
-    te[ 12 ] = me[ 12 ];
-    te[ 13 ] = me[ 13 ];
-    te[ 14 ] = me[ 14 ];
-
-    return this;
-
-  },
-
-  extractRotation: function () {
-
-    var v1 = new Zia.Vector3();
-
-    return function ( m ) {
-
-      var te = this.elements;
-      var me = m.elements;
-
-      var scaleX = 1 / v1.set( me[ 0 ], me[ 1 ], me[ 2 ] ).length();
-      var scaleY = 1 / v1.set( me[ 4 ], me[ 5 ], me[ 6 ] ).length();
-      var scaleZ = 1 / v1.set( me[ 8 ], me[ 9 ], me[ 10 ] ).length();
-
-      te[ 0 ] = me[ 0 ] * scaleX;
-      te[ 1 ] = me[ 1 ] * scaleX;
-      te[ 2 ] = me[ 2 ] * scaleX;
-
-      te[ 4 ] = me[ 4 ] * scaleY;
-      te[ 5 ] = me[ 5 ] * scaleY;
-      te[ 6 ] = me[ 6 ] * scaleY;
-
-      te[ 8 ] = me[ 8 ] * scaleZ;
-      te[ 9 ] = me[ 9 ] * scaleZ;
-      te[ 10 ] = me[ 10 ] * scaleZ;
-
-      return this;
-
-    };
-
-  }(),
-
-  makeRotationFromEuler: function ( euler ) {
-
-    if ( euler instanceof Zia.Euler === false ) {
-
-      console.error( 'Zia.Matrix: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
-
-    }
-
-    var te = this.elements;
-
-    var x = euler.x, y = euler.y, z = euler.z;
-    var a = Math.cos( x ), b = Math.sin( x );
-    var c = Math.cos( y ), d = Math.sin( y );
-    var e = Math.cos( z ), f = Math.sin( z );
-
-    if ( euler.order === 'XYZ' ) {
-
-      var ae = a * e, af = a * f, be = b * e, bf = b * f;
-
-      te[ 0 ] = c * e;
-      te[ 4 ] = - c * f;
-      te[ 8 ] = d;
-
-      te[ 1 ] = af + be * d;
-      te[ 5 ] = ae - bf * d;
-      te[ 9 ] = - b * c;
-
-      te[ 2 ] = bf - ae * d;
-      te[ 6 ] = be + af * d;
-      te[ 10 ] = a * c;
-
-    } else if ( euler.order === 'YXZ' ) {
-
-      var ce = c * e, cf = c * f, de = d * e, df = d * f;
-
-      te[ 0 ] = ce + df * b;
-      te[ 4 ] = de * b - cf;
-      te[ 8 ] = a * d;
-
-      te[ 1 ] = a * f;
-      te[ 5 ] = a * e;
-      te[ 9 ] = - b;
-
-      te[ 2 ] = cf * b - de;
-      te[ 6 ] = df + ce * b;
-      te[ 10 ] = a * c;
-
-    } else if ( euler.order === 'ZXY' ) {
-
-      var ce = c * e, cf = c * f, de = d * e, df = d * f;
-
-      te[ 0 ] = ce - df * b;
-      te[ 4 ] = - a * f;
-      te[ 8 ] = de + cf * b;
-
-      te[ 1 ] = cf + de * b;
-      te[ 5 ] = a * e;
-      te[ 9 ] = df - ce * b;
-
-      te[ 2 ] = - a * d;
-      te[ 6 ] = b;
-      te[ 10 ] = a * c;
-
-    } else if ( euler.order === 'ZYX' ) {
-
-      var ae = a * e, af = a * f, be = b * e, bf = b * f;
-
-      te[ 0 ] = c * e;
-      te[ 4 ] = be * d - af;
-      te[ 8 ] = ae * d + bf;
-
-      te[ 1 ] = c * f;
-      te[ 5 ] = bf * d + ae;
-      te[ 9 ] = af * d - be;
-
-      te[ 2 ] = - d;
-      te[ 6 ] = b * c;
-      te[ 10 ] = a * c;
-
-    } else if ( euler.order === 'YZX' ) {
-
-      var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
-
-      te[ 0 ] = c * e;
-      te[ 4 ] = bd - ac * f;
-      te[ 8 ] = bc * f + ad;
-
-      te[ 1 ] = f;
-      te[ 5 ] = a * e;
-      te[ 9 ] = - b * e;
-
-      te[ 2 ] = - d * e;
-      te[ 6 ] = ad * f + bc;
-      te[ 10 ] = ac - bd * f;
-
-    } else if ( euler.order === 'XZY' ) {
-
-      var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
-
-      te[ 0 ] = c * e;
-      te[ 4 ] = - f;
-      te[ 8 ] = d * e;
-
-      te[ 1 ] = ac * f + bd;
-      te[ 5 ] = a * e;
-      te[ 9 ] = ad * f - bc;
-
-      te[ 2 ] = bc * f - ad;
-      te[ 6 ] = b * e;
-      te[ 10 ] = bd * f + ac;
-
-    }
-
-    // last column
-    te[ 3 ] = 0;
-    te[ 7 ] = 0;
-    te[ 11 ] = 0;
-
-    // bottom row
-    te[ 12 ] = 0;
-    te[ 13 ] = 0;
-    te[ 14 ] = 0;
-    te[ 15 ] = 1;
-
-    return this;
-
-  },
-
-  makeRotationFromQuaternion: function ( q ) {
-
-    var te = this.elements;
-
-    var x = q.x, y = q.y, z = q.z, w = q.w;
-    var x2 = x + x, y2 = y + y, z2 = z + z;
-    var xx = x * x2, xy = x * y2, xz = x * z2;
-    var yy = y * y2, yz = y * z2, zz = z * z2;
-    var wx = w * x2, wy = w * y2, wz = w * z2;
-
-    te[ 0 ] = 1 - ( yy + zz );
-    te[ 4 ] = xy - wz;
-    te[ 8 ] = xz + wy;
-
-    te[ 1 ] = xy + wz;
-    te[ 5 ] = 1 - ( xx + zz );
-    te[ 9 ] = yz - wx;
-
-    te[ 2 ] = xz - wy;
-    te[ 6 ] = yz + wx;
-    te[ 10 ] = 1 - ( xx + yy );
-
-    // last column
-    te[ 3 ] = 0;
-    te[ 7 ] = 0;
-    te[ 11 ] = 0;
-
-    // bottom row
-    te[ 12 ] = 0;
-    te[ 13 ] = 0;
-    te[ 14 ] = 0;
-    te[ 15 ] = 1;
-
-    return this;
-
-  },
-
-  makeLookAt: function () {
-
-    var x = new Zia.Vector3();
-    var y = new Zia.Vector3();
-    var z = new Zia.Vector3();
-
-    return function ( eye, target, up ) {
-
-      var te = this.elements;
-
-      z.subVectors(eye, target).normalize();
-      x.crossVectors(up, z).normalize();
-      y.crossVectors(z, x);
-
-      var translateX = x.dot(eye);
-      var translateY = y.dot(eye);
-      var translateZ = z.dot(eye);
-
-      te[0] = x.x; te[4] = x.y; te[8] = x.z;  te[12] = -translateX;
-      te[1] = y.x; te[5] = y.y; te[9] = y.z;  te[13] = -translateY;
-      te[2] = z.x; te[6] = z.y; te[10] = z.z; te[14] = -translateZ;
-      te[3] = 0;   te[7] = 0;   te[11] = 0;   te[15] = 1;
-
-      return this;
-
-    };
-
-  }(),
-
-  multiply: function(m) {
-    return Zia.Matrix4.multiply(this, m, this);
-  },
-
-  multiplyToArray: function ( a, b, r ) {
-
-    var te = this.elements;
-
-    this.multiplyMatrices( a, b );
-
-    r[ 0 ] = te[ 0 ]; r[ 1 ] = te[ 1 ]; r[ 2 ] = te[ 2 ]; r[ 3 ] = te[ 3 ];
-    r[ 4 ] = te[ 4 ]; r[ 5 ] = te[ 5 ]; r[ 6 ] = te[ 6 ]; r[ 7 ] = te[ 7 ];
-    r[ 8 ]  = te[ 8 ]; r[ 9 ]  = te[ 9 ]; r[ 10 ] = te[ 10 ]; r[ 11 ] = te[ 11 ];
-    r[ 12 ] = te[ 12 ]; r[ 13 ] = te[ 13 ]; r[ 14 ] = te[ 14 ]; r[ 15 ] = te[ 15 ];
-
-    return this;
-
-  },
-
-  applyToVector3Array: function () {
-
-    var v1 = new Zia.Vector3();
-
-    return function ( array, offset, length ) {
-
-      if ( offset === undefined ) offset = 0;
-      if ( length === undefined ) length = array.length;
-
-      for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
-
-        v1.x = array[ j ];
-        v1.y = array[ j + 1 ];
-        v1.z = array[ j + 2 ];
-
-        v1.applyMatrix4( this );
-
-        array[ j ]     = v1.x;
-        array[ j + 1 ] = v1.y;
-        array[ j + 2 ] = v1.z;
-
-      }
-
-      return array;
-
-    };
-
-  }(),
-
-  determinant: function () {
-
-    var te = this.elements;
-
-    var n11 = te[ 0 ], n12 = te[ 4 ], n13 = te[ 8 ], n14 = te[ 12 ];
-    var n21 = te[ 1 ], n22 = te[ 5 ], n23 = te[ 9 ], n24 = te[ 13 ];
-    var n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ], n34 = te[ 14 ];
-    var n41 = te[ 3 ], n42 = te[ 7 ], n43 = te[ 11 ], n44 = te[ 15 ];
-
-    //TODO: make this more efficient
-    //( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
-
-    return (
-      n41 * (
-        + n14 * n23 * n32
-         - n13 * n24 * n32
-         - n14 * n22 * n33
-         + n12 * n24 * n33
-         + n13 * n22 * n34
-         - n12 * n23 * n34
-      ) +
-      n42 * (
-        + n11 * n23 * n34
-         - n11 * n24 * n33
-         + n14 * n21 * n33
-         - n13 * n21 * n34
-         + n13 * n24 * n31
-         - n14 * n23 * n31
-      ) +
-      n43 * (
-        + n11 * n24 * n32
-         - n11 * n22 * n34
-         - n14 * n21 * n32
-         + n12 * n21 * n34
-         + n14 * n22 * n31
-         - n12 * n24 * n31
-      ) +
-      n44 * (
-        - n13 * n22 * n31
-         - n11 * n23 * n32
-         + n11 * n22 * n33
-         + n13 * n21 * n32
-         - n12 * n21 * n33
-         + n12 * n23 * n31
-      )
-
-    );
-
-  },
-
-  transpose: function () {
-
-    var te = this.elements;
-    var tmp;
-
-    tmp = te[ 1 ]; te[ 1 ] = te[ 4 ]; te[ 4 ] = tmp;
-    tmp = te[ 2 ]; te[ 2 ] = te[ 8 ]; te[ 8 ] = tmp;
-    tmp = te[ 6 ]; te[ 6 ] = te[ 9 ]; te[ 9 ] = tmp;
-
-    tmp = te[ 3 ]; te[ 3 ] = te[ 12 ]; te[ 12 ] = tmp;
-    tmp = te[ 7 ]; te[ 7 ] = te[ 13 ]; te[ 13 ] = tmp;
-    tmp = te[ 11 ]; te[ 11 ] = te[ 14 ]; te[ 14 ] = tmp;
-
-    return this;
-
-  },
-
-  flattenToArrayOffset: function ( array, offset ) {
-
-    var te = this.elements;
-
-    array[ offset     ] = te[ 0 ];
-    array[ offset + 1 ] = te[ 1 ];
-    array[ offset + 2 ] = te[ 2 ];
-    array[ offset + 3 ] = te[ 3 ];
-
-    array[ offset + 4 ] = te[ 4 ];
-    array[ offset + 5 ] = te[ 5 ];
-    array[ offset + 6 ] = te[ 6 ];
-    array[ offset + 7 ] = te[ 7 ];
-
-    array[ offset + 8 ]  = te[ 8 ];
-    array[ offset + 9 ]  = te[ 9 ];
-    array[ offset + 10 ] = te[ 10 ];
-    array[ offset + 11 ] = te[ 11 ];
-
-    array[ offset + 12 ] = te[ 12 ];
-    array[ offset + 13 ] = te[ 13 ];
-    array[ offset + 14 ] = te[ 14 ];
-    array[ offset + 15 ] = te[ 15 ];
-
-    return array;
-
-  },
-
-  setPosition: function ( v ) {
-
-    var te = this.elements;
-
-    te[ 12 ] = v.x;
-    te[ 13 ] = v.y;
-    te[ 14 ] = v.z;
-
-    return this;
-
-  },
-
-  scale: function ( v ) {
-
-    var te = this.elements;
-    var x = v.x, y = v.y, z = v.z;
-
-    te[ 0 ] *= x; te[ 4 ] *= y; te[ 8 ] *= z;
-    te[ 1 ] *= x; te[ 5 ] *= y; te[ 9 ] *= z;
-    te[ 2 ] *= x; te[ 6 ] *= y; te[ 10 ] *= z;
-    te[ 3 ] *= x; te[ 7 ] *= y; te[ 11 ] *= z;
-
-    return this;
-
-  },
-
-  getMaxScaleOnAxis: function () {
-
-    var te = this.elements;
-
-    var scaleXSq = te[ 0 ] * te[ 0 ] + te[ 1 ] * te[ 1 ] + te[ 2 ] * te[ 2 ];
-    var scaleYSq = te[ 4 ] * te[ 4 ] + te[ 5 ] * te[ 5 ] + te[ 6 ] * te[ 6 ];
-    var scaleZSq = te[ 8 ] * te[ 8 ] + te[ 9 ] * te[ 9 ] + te[ 10 ] * te[ 10 ];
-
-    return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
-
-  },
-
-  compose: function ( position, quaternion, scale ) {
-
-    this.makeRotationFromQuaternion( quaternion );
-    this.scale( scale );
-    this.setPosition( position );
-
-    return this;
-
-  },
-
-  decompose: function () {
-
-    var vector = new Zia.Vector3();
-    var matrix = new Zia.Matrix4();
-
-    return function ( position, quaternion, scale ) {
-
-      var te = this.elements;
-
-      var sx = vector.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-      var sy = vector.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-      var sz = vector.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
-
-      // if determine is negative, we need to invert one scale
-      var det = this.determinant();
-      if ( det < 0 ) {
-        sx = - sx;
-      }
-
-      position.x = te[ 12 ];
-      position.y = te[ 13 ];
-      position.z = te[ 14 ];
-
-      // scale the rotation part
-
-      matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
-
-      var invSX = 1 / sx;
-      var invSY = 1 / sy;
-      var invSZ = 1 / sz;
-
-      matrix.elements[ 0 ] *= invSX;
-      matrix.elements[ 1 ] *= invSX;
-      matrix.elements[ 2 ] *= invSX;
-
-      matrix.elements[ 4 ] *= invSY;
-      matrix.elements[ 5 ] *= invSY;
-      matrix.elements[ 6 ] *= invSY;
-
-      matrix.elements[ 8 ] *= invSZ;
-      matrix.elements[ 9 ] *= invSZ;
-      matrix.elements[ 10 ] *= invSZ;
-
-      quaternion.setFromRotationMatrix( matrix );
-
-      scale.x = sx;
-      scale.y = sy;
-      scale.z = sz;
-
-      return this;
-
-    };
-
-  }(),
-
-  makeFrustum: function ( left, right, bottom, top, near, far ) {
-
-    var te = this.elements;
-    var x = 2 * near / ( right - left );
-    var y = 2 * near / ( top - bottom );
-
-    var a = ( right + left ) / ( right - left );
-    var b = ( top + bottom ) / ( top - bottom );
-    var c = - ( far + near ) / ( far - near );
-    var d = - 2 * far * near / ( far - near );
-
-    te[ 0 ] = x;  te[ 4 ] = 0;  te[ 8 ] = a;  te[ 12 ] = 0;
-    te[ 1 ] = 0;  te[ 5 ] = y;  te[ 9 ] = b;  te[ 13 ] = 0;
-    te[ 2 ] = 0;  te[ 6 ] = 0;  te[ 10 ] = c; te[ 14 ] = d;
-    te[ 3 ] = 0;  te[ 7 ] = 0;  te[ 11 ] = - 1; te[ 15 ] = 0;
-
-    return this;
-
-  },
-
-  makePerspective: function ( fov, aspect, near, far ) {
-
-    var ymax = near * Math.tan(fov * 0.5);
-    var ymin = - ymax;
-    var xmin = ymin * aspect;
-    var xmax = ymax * aspect;
-
-    return this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
-
-  },
-
-  makeOrthographic: function ( left, right, top, bottom, near, far ) {
-
-    var te = this.elements;
-    var w = right - left;
-    var h = top - bottom;
-    var p = far - near;
-
-    var x = ( right + left ) / w;
-    var y = ( top + bottom ) / h;
-    var z = ( far + near ) / p;
-
-    te[ 0 ] = 2 / w;  te[ 4 ] = 0;  te[ 8 ] = 0;  te[ 12 ] = - x;
-    te[ 1 ] = 0;  te[ 5 ] = 2 / h;  te[ 9 ] = 0;  te[ 13 ] = - y;
-    te[ 2 ] = 0;  te[ 6 ] = 0;  te[ 10 ] = - 2 / p; te[ 14 ] = - z;
-    te[ 3 ] = 0;  te[ 7 ] = 0;  te[ 11 ] = 0; te[ 15 ] = 1;
-
-    return this;
-
-  },
-
-  fromArray: function ( array ) {
-
-    this.elements.set( array );
-
-    return this;
-
-  },
-
-  toArray: function () {
-
-    var te = this.elements;
-
-    return [
-      te[ 0 ], te[ 1 ], te[ 2 ], te[ 3 ],
-      te[ 4 ], te[ 5 ], te[ 6 ], te[ 7 ],
-      te[ 8 ], te[ 9 ], te[ 10 ], te[ 11 ],
-      te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
-    ];
+    te[ 2 ] = bc * f - ad;
+    te[ 6 ] = b * e;
+    te[ 10 ] = bd * f + ac;
 
   }
+
+  // last column
+  te[ 3 ] = 0;
+  te[ 7 ] = 0;
+  te[ 11 ] = 0;
+
+  // bottom row
+  te[ 12 ] = 0;
+  te[ 13 ] = 0;
+  te[ 14 ] = 0;
+  te[ 15 ] = 1;
+
+  return this;
+
+};
+
+Zia.Matrix4.prototype.multiply = function(m) {
+  return Zia.Matrix4.multiply(this, m, this);
+};
+
+/**
+ * Calculates the determinant of the current Matrix4 instance.
+ * @method
+ *
+ * @returns {Number} The determinant.
+ */
+Zia.Matrix4.prototype.determinant = function() {
+  var te = this.elements;
+
+  var n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
+  var n21 = te[1], n22 = te[5], n23 = te[9], n24 = te[13];
+  var n31 = te[2], n32 = te[6], n33 = te[10], n34 = te[14];
+  var n41 = te[3], n42 = te[7], n43 = te[11], n44 = te[15];
+
+  return (
+    n41 * (
+      + n14 * n23 * n32
+       - n13 * n24 * n32
+       - n14 * n22 * n33
+       + n12 * n24 * n33
+       + n13 * n22 * n34
+       - n12 * n23 * n34
+    ) +
+    n42 * (
+      + n11 * n23 * n34
+       - n11 * n24 * n33
+       + n14 * n21 * n33
+       - n13 * n21 * n34
+       + n13 * n24 * n31
+       - n14 * n23 * n31
+    ) +
+    n43 * (
+      + n11 * n24 * n32
+       - n11 * n22 * n34
+       - n14 * n21 * n32
+       + n12 * n21 * n34
+       + n14 * n22 * n31
+       - n12 * n24 * n31
+    ) +
+    n44 * (
+      - n13 * n22 * n31
+       - n11 * n23 * n32
+       + n11 * n22 * n33
+       + n13 * n21 * n32
+       - n12 * n21 * n33
+       + n12 * n23 * n31
+    )
+  );
 };
 
 /**
  * Duplicates the current Matrix4 instance.
  * @method
  *
- * @param {Zia.Matrix4} [result] - The object in which to store the result.
- * @returns {Zia.Matrix4} The modified result parameter, or a new Matrix4 instance if none was supplied.
+ * @param {Zia.Matrix4} result - The object in which to store the result.
+ * @returns {Zia.Matrix4} The modified result parameter.
  */
 Zia.Matrix4.prototype.clone = function(result) {
-  if (result === undefined) {
-    result = new Zia.Matrix4();
-  }
-
-  var te = this.elements;
-
-  result.set(
-    te[ 0 ], te[ 4 ], te[ 8 ], te[ 12 ],
-    te[ 1 ], te[ 5 ], te[ 9 ], te[ 13 ],
-    te[ 2 ], te[ 6 ], te[ 10 ], te[ 14 ],
-    te[ 3 ], te[ 7 ], te[ 11 ], te[ 15 ]
-  );
-
+  result.elements.set(this.elements);
   return result;
 };
+
+/**
+ * Extracts the scale, rotation, and translation components of the current
+ * Matrix4 instance. Assumes this is a transform matrix.
+ * @method
+ *
+ * @param {Zia.Vector3} scale - The scale component of the transform matrix.
+ * @param {Zia.Quaternion} rotation - The rotation component of the transform matrix.
+ * @param {Zia.Vector3} translation - The translation component of the transform matrix.
+ * @returns {Boolean} True if the matrix can be decomposed, otherwise false.
+ */
+Zia.Matrix4.prototype.decompose = (function() {
+  var vector = new Zia.Vector3();
+  var matrix = new Zia.Matrix4();
+
+  return function (scale, rotation, translation) {
+    var te = this.elements;
+
+    var sx = vector.set(te[0], te[1], te[2]).length();
+    var sy = vector.set(te[4], te[5], te[6]).length();
+    var sz = vector.set(te[8], te[9], te[10]).length();
+
+    // if determinant is negative, we need to invert one scale
+    var det = this.determinant();
+    if (det < 0) {
+      sx = - sx;
+    }
+
+    translation.x = te[12];
+    translation.y = te[13];
+    translation.z = te[14];
+
+    // scale the rotation part
+
+    matrix.elements.set(this.elements); // at this point matrix is incomplete so we can't use .copy()
+
+    var invSX = 1 / sx;
+    var invSY = 1 / sy;
+    var invSZ = 1 / sz;
+
+    matrix.elements[ 0 ] *= invSX;
+    matrix.elements[ 1 ] *= invSX;
+    matrix.elements[ 2 ] *= invSX;
+
+    matrix.elements[ 4 ] *= invSY;
+    matrix.elements[ 5 ] *= invSY;
+    matrix.elements[ 6 ] *= invSY;
+
+    matrix.elements[ 8 ] *= invSZ;
+    matrix.elements[ 9 ] *= invSZ;
+    matrix.elements[ 10 ] *= invSZ;
+
+    rotation.setFromRotationMatrix( matrix );
+
+    scale.x = sx;
+    scale.y = sy;
+    scale.z = sz;
+
+    return true; // TODO: In what situation should we return false?
+  };
+})();
