@@ -69,6 +69,8 @@ Zia.Matrix4.compose = (function() {
 /**
  * Creates a matrix that can be used to translate vectors.
  *
+ * @static
+ *
  * @param {Zia.Vector3} translation - Amounts to translate by on the x, y and z axes.
  * @param {Zia.Matrix4} result - The object in which to place the calculated result.
  * 

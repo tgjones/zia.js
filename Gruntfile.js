@@ -26,9 +26,32 @@ module.exports = function(grunt) {
     "test/support/**/*.js"
   ];
 
+  // ------ TODO: Refactor this
+  var apiPages = [];
+
+  function loadApiPages() {
+    apiPages.length = 0;
+    if (grunt.file.isFile('.tmp/dox/pages.json')) {
+      Array.prototype.push.apply(apiPages,
+        grunt.file.readJSON('.tmp/dox/pages.json').pages);
+    }
+  }
+  grunt.task.registerTask(
+    'load-api-pages',
+    'Reloads pages.json after it is changed',
+    loadApiPages);
+
+  loadApiPages();
+  // ------
+
   grunt.initConfig({
     assemble: {
       options: {
+        assets: 'dist/site/assets',
+        helpers: ['site/helpers/*.js'],
+        partials: ['site/includes/**/*.html', 'site/layouts/**/*.html'],
+        layoutdir: 'site/layouts',
+        layout: 'page.html',
         marked: {
           highlight: function(code, lang) {
             if (lang === undefined) lang = 'bash';
@@ -41,12 +64,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           flatten: false,
-          assets: 'dist/site/assets',
           data: ['site/data/*.json'],
-          helpers: ['site/helpers/*.js'],
-          partials: ['site/includes/**/*.html', 'site/layouts/**/*.html'],
-          layoutdir: 'site/layouts',
-          layout: 'page.html',
           collections: [
             {
               name: 'examples',
@@ -58,6 +76,15 @@ module.exports = function(grunt) {
         cwd: 'site/pages',
         src: '**/*.{html,md}',
         dest: 'dist/site/'
+      },
+      api: {
+        options: {
+          pages: apiPages,
+          layout: 'api.html'
+        },
+        files: {
+          'dist/site/docs/api2/': []
+        }
       }
     },
 
@@ -143,12 +170,29 @@ module.exports = function(grunt) {
       }
     },
 
-    clean: ['dist/'],
+    clean: ['dist/', '.tmp'],
 
     connect: {
       examples: {
         port: 8080,
         base: 'dist/site/'
+      }
+    },
+
+    doxication : {
+      all: {
+        options: {
+          format: 'json'
+        },
+        src: srcFiles,
+        dest: '.tmp/dox/apidox.json'
+      }
+    },
+
+    'doxication-assemble' : {
+      all: {
+        src: '.tmp/dox/apidox.json',
+        dest: '.tmp/dox/pages.json'
       }
     },
 
@@ -205,9 +249,17 @@ module.exports = function(grunt) {
         tasks: [ "karma:dev:run"]
       },
       assemble: {
-        files: ['site/{helpers,includes,layouts,pages}/**/*.*'],
-        tasks: ['assemble'],
+        files: ['site/{helpers,includes,layouts,pages}/**/*.*', '.tmp/dox/pages.json'],
+        tasks: ['load-api-pages', 'assemble'],
         options: { livereload: true }
+      },
+      doxication: {
+        files: srcFiles,
+        tasks: ['doxication']
+      },
+      "doxication-assemble": {
+        files: ['.tmp/dox/apidox.json'],
+        tasks: ['doxication-assemble']
       },
       site_assets: {
         files: ['**/*'],
@@ -236,7 +288,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks('grunt-newer');
 
-  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "assemble", "jsdoc" ]);
+  grunt.loadTasks('lib/doxication');
+
+  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "doxication", "doxication-assemble", "assemble", "jsdoc" ]);
   grunt.registerTask("default", [ "build", "karma:dev:start", "watch" ]);
   grunt.registerTask("deploy",  [ "build", "gh-pages" ]);
 };
