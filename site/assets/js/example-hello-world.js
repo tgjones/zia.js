@@ -27,13 +27,15 @@ var vertexBuffer = new Zia.VertexBuffer(graphicsDevice,
 var indexBuffer = new Zia.IndexBuffer(graphicsDevice,
   new Uint16Array(cubePrimitive.indices));
 
-var projectionMatrix = new Zia.Matrix4().makePerspective(45,
-  graphicsDevice.viewport.aspectRatio, 0.1, 100);
-var viewMatrix = new Zia.Matrix4().makeLookAt(
-  new Zia.Vector3(1, 1, -1.5),
+var projectionMatrix = Zia.Matrix4.createPerspectiveFieldOfView(
+  Zia.MathUtil.PI_OVER_FOUR, graphicsDevice.viewport.aspectRatio, 0.1, 100,
+  new Zia.Matrix4());
+var viewMatrix = Zia.Matrix4.createLookAt(
+  new Zia.Vector3(1.5, 1, -2),
   new Zia.Vector3(0, 0, 0),
-  new Zia.Vector3(0, 1, 0));
-var modelMatrix = new Zia.Matrix4().identity();
+  new Zia.Vector3(0, 1, 0),
+  new Zia.Matrix4());
+var modelMatrix = Zia.Matrix4.createIdentity(new Zia.Matrix4());
 
 graphicsDevice.setIndexBuffer(indexBuffer);
 graphicsDevice.setVertexBuffer(vertexBuffer);

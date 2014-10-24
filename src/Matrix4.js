@@ -226,7 +226,7 @@ Zia.Matrix4.createLookAt = (function() {
   var z = new Zia.Vector3();
 
   return function(eye, target, up, result) {
-    var te = this.elements;
+    var te = result.elements;
 
     z.subVectors(eye, target).normalize();
     x.crossVectors(up, z).normalize();
@@ -304,7 +304,7 @@ Zia.Matrix4.createPerspectiveFieldOfView = function (fieldOfView, aspectRatio, n
   var ymin = -ymax;
   var xmin = ymin * aspectRatio;
   var xmax = ymax * aspectRatio;
-  return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, result);
+  return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
 };
 
 /**

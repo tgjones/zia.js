@@ -1729,6 +1729,7 @@ Zia.MathUtil = {
 
   TWO_PI: Math.PI * 2,
   PI_OVER_TWO: Math.PI / 2,
+  PI_OVER_FOUR: Math.PI / 4,
 
   withinEpsilon: function(a, b, epsilon) {
     var num = a - b;
@@ -2246,7 +2247,7 @@ Zia.Matrix4.createLookAt = (function() {
   var z = new Zia.Vector3();
 
   return function(eye, target, up, result) {
-    var te = this.elements;
+    var te = result.elements;
 
     z.subVectors(eye, target).normalize();
     x.crossVectors(up, z).normalize();
@@ -2324,7 +2325,7 @@ Zia.Matrix4.createPerspectiveFieldOfView = function (fieldOfView, aspectRatio, n
   var ymin = -ymax;
   var xmin = ymin * aspectRatio;
   var xmax = ymax * aspectRatio;
-  return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, result);
+  return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
 };
 
 /**
@@ -4125,8 +4126,8 @@ Zia.ProgramUtil = {
     return function(program, dirtyFlags, model, view, projection, modelView) {
       // Recompute the model+view+projection matrix?
       if ((dirtyFlags & Zia.ProgramDirtyFlags.ModelViewProj) != 0) {
-        modelView.multiplyMatrices(view, model);
-        modelViewProjectionMatrix.multiplyMatrices(projection, modelView);
+        Zia.Matrix4.multiply(view, model, modelView);
+        Zia.Matrix4.multiply(projection, modelView, modelViewProjectionMatrix);
         program.setUniform('uMVPMatrix', modelViewProjectionMatrix);
           
         dirtyFlags &= ~Zia.ProgramDirtyFlags.ModelViewProj;
@@ -4203,7 +4204,7 @@ Zia.ProgramUtil = {
 
       // Set the eye position.
       if ((dirtyFlags & Zia.ProgramDirtyFlags.EyePosition) != 0) {
-        viewInverseMatrix.getInverse(view);
+        Zia.Matrix4.invert(viewInverseMatrix, view);
         eyePosition.setFromMatrixColumn(3, viewInverseMatrix);
         program.setUniform('uEyePosition', eyePosition);
 

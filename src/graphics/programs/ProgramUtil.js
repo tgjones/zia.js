@@ -56,8 +56,8 @@ Zia.ProgramUtil = {
     return function(program, dirtyFlags, model, view, projection, modelView) {
       // Recompute the model+view+projection matrix?
       if ((dirtyFlags & Zia.ProgramDirtyFlags.ModelViewProj) != 0) {
-        modelView.multiplyMatrices(view, model);
-        modelViewProjectionMatrix.multiplyMatrices(projection, modelView);
+        Zia.Matrix4.multiply(view, model, modelView);
+        Zia.Matrix4.multiply(projection, modelView, modelViewProjectionMatrix);
         program.setUniform('uMVPMatrix', modelViewProjectionMatrix);
           
         dirtyFlags &= ~Zia.ProgramDirtyFlags.ModelViewProj;
@@ -134,7 +134,7 @@ Zia.ProgramUtil = {
 
       // Set the eye position.
       if ((dirtyFlags & Zia.ProgramDirtyFlags.EyePosition) != 0) {
-        viewInverseMatrix.getInverse(view);
+        Zia.Matrix4.invert(viewInverseMatrix, view);
         eyePosition.setFromMatrixColumn(3, viewInverseMatrix);
         program.setUniform('uEyePosition', eyePosition);
 

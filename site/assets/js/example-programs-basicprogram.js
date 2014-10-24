@@ -15,15 +15,18 @@ document.addEventListener('DOMContentLoaded', function () {
   var cubeModel = Zia.GeometricPrimitive.convertToModel(
     graphicsDevice, Zia.GeometricPrimitive.createTeapot());
 
-  var projectionMatrix = new Zia.Matrix4().makePerspective(45,
-    graphicsDevice.viewport.aspectRatio, 0.1, 100);
+  var projectionMatrix = Zia.Matrix4.createPerspectiveFieldOfView(
+    Zia.MathUtil.PI_OVER_FOUR,
+    graphicsDevice.viewport.aspectRatio, 0.1, 100,
+    new Zia.Matrix4());
 
-  var viewMatrix = new Zia.Matrix4().makeLookAt(
+  var viewMatrix = Zia.Matrix4.createLookAt(
     new Zia.Vector3(1, 1, -1),
     new Zia.Vector3(0, 0, 0),
-    new Zia.Vector3(0, 1, 0));
+    new Zia.Vector3(0, 1, 0),
+    new Zia.Matrix4());
 
-  var modelMatrix = new Zia.Matrix4().identity();
+  var modelMatrix = new Zia.Matrix4();
 
   var lastCubeUpdateTime, rotationAngle = 0;
 
@@ -36,17 +39,20 @@ document.addEventListener('DOMContentLoaded', function () {
     stats.begin();
 
     if (graphicsDevice.resize()) {
-      projectionMatrix.makePerspective(45,
+      Zia.Matrix4.createPerspectiveFieldOfView(
+        Zia.MathUtil.PI_OVER_FOUR,
         graphicsDevice.viewport.aspectRatio,
-        0.1, 100);
+        0.1, 100,
+        projectionMatrix);
     }
 
     graphicsDevice.clear(
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       new Zia.Color4(0.4, 0.4, 0.4, 1), 1);
 
-    modelMatrix.makeRotationY(Zia.Math.degToRad(rotationAngle));
-
+    Zia.Matrix4.createRotationY(
+      Zia.Math.degToRad(rotationAngle),
+      modelMatrix);
     cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
 
     var currentTime = (new Date).getTime();
