@@ -55,15 +55,17 @@ document.addEventListener('DOMContentLoaded', function () {
       "}"
     ].join('\n')));
 
-  var projectionMatrix = new Zia.Matrix4().makePerspective(45,
-    graphicsDevice.viewport.aspectRatio, 0.1, 100);
+  var projectionMatrix = Zia.Matrix4.createPerspectiveFieldOfView(
+    Zia.MathUtil.PI_OVER_FOUR,
+    graphicsDevice.viewport.aspectRatio, 0.1, 100,
+    new Zia.Matrix4());
 
   var cameraPositionMatrix = new Zia.Matrix4();
   var cameraPosition = new Zia.Vector3();
   var cameraTarget = new Zia.Vector3(0, 0, 0);
   var cameraUp = new Zia.Vector3(0, 1, 0);
   var viewMatrix = new Zia.Matrix4();
-  var modelMatrix = new Zia.Matrix4().identity();
+  var modelMatrix = new Zia.Matrix4();
 
   var lastCubeUpdateTime, rotationAngle = 0;
   var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();
@@ -80,29 +82,34 @@ document.addEventListener('DOMContentLoaded', function () {
     stats.begin();
 
     if (graphicsDevice.resize()) {
-      projectionMatrix.makePerspective(45,
+      Zia.Matrix4.createPerspectiveFieldOfView(
+        Zia.MathUtil.PI_OVER_FOUR,
         graphicsDevice.viewport.aspectRatio,
-        0.1, 100);
+        0.1, 100,
+        projectionMatrix);
     }
 
     graphicsDevice.clear(
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       new Zia.Color4(0.4, 0.4, 0.4, 1), 1);
 
-    cameraPositionMatrix.makeRotationY(Zia.Math.degToRad(rotationAngle));
+    Zia.Matrix4.createRotationY(
+      Zia.Math.degToRad(rotationAngle),
+      cameraPositionMatrix);
     cameraPosition.set(0, 0.5, -1.5).applyMatrix4(cameraPositionMatrix);
 
-    viewMatrix.makeLookAt(
+    Zia.Matrix4.createLookAt(
       cameraPosition,
       cameraTarget,
-      cameraUp);
+      cameraUp,
+      viewMatrix);
 
     var tempRasterizerState = graphicsDevice.rasterizerState;
     graphicsDevice.rasterizerState = skyboxRasterizerState;
 
     skyboxProgram.apply();
     skyboxProgram.setUniform('uCubeSampler', environmentMap);
-    skyboxMVPMatrix.multiplyMatrices(projectionMatrix, viewMatrix);
+    Zia.Matrix4.multiply(projectionMatrix, viewMatrix, skyboxMVPMatrix);
     skyboxMVPMatrix.multiply(identityMatrix);
     skyboxProgram.setUniform('uMMatrix', identityMatrix);
     skyboxProgram.setUniform('uMVPMatrix', skyboxMVPMatrix);

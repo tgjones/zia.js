@@ -4,11 +4,13 @@
     <meta charset="utf-8">
     <title>Home - Zia.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="assets/css/bootstrap.css" media="screen">
     <link rel="stylesheet" href="assets/css/bootflat.css" media="screen">
     <link rel="stylesheet" href="assets/css/highlight.solarized_light.css" media="screen">
     <link rel="stylesheet" href="assets/css/site.css" media="screen">
+
     <script type="text/javascript" src="assets/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/js/jquery.fs.selector.min.js"></script>
@@ -21,7 +23,7 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="../" class="navbar-brand">Zia.js</a>
+          <a href="index.html" class="navbar-brand">Zia.js</a>
           <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -30,8 +32,14 @@
         </div>
         <div class="navbar-collapse collapse navbar-right" id="navbar-main">
           <ul class="nav navbar-nav">
-            <li>
-              <a href="docs/getting-started.html">Docs</a>
+            <li class="dropdown ">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="docs/getting-started.html">Getting Started</a></li>
+                <li><a href="docs/api/index.html">API Reference</a></li>
+                <li class="divider"></li>
+                <li><a href="docs/test-suite.html">Unit Test Suite</a></li>
+              </ul>
             </li>
             <li>
               <a href="examples/index.html">Examples</a>
@@ -68,6 +76,9 @@ that can be used to build a game, or a game engine.</p>
 <p>Just like XNA gave game developers a friendly set of APIs to use to build games
 on Windows-based platforms, I&#39;m hoping to do the same for the web with Zia.js.</p>
 
+
+      <p>Zia.js has an extensive <a href="docs/test-suite.html">unit test suite</a>,
+      and a good set of <a href="docs/api/index.html">API documentation</a>.</p>
 
       <hr />
       <p class="text-center">
@@ -107,13 +118,15 @@ program.enableDefaultLighting();
 <span class="hljs-keyword">var</span> indexBuffer = <span class="hljs-keyword">new</span> Zia.IndexBuffer(graphicsDevice,
   <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint16Array</span>(cubePrimitive.indices));
 
-<span class="hljs-keyword">var</span> projectionMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makePerspective(<span class="hljs-number">45</span>,
-  graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>);
-<span class="hljs-keyword">var</span> viewMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().makeLookAt(
-  <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1.5</span>),
+<span class="hljs-keyword">var</span> projectionMatrix = Zia.Matrix4.createPerspectiveFieldOfView(
+  Zia.MathUtil.PI_OVER_FOUR, graphicsDevice.viewport.aspectRatio, <span class="hljs-number">0.1</span>, <span class="hljs-number">100</span>,
+  <span class="hljs-keyword">new</span> Zia.Matrix4());
+<span class="hljs-keyword">var</span> viewMatrix = Zia.Matrix4.createLookAt(
+  <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">1.5</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">2</span>),
   <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>),
-  <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>));
-<span class="hljs-keyword">var</span> modelMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4().identity();
+  <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>),
+  <span class="hljs-keyword">new</span> Zia.Matrix4());
+<span class="hljs-keyword">var</span> modelMatrix = Zia.Matrix4.createIdentity(<span class="hljs-keyword">new</span> Zia.Matrix4());
 
 graphicsDevice.setIndexBuffer(indexBuffer);
 graphicsDevice.setVertexBuffer(vertexBuffer);

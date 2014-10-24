@@ -11,6 +11,14 @@ h2 {
 h1, h2, h3 {
   line-height: 40px; }
 
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  color: #666; }
+
 hr {
   border-top: 1px solid #CCC; }
 
@@ -23,7 +31,7 @@ hr {
     color: #ccc;
     font-size: 16px;
     text-transform: uppercase; }
-  .navbar-inverse li.active a {
+  .navbar-inverse li.active > a {
     border-bottom: 3px solid #3bafda;
     height: 50px; }
 
@@ -77,6 +85,23 @@ hr {
     padding: 5px; }
     .canvas-container .controls-overlay .radio-container {
       margin-left: 25px; }
+
+.api-reference h3.member-title {
+  font-size: 22px;
+  line-height: 22px;
+  margin-top: 0;
+  margin-bottom: 3px; }
+  .api-reference h3.member-title .label {
+    line-height: 22px; }
+.api-reference .defined-in {
+  font-size: 75%; }
+.api-reference .description p {
+  margin-top: 15px; }
+.api-reference h4 {
+  font-size: 15px;
+  margin-top: 20px; }
+.api-reference table p:last-child {
+  margin-bottom: 0; }
 
 :fullscreen {
   width: 100%;

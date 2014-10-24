@@ -20,30 +20,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  var projectionMatrix = new Zia.Matrix4().makePerspective(45,
-    graphicsDevice.viewport.aspectRatio, 0.1, 100);
-  var viewMatrix = new Zia.Matrix4().makeLookAt(
+  var projectionMatrix = Zia.Matrix4.createPerspectiveFieldOfView(
+    Zia.MathUtil.PI_OVER_FOUR, graphicsDevice.viewport.aspectRatio, 0.1, 100,
+    new Zia.Matrix4());
+  var viewMatrix = Zia.Matrix4.createLookAt(
     new Zia.Vector3(0, 1, -2),
     new Zia.Vector3(0, 0, 0),
-    new Zia.Vector3(0, 1, 0));
-  var modelMatrix = new Zia.Matrix4().identity();
+    new Zia.Vector3(0, 1, 0),
+    new Zia.Matrix4());
+  var modelMatrix = new Zia.Matrix4();
 
   var rotationAxis = new Zia.Vector3(0, 1, 0);
   var rotationAngle = 0;
 
   function drawScene() {
     if (graphicsDevice.resize()) {
-      projectionMatrix.makePerspective(45,
-        graphicsDevice.viewport.aspectRatio,
-        0.1, 100);
+      Zia.Matrix4.createPerspectiveFieldOfView(
+        Zia.MathUtil.PI_OVER_FOUR, graphicsDevice.viewport.aspectRatio, 0.1, 100,
+        projectionMatrix);
     }
 
     graphicsDevice.clear(
       Zia.ClearOptions.ColorBuffer | Zia.ClearOptions.DepthBuffer,
       new Zia.Color4(0, 0, 0, 1), 1);
 
-    modelMatrix.makeRotationAxis(rotationAxis,
-      Zia.Math.degToRad(rotationAngle));
+    Zia.Matrix4.createFromAxisAngle(
+      rotationAxis,
+      Zia.Math.degToRad(rotationAngle),
+      modelMatrix);
 
     cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
   }

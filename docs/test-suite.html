@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Examples - Zia.js</title>
+    <title>Test Suite - Zia.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
@@ -32,17 +32,17 @@
         </div>
         <div class="navbar-collapse collapse navbar-right" id="navbar-main">
           <ul class="nav navbar-nav">
-            <li class="dropdown ">
+            <li class="dropdown active">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="../docs/getting-started.html">Getting Started</a></li>
-                <li><a href="../docs/api/index.html">API Reference</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
+                <li><a href="api/index.html">API Reference</a></li>
                 <li class="divider"></li>
-                <li><a href="../docs/test-suite.html">Unit Test Suite</a></li>
+                <li><a href="test-suite.html">Unit Test Suite</a></li>
               </ul>
             </li>
-            <li class="active">
-              <a href="index.html">Examples</a>
+            <li>
+              <a href="../examples/index.html">Examples</a>
             </li>
             <li>
               <a href="https://github.com/tgjones/zia.js">GitHub</a>
@@ -57,56 +57,33 @@
 <div class="container">
   
 
-<div class="row">
-  <div class="col-md-3 sidebar-nav">
-    
-      <div class="sidebar-nav-section">
-        <h3>Graphics</h3>
-        <ul class="list-unstyled">
-          
-          <li>
-            <a href="primitives.html"
-              class="">
-              Primitives
-            </a>
-          </li>
-          
-          <li>
-            <a href="programs-basicprogram.html"
-              class="">
-              Programs - BasicProgram
-            </a>
-          </li>
-          
-          <li>
-            <a href="programs-environmentmapprogram.html"
-              class="">
-              Programs - EnvironmentMapProgram
-            </a>
-          </li>
-          
-          <li>
-            <a href="texture-filtering.html"
-              class="">
-              Texture Filtering
-            </a>
-          </li>
-          
-        </ul>
-      </div>
-    
-  </div>
-  <div class="col-md-9">
-    <h1>Examples</h1>
-    
-
-<p class="info">Choose an example from the list on the left.</p>
-
-<p>Several of these examples are based on the WebGL lessons over at
-<a href="http://learningwebgl.com">LearningWebGL.com</a>, which have
-generously been released under the <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution/Share-Alike license</a>.</p>
+<div class="container">
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+      <h1>Test Suite</h1>
+      <div id="html-reporter-container"></div>
+    </div>
+    <div class="col-md-2"></div>
   </div>
 </div>
+
+<link rel="stylesheet" type="text/css" href="../assets/css/jasmine/jasmine.css">
+
+<style type="text/css">
+  body { padding-top: 50px; }
+</style>
+
+<script src="../assets/js/jasmine/es5-shim.js"></script>
+<script src="../assets/js/jasmine/jasmine.js"></script>
+<script src="../assets/js/jasmine/jasmine-html.js"></script>
+<script src="../assets/js/jasmine/custom-boot.js"></script>
+
+<script src="../assets/js/zia.js"></script>
+
+<script src="../assets/js/zia-spec-dependencies.js"></script>
+<script src="../assets/js/zia-spec-helpers.js"></script>
+<script src="../assets/js/zia-specs.js"></script>
 </div>
 
     <div class="container footer-container">
