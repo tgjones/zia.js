@@ -15,6 +15,15 @@ h1, h2, h3 {
   line-height: 40px;
 }
 
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  color: #666;
+}
+
 hr {
   border-top: 1px solid #CCC;
 }
@@ -120,6 +129,36 @@ hr {
     .radio-container {
       margin-left: 25px;
     }
+  }
+}
+
+.api-reference {
+  h3.member-title {
+    font-size: 22px;
+    line-height: 22px;
+    margin-top: 0;
+    margin-bottom: 3px;
+
+    .label {
+      line-height: 22px;
+    }
+  }
+
+  .defined-in {
+    font-size: 75%;
+  }
+
+  .description p {
+    margin-top: 15px;
+  }
+
+  h4 {
+    font-size: 15px;
+    margin-top: 20px;
+  }
+
+  table p:last-child {
+    margin-bottom: 0;
   }
 }
 

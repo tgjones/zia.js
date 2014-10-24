@@ -8,4 +8,9 @@ module.exports.register = function (Handlebars, options, params)  {
     var highlighted = hljs.highlight('js', content).value;
     return new Handlebars.SafeString('<pre class="hljs">' + highlighted + "</pre>");
   });
+
+  Handlebars.registerHelper('inlineCode', function (code)  { 
+    var highlighted = hljs.highlight('js', code).value;
+    return new Handlebars.SafeString('<pre class="hljs">' + highlighted + "</pre>");
+  });
 };

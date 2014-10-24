@@ -2019,7 +2019,7 @@ Zia.Matrix3.prototype = {
 
 };
 
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -2501,32 +2501,32 @@ Zia.Matrix4.invert = function(matrix, result) {
   var te = matrix.elements;
   var me = result.elements;
 
-  var n11 = me[ 0 ], n12 = me[ 4 ], n13 = me[ 8 ], n14 = me[ 12 ];
-  var n21 = me[ 1 ], n22 = me[ 5 ], n23 = me[ 9 ], n24 = me[ 13 ];
-  var n31 = me[ 2 ], n32 = me[ 6 ], n33 = me[ 10 ], n34 = me[ 14 ];
-  var n41 = me[ 3 ], n42 = me[ 7 ], n43 = me[ 11 ], n44 = me[ 15 ];
+  var n11 = me[0], n12 = me[4], n13 = me[8], n14 = me[12];
+  var n21 = me[1], n22 = me[5], n23 = me[9], n24 = me[13];
+  var n31 = me[2], n32 = me[6], n33 = me[10], n34 = me[14];
+  var n41 = me[3], n42 = me[7], n43 = me[11], n44 = me[15];
 
-  te[ 0 ] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
-  te[ 4 ] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
-  te[ 8 ] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
-  te[ 12 ] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
-  te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
-  te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
-  te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
-  te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
-  te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
-  te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
-  te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
-  te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
-  te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
-  te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
-  te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
-  te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
+  te[0] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
+  te[4] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
+  te[8] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
+  te[12] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+  te[1] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
+  te[5] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
+  te[9] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
+  te[13] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
+  te[2] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
+  te[6] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
+  te[10] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
+  te[14] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
+  te[3] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
+  te[7] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
+  te[11] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
+  te[15] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
 
-  var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
+  var det = n11 * te[0] + n21 * te[4] + n31 * te[8] + n41 * te[12];
 
   if (det === 0) {
-    throw new Error("Matrix4.getInverse(): can't invert matrix, determinant is 0");
+    throw new Error("Can't invert matrix, determinant is 0");
   }
 
   Zia.Matrix4.multiplyByScalar(result, 1 / det, result);
@@ -2535,7 +2535,7 @@ Zia.Matrix4.invert = function(matrix, result) {
 };
 
 /**
- * Transposes a matrix (flips values across the diagonal).
+ * Transposes a matrix.
  *
  * @param {Zia.Matrix4} matrix - The matrix to transpose.
  * @param {Zia.Matrix4} result - The object in which to place the calculated result.
@@ -2552,19 +2552,22 @@ Zia.Matrix4.transpose = function(matrix, result) {
   var re = result.elements;
   var tmp;
 
-  tmp = te[ 1 ]; re[ 1 ] = te[ 4 ]; re[ 4 ] = tmp;
-  tmp = te[ 2 ]; re[ 2 ] = te[ 8 ]; re[ 8 ] = tmp;
-  tmp = te[ 6 ]; re[ 6 ] = te[ 9 ]; re[ 9 ] = tmp;
+  tmp = te[1]; re[1] = te[4]; re[4] = tmp;
+  tmp = te[2]; re[2] = te[8]; re[8] = tmp;
+  tmp = te[6]; re[6] = te[9]; re[9] = tmp;
 
-  tmp = te[ 3 ]; re[ 3 ] = te[ 12 ]; re[ 12 ] = tmp;
-  tmp = te[ 7 ]; re[ 7 ] = te[ 13 ]; re[ 13 ] = tmp;
-  tmp = te[ 11 ]; re[ 11 ] = te[ 14 ]; re[ 14 ] = tmp;
+  tmp = te[3]; re[3] = te[12]; re[12] = tmp;
+  tmp = te[7]; re[7] = te[13]; re[13] = tmp;
+  tmp = te[11]; re[11] = te[14]; re[14] = tmp;
 
   return result;
 };
 
 Zia.Matrix4.prototype.constructor = Zia.Matrix4;
 
+/**
+ * Gets the translation component of the current transformation matrix.
+ */
 Zia.Matrix4.prototype.getTranslation = function(result) {
   var te = this.elements;
   result.x = te[12];
@@ -2573,6 +2576,9 @@ Zia.Matrix4.prototype.getTranslation = function(result) {
   return result;
 };
 
+/**
+ * Sets the translation component of the current transformation matrix.
+ */
 Zia.Matrix4.prototype.setTranslation = function(translation) {
   var te = this.elements;
   te[12] = translation.x;

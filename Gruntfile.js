@@ -31,9 +31,9 @@ module.exports = function(grunt) {
 
   function loadApiPages() {
     apiPages.length = 0;
-    if (grunt.file.isFile('.tmp/dox/pages.json')) {
+    if (grunt.file.isFile('.tmp/jsdoc/pages.json')) {
       Array.prototype.push.apply(apiPages,
-        grunt.file.readJSON('.tmp/dox/pages.json').pages);
+        grunt.file.readJSON('.tmp/jsdoc/pages.json').pages);
     }
   }
   grunt.task.registerTask(
@@ -83,7 +83,7 @@ module.exports = function(grunt) {
           layout: 'api.html'
         },
         files: {
-          'dist/site/docs/api2/': []
+          'dist/site/docs/api/': []
         }
       }
     },
@@ -144,7 +144,8 @@ module.exports = function(grunt) {
       dist : {
         src: ['src/**/*.js'],
         options: {
-          destination: 'dist/site/docs/api',
+          destination: '.tmp/jsdoc/',
+          destfile: 'api.json',
           template: "site/jsdoc",
           configure: "site/jsdoc/jsdoc.conf.json"
         }
@@ -179,20 +180,10 @@ module.exports = function(grunt) {
       }
     },
 
-    doxication : {
+    'jsdoc-assemble' : {
       all: {
-        options: {
-          format: 'json'
-        },
-        src: srcFiles,
-        dest: '.tmp/dox/apidox.json'
-      }
-    },
-
-    'doxication-assemble' : {
-      all: {
-        src: '.tmp/dox/apidox.json',
-        dest: '.tmp/dox/pages.json'
+        src: '.tmp/jsdoc/jsdoc.json',
+        dest: '.tmp/jsdoc/pages.json'
       }
     },
 
@@ -249,7 +240,7 @@ module.exports = function(grunt) {
         tasks: [ "karma:dev:run"]
       },
       assemble: {
-        files: ['site/{helpers,includes,layouts,pages}/**/*.*', '.tmp/dox/pages.json'],
+        files: ['site/{helpers,includes,layouts,pages}/**/*.*', '.tmp/jsdoc/pages.json'],
         tasks: ['load-api-pages', 'assemble'],
         options: { livereload: true }
       },
@@ -257,9 +248,9 @@ module.exports = function(grunt) {
         files: srcFiles,
         tasks: ['doxication']
       },
-      "doxication-assemble": {
-        files: ['.tmp/dox/apidox.json'],
-        tasks: ['doxication-assemble']
+      "jsdoc-assemble": {
+        files: ['lib/tasks/jsdoc-assemble.js', '.tmp/jsdoc/jsdoc.json'],
+        tasks: ['jsdoc-assemble']
       },
       site_assets: {
         files: ['**/*'],
@@ -288,9 +279,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks('grunt-newer');
 
-  grunt.loadTasks('lib/doxication');
+  grunt.loadTasks('lib/tasks');
 
-  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "doxication", "doxication-assemble", "assemble", "jsdoc" ]);
+  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "jsdoc", "jsdoc-assemble", "load-api-pages", "assemble" ]);
   grunt.registerTask("default", [ "build", "karma:dev:start", "watch" ]);
   grunt.registerTask("deploy",  [ "build", "gh-pages" ]);
 };
