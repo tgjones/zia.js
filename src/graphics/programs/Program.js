@@ -4,7 +4,8 @@
   function getProgramInfo(gl, program) {
     var result = {
       attributes: [],
-      uniforms: []
+      uniforms: [],
+      samplers: {}
     };
     var activeUniforms   = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
     var activeAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
@@ -30,6 +31,18 @@
       var attribute = gl.getActiveAttrib(program, i);
       result.attributes.push(toSimpleObject(attribute,
         gl.getAttribLocation(program, attribute.name)));
+    }
+
+    // Loop through samplers
+    var samplerIndex = 0;
+    for (var i = 0; i < result.uniforms.length; i++) {
+      var uniform = result.uniforms[i];
+      switch (uniform.type) {
+        case gl.SAMPLER_2D :
+        case gl.SAMPLER_CUBE :
+          result.samplers[uniform.name] = samplerIndex++;
+          break;
+      }
     }
     
     return result;
@@ -67,6 +80,8 @@
       var uniform = this._uniforms[i];
       this._uniformsByName[uniform.name] = uniform;
     }
+
+    this._samplerIndices = programInfo.samplers;
   };
 
 })();
@@ -118,28 +133,27 @@ Zia.Program.prototype = {
           gl.uniformMatrix4fv(uniform.location, false, value.elements);
           break;
         case gl.SAMPLER_2D :
-          gl.activeTexture(gl.TEXTURE0); // TODO
-          if (value !== null) {
-            gl.bindTexture(gl.TEXTURE_2D, value._texture);
-            gl.uniform1i(uniform.location, 0); // TODO
-          } else {
-            gl.bindTexture(gl.TEXTURE_2D, null);
-          }
+          this._setUniformSampler(gl, uniform, value, gl.TEXTURE_2D);
           break;
         case gl.SAMPLER_CUBE :
-          gl.activeTexture(gl.TEXTURE1); // TODO
-          if (value !== null) {
-            gl.bindTexture(gl.TEXTURE_CUBE_MAP, value._texture);
-            gl.uniform1i(uniform.location, 1); // TODO
-          } else {
-            gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
-          }
+          this._setUniformSampler(gl, uniform, value, gl.TEXTURE_CUBE_MAP);
           break;
         default :
           throw "Not implemented for type: " + uniform.type;
       }
     }
   })(),
+
+  _setUniformSampler: function(gl, uniform, value, textureType) {
+    var samplerIndex = this._samplerIndices[uniform.name];
+    gl.activeTexture(gl.TEXTURE0 + samplerIndex);
+    if (value !== null) {
+      gl.bindTexture(textureType, value._texture);
+      gl.uniform1i(uniform.location, samplerIndex);
+    } else {
+      gl.bindTexture(textureType, null);
+    }
+  },
 
   destroy: function() {
     var attachedShaders = this._gl.getAttachedShaders(this._program);

@@ -89,7 +89,6 @@ Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, opt
 
         if (loaded === 6) {
           result._generateMipmap();
-          result._changed = true;
         }
       };
       image.src = imagePath;
