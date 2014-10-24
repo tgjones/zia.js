@@ -44,7 +44,7 @@ module.exports = function(grunt) {
           assets: 'dist/site/assets',
           data: ['site/data/*.json'],
           helpers: ['site/helpers/*.js'],
-          partials: ['site/includes/**/*.html'],
+          partials: ['site/includes/**/*.html', 'site/layouts/**/*.html'],
           layoutdir: 'site/layouts',
           layout: 'page.html',
           collections: [
@@ -68,6 +68,18 @@ module.exports = function(grunt) {
       dist: {
         src: srcFiles,
         dest: 'build/zia.js'
+      },
+      testHelpers: {
+        src: helperFiles,
+        dest: 'dist/site/assets/js/zia-spec-helpers.js'
+      },
+      tests: {
+        src: testFiles,
+        dest: 'dist/site/assets/js/zia-specs.js'
+      },
+      vendorFiles: {
+        src: vendorFiles,
+        dest: 'dist/site/assets/js/zia-spec-dependencies.js'
       }
     },
 
@@ -76,6 +88,14 @@ module.exports = function(grunt) {
         files: [
           {expand:true, cwd: 'site/assets/', src: ['**/*','!**/*.scss'], dest: 'dist/site/assets/', filter:'isFile'},
           {expand:true, cwd: 'build/', src: ['*.js'], dest: 'dist/site/assets/js', filter: 'isFile'}
+        ]
+      },
+      jasmine: {
+        files: [
+          { src: 'node_modules/grunt-contrib-jasmine/node_modules/es5-shim/es5-shim.js', dest: 'dist/site/assets/js/jasmine/es5-shim.js' },
+          { src: 'node_modules/grunt-contrib-jasmine/vendor/jasmine-2.0.0/jasmine.js', dest: 'dist/site/assets/js/jasmine/jasmine.js' },
+          { src: 'node_modules/grunt-contrib-jasmine/vendor/jasmine-2.0.0/jasmine-html.js', dest: 'dist/site/assets/js/jasmine/jasmine-html.js' },
+          { src: 'node_modules/grunt-contrib-jasmine/vendor/jasmine-2.0.0/jasmine.css', dest: 'dist/site/assets/css/jasmine/jasmine.css' }
         ]
       }
     },
@@ -190,9 +210,9 @@ module.exports = function(grunt) {
         options: { livereload: true }
       },
       site_assets: {
-        options: { cwd: 'site/assets/', livereload: true },
         files: ['**/*'],
-        tasks: ['copy']
+        tasks: ['copy'],
+        options: { cwd: 'site/assets/', livereload: true }
       },
       jsdoc: {
         files: [srcFiles, 'site/jsdoc/**/*.*'],

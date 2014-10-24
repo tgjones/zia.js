@@ -33,7 +33,7 @@ hr {
     text-transform: uppercase;
   }
 
-  li.active a {
+  li.active > a {
     border-bottom: 3px solid #3bafda;
     height: 50px;
   }
