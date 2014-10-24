@@ -22,6 +22,12 @@ Zia.Texture2D.createFromImagePath = function (graphicsDevice, imagePath, options
   var result = new Zia.Texture2D(graphicsDevice, options);
 
   var gl = graphicsDevice._gl;
+
+  // Set temporary 1x1 white texture, until image has loaded
+  result.width = 1;
+  result.height = 1;
+  result.setData(new Uint8Array([255, 255, 255, 255]));
+
   var image = new Image();
   image.onload = function() {
     result._setData(function() {
@@ -32,7 +38,6 @@ Zia.Texture2D.createFromImagePath = function (graphicsDevice, imagePath, options
     result._generateMipmap();
     result.width = image.naturalWidth;
     result.height = image.naturalHeight;
-    result._ready = true;
   };
   image.src = imagePath;
 
@@ -46,7 +51,6 @@ Zia.Texture2D.createFromImageData = function (graphicsDevice, imageData, width, 
 
   var gl = graphicsDevice._gl;
   result.setData(imageData);
-  result._ready = true;
 
   return result;
 };

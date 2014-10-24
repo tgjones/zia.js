@@ -4038,17 +4038,21 @@ Zia.Program.prototype = {
           gl.uniformMatrix4fv(uniform.location, false, value.elements);
           break;
         case gl.SAMPLER_2D :
-          if (value !== null && value._ready === true) {
-            gl.activeTexture(gl.TEXTURE0); // TODO
+          gl.activeTexture(gl.TEXTURE0); // TODO
+          if (value !== null) {
             gl.bindTexture(gl.TEXTURE_2D, value._texture);
             gl.uniform1i(uniform.location, 0); // TODO
+          } else {
+            gl.bindTexture(gl.TEXTURE_2D, null);
           }
           break;
         case gl.SAMPLER_CUBE :
-          if (value !== null && value._ready === true) {
-            gl.activeTexture(gl.TEXTURE1); // TODO
+          gl.activeTexture(gl.TEXTURE1); // TODO
+          if (value !== null) {
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, value._texture);
             gl.uniform1i(uniform.location, 1); // TODO
+          } else {
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
           }
           break;
         default :
@@ -4083,11 +4087,9 @@ Zia.ProgramDirtyFlags = {
   MaterialColor          : 8,
   SpecularColor          : 16,
   SpecularPower          : 32,
-  Texture                : 64,
-  EnvironmentMap         : 128,
-  EnvironmentMapAmount   : 256,
-  EnvironmentMapSpecular : 512,
-  FresnelFactor          : 1024,
+  EnvironmentMapAmount   : 64,
+  EnvironmentMapSpecular : 128,
+  FresnelFactor          : 256,
   All                    : -1
 };
 
@@ -4703,7 +4705,6 @@ Zia.Texture = function (graphicsDevice, options, textureType) {
   var gl = this._gl = graphicsDevice._gl;
   this._texture = this._gl.createTexture();
   this._textureType = textureType;
-  this._ready = false;
 
   this._options = Zia.ObjectUtil.reverseMerge(options || {}, {
     filter: Zia.TextureFilter.MinNearestMagMipLinear,
@@ -4780,6 +4781,12 @@ Zia.Texture2D.createFromImagePath = function (graphicsDevice, imagePath, options
   var result = new Zia.Texture2D(graphicsDevice, options);
 
   var gl = graphicsDevice._gl;
+
+  // Set temporary 1x1 white texture, until image has loaded
+  result.width = 1;
+  result.height = 1;
+  result.setData(new Uint8Array([255, 255, 255, 255]));
+
   var image = new Image();
   image.onload = function() {
     result._setData(function() {
@@ -4790,7 +4797,6 @@ Zia.Texture2D.createFromImagePath = function (graphicsDevice, imagePath, options
     result._generateMipmap();
     result.width = image.naturalWidth;
     result.height = image.naturalHeight;
-    result._ready = true;
   };
   image.src = imagePath;
 
@@ -4804,7 +4810,6 @@ Zia.Texture2D.createFromImageData = function (graphicsDevice, imageData, width, 
 
   var gl = graphicsDevice._gl;
   result.setData(imageData);
-  result._ready = true;
 
   return result;
 };
@@ -4869,6 +4874,13 @@ Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, opt
 
   var result = new Zia.TextureCube(graphicsDevice, options);
 
+  // Set temporary 1x1 white texture, until images have loaded
+  result.size = 1;
+  var whitePixel = new Uint8Array([255, 255, 255, 255]);
+  for (var i = 0; i < 6; i++) {
+    result.setData(i, whitePixel);
+  }
+
   var gl = graphicsDevice._gl;
   var loaded = 0;
   for (var i = 0; i < imagePaths.length; i++) {
@@ -4898,7 +4910,7 @@ Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, opt
 
         if (loaded === 6) {
           result._generateMipmap();
-          result._ready = true;
+          result._changed = true;
         }
       };
       image.src = imagePath;
@@ -6720,12 +6732,7 @@ Zia.Viewport.prototype = {
             this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
       }
 
-      if ((this._dirtyFlags & DF.Texture) != 0) {
-        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
-          this.setUniform('uSampler', this._texture);
-          this._dirtyFlags &= ~DF.Texture;
-        }
-      }
+      this.setUniform('uSampler', this._texture);
 
       this._directionalLight0._apply();
       this._directionalLight1._apply();
@@ -7058,18 +7065,12 @@ Zia.DirectionalLight.prototype = {
 
     texture: {
       get: function() { return this._texture; },
-      set: function(v) {
-        this._texture = v;
-        this._dirtyFlags |= DF.Texture;
-      }
+      set: function(v) { this._texture = v; }
     },
 
     environmentMap: {
       get: function() { return this._environmentMap; },
-      set: function(v) {
-        this._environmentMap = v;
-        this._dirtyFlags |= DF.EnvironmentMap;
-      }
+      set: function(v) { this._environmentMap = v; }
     },
 
     environmentMapAmount: {
@@ -7127,12 +7128,8 @@ Zia.DirectionalLight.prototype = {
         this._dirtyFlags &= ~DF.MaterialColor;
       }
 
-      if ((this._dirtyFlags & DF.EnvironmentMap) != 0) {
-        if ((this._environmentMap !== null && this._environmentMap._ready === true) || this._environmentMap === null) {
-          this.setUniform('uEnvironmentMapSampler', this._environmentMap);
-          this._dirtyFlags &= ~DF.EnvironmentMap;
-        }
-      }
+      this.setUniform('uSampler', this._texture);
+      this.setUniform('uEnvironmentMapSampler', this._environmentMap);
 
       if ((this._dirtyFlags & DF.EnvironmentMapAmount) != 0) {
         this.setUniform('uEnvironmentMapAmount', this._environmentMapAmount);
@@ -7152,13 +7149,6 @@ Zia.DirectionalLight.prototype = {
       // Recompute the world inverse transpose and eye position?
       this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
         this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
-
-      if ((this._dirtyFlags & DF.Texture) != 0) {
-        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
-          this.setUniform('uSampler', this._texture);
-          this._dirtyFlags &= ~DF.Texture;
-        }
-      }
 
       this._directionalLight0._apply();
       this._directionalLight1._apply();

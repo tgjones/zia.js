@@ -118,17 +118,21 @@ Zia.Program.prototype = {
           gl.uniformMatrix4fv(uniform.location, false, value.elements);
           break;
         case gl.SAMPLER_2D :
-          if (value !== null && value._ready === true) {
-            gl.activeTexture(gl.TEXTURE0); // TODO
+          gl.activeTexture(gl.TEXTURE0); // TODO
+          if (value !== null) {
             gl.bindTexture(gl.TEXTURE_2D, value._texture);
             gl.uniform1i(uniform.location, 0); // TODO
+          } else {
+            gl.bindTexture(gl.TEXTURE_2D, null);
           }
           break;
         case gl.SAMPLER_CUBE :
-          if (value !== null && value._ready === true) {
-            gl.activeTexture(gl.TEXTURE1); // TODO
+          gl.activeTexture(gl.TEXTURE1); // TODO
+          if (value !== null) {
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, value._texture);
             gl.uniform1i(uniform.location, 1); // TODO
+          } else {
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
           }
           break;
         default :

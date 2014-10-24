@@ -322,12 +322,7 @@
             this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
       }
 
-      if ((this._dirtyFlags & DF.Texture) != 0) {
-        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
-          this.setUniform('uSampler', this._texture);
-          this._dirtyFlags &= ~DF.Texture;
-        }
-      }
+      this.setUniform('uSampler', this._texture);
 
       this._directionalLight0._apply();
       this._directionalLight1._apply();

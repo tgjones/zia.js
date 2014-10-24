@@ -239,18 +239,12 @@
 
     texture: {
       get: function() { return this._texture; },
-      set: function(v) {
-        this._texture = v;
-        this._dirtyFlags |= DF.Texture;
-      }
+      set: function(v) { this._texture = v; }
     },
 
     environmentMap: {
       get: function() { return this._environmentMap; },
-      set: function(v) {
-        this._environmentMap = v;
-        this._dirtyFlags |= DF.EnvironmentMap;
-      }
+      set: function(v) { this._environmentMap = v; }
     },
 
     environmentMapAmount: {
@@ -308,12 +302,8 @@
         this._dirtyFlags &= ~DF.MaterialColor;
       }
 
-      if ((this._dirtyFlags & DF.EnvironmentMap) != 0) {
-        if ((this._environmentMap !== null && this._environmentMap._ready === true) || this._environmentMap === null) {
-          this.setUniform('uEnvironmentMapSampler', this._environmentMap);
-          this._dirtyFlags &= ~DF.EnvironmentMap;
-        }
-      }
+      this.setUniform('uSampler', this._texture);
+      this.setUniform('uEnvironmentMapSampler', this._environmentMap);
 
       if ((this._dirtyFlags & DF.EnvironmentMapAmount) != 0) {
         this.setUniform('uEnvironmentMapAmount', this._environmentMapAmount);
@@ -333,13 +323,6 @@
       // Recompute the world inverse transpose and eye position?
       this._dirtyFlags = Zia.ProgramUtil.setLightingMatrices(
         this, this._dirtyFlags, this._modelMatrix, this._viewMatrix);
-
-      if ((this._dirtyFlags & DF.Texture) != 0) {
-        if ((this._texture !== null && this._texture._ready === true) || this._texture === null) {
-          this.setUniform('uSampler', this._texture);
-          this._dirtyFlags &= ~DF.Texture;
-        }
-      }
 
       this._directionalLight0._apply();
       this._directionalLight1._apply();

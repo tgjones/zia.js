@@ -13,11 +13,9 @@ Zia.ProgramDirtyFlags = {
   MaterialColor          : 8,
   SpecularColor          : 16,
   SpecularPower          : 32,
-  Texture                : 64,
-  EnvironmentMap         : 128,
-  EnvironmentMapAmount   : 256,
-  EnvironmentMapSpecular : 512,
-  FresnelFactor          : 1024,
+  EnvironmentMapAmount   : 64,
+  EnvironmentMapSpecular : 128,
+  FresnelFactor          : 256,
   All                    : -1
 };
 

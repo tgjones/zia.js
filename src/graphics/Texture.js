@@ -2,7 +2,6 @@ Zia.Texture = function (graphicsDevice, options, textureType) {
   var gl = this._gl = graphicsDevice._gl;
   this._texture = this._gl.createTexture();
   this._textureType = textureType;
-  this._ready = false;
 
   this._options = Zia.ObjectUtil.reverseMerge(options || {}, {
     filter: Zia.TextureFilter.MinNearestMagMipLinear,

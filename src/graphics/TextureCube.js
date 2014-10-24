@@ -53,6 +53,13 @@ Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, opt
 
   var result = new Zia.TextureCube(graphicsDevice, options);
 
+  // Set temporary 1x1 white texture, until images have loaded
+  result.size = 1;
+  var whitePixel = new Uint8Array([255, 255, 255, 255]);
+  for (var i = 0; i < 6; i++) {
+    result.setData(i, whitePixel);
+  }
+
   var gl = graphicsDevice._gl;
   var loaded = 0;
   for (var i = 0; i < imagePaths.length; i++) {
@@ -82,7 +89,7 @@ Zia.TextureCube.createFromImagePaths = function (graphicsDevice, imagePaths, opt
 
         if (loaded === 6) {
           result._generateMipmap();
-          result._ready = true;
+          result._changed = true;
         }
       };
       image.src = imagePath;
