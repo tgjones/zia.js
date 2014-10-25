@@ -27,32 +27,56 @@
 
 /**
  * Constructs a new 4x4 matrix. Parameters are supplied in row-major order
- * to aid readability. If called with no parameters, the matrix is initialised
- * to the identity matrix. If called with any parameters, make sure you call
- * it with all 16 values.
+ * to aid readability. If called with no parameters, all matrix elements are
+ * initialised to 0. If called with any parameters, make sure you supply
+ * all 16 values.
  * 
  * @constructor
  *
+ * @param {Number} [m11=0.0] - The value for row 0, column 0.
+ * @param {Number} [m12=0.0] - The value for row 0, column 1.
+ * @param {Number} [m13=0.0] - The value for row 0, column 2.
+ * @param {Number} [m14=0.0] - The value for row 0, column 3.
+ * @param {Number} [m21=0.0] - The value for row 1, column 0.
+ * @param {Number} [m22=0.0] - The value for row 1, column 1.
+ * @param {Number} [m23=0.0] - The value for row 1, column 2.
+ * @param {Number} [m24=0.0] - The value for row 1, column 3.
+ * @param {Number} [m31=0.0] - The value for row 2, column 0.
+ * @param {Number} [m32=0.0] - The value for row 2, column 1.
+ * @param {Number} [m33=0.0] - The value for row 2, column 2.
+ * @param {Number} [m34=0.0] - The value for row 2, column 3.
+ * @param {Number} [m41=0.0] - The value for row 3, column 0.
+ * @param {Number} [m42=0.0] - The value for row 3, column 1.
+ * @param {Number} [m43=0.0] - The value for row 3, column 2.
+ * @param {Number} [m44=0.0] - The value for row 3, column 3.
+ *
  * @classdesc
- * Represents a 4x4 matrix. The elements are stored in a Float32Array
- * in column-major order to optimise passing to WebGL.
+ * Represents a 4x4 matrix. The elements are stored in a `Float32Array`
+ * in column-major order to optimise handoff to WebGL.
  */
-Zia.Matrix4 = function(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) {
-  if (n11 == undefined) {
-    this.elements = new Float32Array([
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1
-    ]);
+Zia.Matrix4 = function(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) {
+  var values;
+  if (m11 === undefined) {
+    values = [
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0
+    ];
   } else {
-    this.elements = new Float32Array([
-      n11, n21, n31, n41,
-      n12, n22, n32, n42,
-      n13, n23, n33, n43,
-      n14, n24, n34, n44
-    ]);
+    values = [
+      m11, m21, m31, m41,
+      m12, m22, m32, m42,
+      m13, m23, m33, m43,
+      m14, m24, m34, m44
+    ];
   }
+
+  /**
+   * The matrix elements.
+   * @type {Float32Array}
+   */
+  this.elements = new Float32Array(values);
 };
 
 Zia.Matrix4.compose = (function() {

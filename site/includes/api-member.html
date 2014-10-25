@@ -1,0 +1,73 @@
+<div class="panel panel-default api-member-details">
+  <div class="panel-heading">
+    <a name="{{name}}"></a>
+    <h3 class="panel-title member-title">
+      <code>{{name}}
+      <small>
+        {{#is memberType "property"}}
+          {{type.names.[0]}}
+        {{else}}
+          ({{#each parameters}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})
+          {{#if returns}}→ {{returns.type}}{{/if}}
+        {{/is}}
+      </small></code>
+      <span class="label label-default pull-right">{{memberType}}</span>
+      {{#each attribs}}
+      <span class="label label-default pull-right">{{this}}</span>
+      {{/each}}
+    </h3>
+  </div>
+  <div class="panel-body">
+    <span class="defined-in">
+      Defined in
+      <a href="https://github.com/tgjones/zia.js/blob/master/src/{{filename}}#L{{line}}">{{filename}}:{{line}}</a>
+    </span>
+
+    <div class="description">
+    {{{description}}}
+    </div>
+
+    {{#if parameters}}
+    <h4>Parameters</h4>
+    <table class="table table-bordered table-striped api-parameters">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each parameters}}
+        <tr>
+          <td><code>{{name}}</code></td>
+          <td>{{apiTypeLink type}}</td>
+          <td>
+            {{#if optional}}
+            <span class="label label-default">optional</span>
+            {{/if}}
+            {{{description}}}
+            {{#if default}}
+            Defaults to <code>{{this.[default]}}</code>.</span>
+            {{/if}}
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{/if}}
+
+    {{#if returns}}
+    <h4>Returns</h4>
+    <div class="member-returns">
+      <p>{{apiTypeLink returns.type}} -</p>
+      {{{returns.description}}}
+    </div>
+    {{/if}}
+
+    {{#gt examples.length 0}}
+    <h4>Example</h4>
+    {{inlineCode examples.[0]}}
+    {{/gt}}
+  </div>
+</div>

@@ -249,10 +249,6 @@ module.exports = function(grunt) {
         tasks: ['load-api-pages', 'assemble'],
         options: { livereload: true }
       },
-      doxication: {
-        files: srcFiles,
-        tasks: ['doxication']
-      },
       "jsdoc-assemble": {
         files: ['lib/tasks/jsdoc-assemble.js', '.tmp/jsdoc/jsdoc.json'],
         tasks: ['jsdoc-assemble']

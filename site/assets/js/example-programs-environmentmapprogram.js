@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var lastCubeUpdateTime, rotationAngle = 0;
   var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();
 
-  var identityMatrix = new Zia.Matrix4();
+  var identityMatrix = Zia.Matrix4.createIdentity(new Zia.Matrix4());
   var skyboxMVPMatrix = new Zia.Matrix4();
 
   var stats = new Stats();

@@ -145,6 +145,10 @@ hr {
       background: transparent;
       padding: 0;
     }
+
+    .label {
+      margin-left: 3px;
+    }
   }
 
   .defined-in {
@@ -153,6 +157,10 @@ hr {
 
   .description p {
     margin-top: 15px;
+  }
+
+  .api-parameters p {
+    display: inline;
   }
 
   .member-returns p {
@@ -166,6 +174,10 @@ hr {
   }
 
   table p:last-child {
+    margin-bottom: 0;
+  }
+
+  .table:last-child {
     margin-bottom: 0;
   }
 

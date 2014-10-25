@@ -28,9 +28,9 @@
 describe('Zia.Matrix4', function() {
   
   describe("constructor", function() {
-    it('initializes to an identity matrix when no parameters are passed', function() {
+    it('initializes to an empty matrix when no parameters are passed', function() {
       var m = new Zia.Matrix4();
-      expect(m.determinant()).toBe(1);
+      expect(m.determinant()).toBe(0);
     });
     
     it ('initializes to the specified values when parameters are passed', function() {
@@ -57,7 +57,7 @@ describe('Zia.Matrix4', function() {
   describe('#set method', function() {
     it("set", function() {
       var b = new Zia.Matrix4();
-      expect( b.determinant()).toBe(1);
+      expect( b.determinant()).toBe(0);
 
       b.set(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
       expect(b.elements[0]).toBe(0);
@@ -79,30 +79,26 @@ describe('Zia.Matrix4', function() {
     });
   });
 
-  it( "identity", function() {
-    var b = new Zia.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
-    expect( b.elements[0] ).toBe(0 );
-    expect( b.elements[1] ).toBe(4 );
-    expect( b.elements[2] ).toBe(8 );
-    expect( b.elements[3] ).toBe(12 );
-    expect( b.elements[4] ).toBe(1 );
-    expect( b.elements[5] ).toBe(5 );
-    expect( b.elements[6] ).toBe(9 );
-    expect( b.elements[7] ).toBe(13 );
-    expect( b.elements[8] ).toBe(2 );
-    expect( b.elements[9] ).toBe(6 );
-    expect( b.elements[10]).toBe( 10 );
-    expect( b.elements[11]).toBe( 14 );
-    expect( b.elements[12]).toBe( 3 );
-    expect( b.elements[13]).toBe( 7 );
-    expect( b.elements[14]).toBe( 11 );
-    expect( b.elements[15]).toBe( 15 );
-
-    var a = new Zia.Matrix4();
-    expect(a).not.toEqualMatrix4(b);
-
-    Zia.Matrix4.createIdentity(b);
-    expect(a).toEqualMatrix4(b);
+  describe('#identity method', function() {
+    it('has 1 on the diagonal, 0 elsewhere', function() {
+      var m = Zia.Matrix4.createIdentity(new Zia.Matrix4());
+      expect(m.elements[0] ).toBe(1);
+      expect(m.elements[1] ).toBe(0);
+      expect(m.elements[2] ).toBe(0);
+      expect(m.elements[3] ).toBe(0);
+      expect(m.elements[4] ).toBe(0);
+      expect(m.elements[5] ).toBe(1);
+      expect(m.elements[6] ).toBe(0);
+      expect(m.elements[7] ).toBe(0);
+      expect(m.elements[8] ).toBe(0);
+      expect(m.elements[9] ).toBe(0);
+      expect(m.elements[10]).toBe(1);
+      expect(m.elements[11]).toBe(0);
+      expect(m.elements[12]).toBe(0);
+      expect(m.elements[13]).toBe(0);
+      expect(m.elements[14]).toBe(0);
+      expect(m.elements[15]).toBe(1);
+    });
   });
 
   it( "multiplyByScalar", function() {
@@ -144,7 +140,7 @@ describe('Zia.Matrix4', function() {
   });
 
   it( "determinant", function() {
-    var a = new Zia.Matrix4();
+    var a = Zia.Matrix4.createIdentity(new Zia.Matrix4());
     expect( a.determinant()).toBe(1);
 
     a.elements[0] = 2;
@@ -159,15 +155,15 @@ describe('Zia.Matrix4', function() {
   });
 
   it( "invert", function() {
-    var identity = new Zia.Matrix4();
+    var identity = Zia.Matrix4.createIdentity(new Zia.Matrix4());
 
-    var a = new Zia.Matrix4();
+    var a = Zia.Matrix4.createIdentity(new Zia.Matrix4());
     var b = new Zia.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
     var c = new Zia.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
     expect(a).not.toEqualMatrix4(b);
     Zia.Matrix4.invert(b, a);
-    expect(b).toEqualMatrix4(new Zia.Matrix4());
+    expect(b).toEqualMatrix4(Zia.Matrix4.createIdentity(new Zia.Matrix4()));
 
     expect(function() { Zia.Matrix4.invert(b, c); }).toThrow();
 
@@ -188,7 +184,7 @@ describe('Zia.Matrix4', function() {
     for( var i = 0, il = testMatrices.length; i < il; i ++ ) {
       var m = testMatrices[i];
 
-      var mInverse = Zia.Matrix4.invert(m, new Zia.Matrix4());
+      var mInverse = Zia.Matrix4.invert(m, Zia.Matrix4.createIdentity(new Zia.Matrix4()));
       var mSelfInverse = m.clone(new Zia.Matrix4());
       Zia.Matrix4.invert(mSelfInverse, mSelfInverse);
 

@@ -41,7 +41,7 @@ $(function() {
     new Zia.Vector3(0, 1, 0),
     new Zia.Matrix4());
 
-  var modelMatrix = new Zia.Matrix4();
+  var modelMatrix = Zia.Matrix.createIdentity(new Zia.Matrix4());
 
   var rotationAxis = new Zia.Vector3(0, 1, 0);
   var rotationAngle = 0;

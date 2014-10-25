@@ -141,6 +141,8 @@ function graft(parentNode, childNodes, parentLongname, parentName) {
                 'name': element.name,
                 'access': element.access || '',
                 'virtual': !!element.virtual,
+                'filename': element.meta.shortpath,
+                'line': element.meta.lineno,
                 'description': element.description || '',
                 'type': element.type? (element.type.length === 1? element.type[0] : element.type) : ''
             });
@@ -203,8 +205,9 @@ function graft(parentNode, childNodes, parentLongname, parentName) {
                 'constructor': {
                     'name': element.name,
                     'description': element.description || '',
-                    'parameters': [
-                    ],
+                    'filename': element.meta.shortpath,
+                    'line': element.meta.lineno,
+                    'parameters': [],
                     'examples': []
                 }
             };
