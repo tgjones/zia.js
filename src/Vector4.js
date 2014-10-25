@@ -36,7 +36,7 @@
  * @param {Number} [w=0.0] - The value for the w coordinate.
  *
  * @classdesc
- * A 4-dimensional vector.
+ * Represents a 4-dimensional vector.
  */
 Zia.Vector4 = function (x, y, z, w) {
   this._x = x || 0;

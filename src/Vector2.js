@@ -34,7 +34,7 @@
  * @param {Number} [y=0.0] - The value for the y coordinate.
  *
  * @classdesc
- * A 2-dimensional vector.
+ * Represents a 2-dimensional vector.
  */
 Zia.Vector2 = function(x, y) {
   this._x = x || 0;

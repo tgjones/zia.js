@@ -35,7 +35,7 @@
  * @param {Number} [z=0.0] - The value for the z coordinate.
  *
  * @classdesc
- * A 3-dimensional vector.
+ * Represents a 3-dimensional vector.
  */
 Zia.Vector3 = function(x, y, z) {
   this._x = x || 0;

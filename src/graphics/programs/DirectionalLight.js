@@ -1,3 +1,14 @@
+/**
+ * Constructs a new `DirectionalLight`. 
+ *
+ * @constructor
+ *
+ * @param {Zia.Program} program - The associated program.
+ * @param {Number} index - The index of this light (used to set uniforms correctly).
+ *
+ * @classdesc
+ * A directional light structure, used by several of the built-in `Program` classes.
+ */
 Zia.DirectionalLight = function(program, index) {
   this._program = program;
   this._index = index;

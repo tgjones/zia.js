@@ -1,4 +1,4 @@
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -25,6 +25,19 @@
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new quaternion.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ * @param {Number} [w=0.0] - The value for the w coordinate.
+ *
+ * @classdesc
+ * Represents a 4-dimensional vector which can be used for rotation.
+ */
 Zia.Quaternion = function (x, y, z, w) {
   this._x = x || 0;
   this._y = y || 0;

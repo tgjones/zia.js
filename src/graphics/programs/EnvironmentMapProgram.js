@@ -129,6 +129,19 @@
     return result.join('\n');
   }
 
+  /**
+   * Constructs a new `EnvironmentMapProgram`. 
+   *
+   * @constructor
+   *
+   * @param {Zia.GraphicsDevice} graphicsDevice - The graphics device.
+   * @param {Object} [options] - TODO
+   *
+   * @classdesc
+   * A rendering effect with support for an environment map cube texture.
+   *
+   * @extends Zia.Program
+   */
   Zia.EnvironmentMapProgram = function (graphicsDevice, options) {
     this._dirtyFlags = Zia.ProgramDirtyFlags.All;
 

@@ -49,8 +49,16 @@
   }
 
   /**
-   * A wrapper for a WebGL Program object.
+   * Constructs a new program. 
+   *
    * @constructor
+   *
+   * @param {Zia.GraphicsDevice} graphicsDevice - The graphics device.
+   * @param {Zia.VertexShader} vertexShader - The vertex shader.
+   * @param {Zia.FragmentShader} fragmentShader - The fragmentShader.
+   *
+   * @classdesc
+   * Wrapper for a single WebGL Program object.
    */
   Zia.Program = function (graphicsDevice, vertexShader, fragmentShader) {
     this._graphicsDevice = graphicsDevice;

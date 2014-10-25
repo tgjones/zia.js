@@ -1,4 +1,4 @@
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -25,8 +25,35 @@
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new 3x3 matrix. Parameters are supplied in row-major order
+ * to aid readability. If called with no parameters, all matrix elements are
+ * initialised to 0. If called with any parameters, make sure you supply
+ * all 9 values.
+ * 
+ * @constructor
+ *
+ * @summary Constructs a new 4x4 matrix.
+ *
+ * @param {Number} [m11=0.0] - The value for row 0, column 0.
+ * @param {Number} [m12=0.0] - The value for row 0, column 1.
+ * @param {Number} [m13=0.0] - The value for row 0, column 2.
+ * @param {Number} [m21=0.0] - The value for row 1, column 0.
+ * @param {Number} [m22=0.0] - The value for row 1, column 1.
+ * @param {Number} [m23=0.0] - The value for row 1, column 2.
+ * @param {Number} [m31=0.0] - The value for row 2, column 0.
+ * @param {Number} [m32=0.0] - The value for row 2, column 1.
+ * @param {Number} [m33=0.0] - The value for row 2, column 2.
+ *
+ * @classdesc
+ * Represents a 3x3 matrix. The elements are stored in a `Float32Array`
+ * in column-major order to optimise handoff to WebGL.
+ */
 Zia.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
-
+  /**
+   * The matrix elements.
+   * @type {Float32Array}
+   */
   this.elements = new Float32Array( 9 );
 
   var te = this.elements;

@@ -139,6 +139,22 @@
     return result.join('\n');
   }
 
+  /**
+   * Constructs a new `BasicProgram`. 
+   *
+   * @constructor
+   *
+   * @param {Zia.GraphicsDevice} graphicsDevice - The graphics device.
+   * @param {Boolean} [options.lightingEnabled=false] - Should lighting be enabled?
+   * @param {Boolean} [options.perPixelLightingEnabled=true] - Should per-pixel (as opposed to per-vertex) lighting be enabled?.
+   * @param {Boolean} [options.textureEnabled=false] - Should textures be enabled?
+   * @param {Boolean} [options.vertexColorEnabled=false] - Will you be using vertices that contain a color component?
+   *
+   * @classdesc
+   * A basic rendering effect with support for lighting and a single texture.
+   *
+   * @extends Zia.Program
+   */
   Zia.BasicProgram = function (graphicsDevice, options) {
     this._dirtyFlags = Zia.ProgramDirtyFlags.All;
 

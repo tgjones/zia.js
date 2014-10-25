@@ -14,6 +14,17 @@ Zia.PrimitiveType = {
   TriangleFan: 6
 };
 
+/**
+ * Constructs a new `GraphicsDevice` object.
+ *
+ * @constructor
+ *
+ * @param {HTMLCanvasElement} canvas - The canvas element.
+ *
+ * @classdesc
+ * Main class in Zia. Manages the WebGL rendering context and associated state,
+ * and performs rendering.
+ */
 Zia.GraphicsDevice = function (canvas, debug) {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;

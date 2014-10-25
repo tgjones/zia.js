@@ -2,6 +2,19 @@
 layout: api-base.html
 ---
 
+{{#if extends}}
+<p><strong>Base Class: </strong> {{apiTypeLink extends}}</p>
+{{/if}}
+
+{{#gt derivedClasses.length 0}}
+<p><strong>Derived Classes:</strong></p>
+<ul>
+  {{#each derivedClasses}}
+  <li>{{apiTypeLink this}}</li>
+  {{/each}}
+</ul>
+{{/gt}}
+
 {{> body}}
 
 {{#if page.data.constructor}}
