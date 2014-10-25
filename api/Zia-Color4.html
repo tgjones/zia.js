@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Zia.Color4 Class - Zia.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,800,700,400italic,600italic,700italic,800italic,300italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../assets/css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/bootflat.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/highlight.solarized_light.css" media="screen">
+    <link rel="stylesheet" href="../assets/css/site.css" media="screen">
+
+    <script type="text/javascript" src="../assets/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../assets/js/jquery.fs.selector.min.js"></script>
+    <script type="text/javascript" src="../assets/js/stats.min.js"></script>
+    <script type="text/javascript" src="../assets/js/dat.gui.min.js"></script>
+    <script type="text/javascript" src="../assets/js/zia.js"></script>
+    <script type="text/javascript" src="../assets/js/site.js"></script>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand">Zia.js</a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse navbar-right" id="navbar-main">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="index.html">API</a></li>
+            <li class="dropdown ">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="../docs/getting-started.html">Getting Started</a></li>
+                <li class="divider"></li>
+                <li><a href="../docs/test-suite.html">Unit Test Suite</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="../examples/index.html">Examples</a>
+            </li>
+            <li>
+              <a href="https://github.com/tgjones/zia.js">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 sidebar-nav">
+      
+      <div class="sidebar-group">
+        <span class="sidebar-group-item heading"><strong>Classes</strong></span>
+
+        
+        <a href="Zia-BasicProgram.html"
+          class="sidebar-group-item ">
+          Zia.BasicProgram
+        </a>
+        
+        <a href="Zia-Color4.html"
+          class="sidebar-group-item active">
+          Zia.Color4
+        </a>
+        
+        <a href="Zia-DirectionalLight.html"
+          class="sidebar-group-item ">
+          Zia.DirectionalLight
+        </a>
+        
+        <a href="Zia-EnvironmentMapProgram.html"
+          class="sidebar-group-item ">
+          Zia.EnvironmentMapProgram
+        </a>
+        
+        <a href="Zia-GraphicsDevice.html"
+          class="sidebar-group-item ">
+          Zia.GraphicsDevice
+        </a>
+        
+        <a href="Zia-Matrix3.html"
+          class="sidebar-group-item ">
+          Zia.Matrix3
+        </a>
+        
+        <a href="Zia-Matrix4.html"
+          class="sidebar-group-item ">
+          Zia.Matrix4
+        </a>
+        
+        <a href="Zia-Program.html"
+          class="sidebar-group-item ">
+          Zia.Program
+        </a>
+        
+        <a href="Zia-Quaternion.html"
+          class="sidebar-group-item ">
+          Zia.Quaternion
+        </a>
+        
+        <a href="Zia-Vector2.html"
+          class="sidebar-group-item ">
+          Zia.Vector2
+        </a>
+        
+        <a href="Zia-Vector3.html"
+          class="sidebar-group-item ">
+          Zia.Vector3
+        </a>
+        
+        <a href="Zia-Vector4.html"
+          class="sidebar-group-item ">
+          Zia.Vector4
+        </a>
+        
+      </div>
+      
+    </div>
+    <div class="col-md-9 api-reference">
+      <h1>Zia.Color4 Class</h1>
+      
+
+
+
+
+
+<p>Represents a 4-component color with red, green, blue and alpha components.</p>
+
+
+<h4>Constructor</h4>
+<table class="table table-bordered table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td class="api-member-table-name">
+      <code><a href="#Color4">Color4</a></code>
+    </td>
+    <td>
+      
+        <p>Constructs a new <code>Color4</code> object.</p>
+      
+    </td>
+  </tr>
+</table>
+
+
+
+<h4>Properties</h4>
+<table class="table table-bordered table-striped api-member-table">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  
+  <tr>
+    <td class="api-member-table-name">
+      <code><a href="#a">a</a></code>
+    </td>
+    <td>
+      
+
+      
+        <p>The alpha component.</p>
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <td class="api-member-table-name">
+      <code><a href="#b">b</a></code>
+    </td>
+    <td>
+      
+
+      
+        <p>The blue component.</p>
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <td class="api-member-table-name">
+      <code><a href="#g">g</a></code>
+    </td>
+    <td>
+      
+
+      
+        <p>The green component.</p>
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <td class="api-member-table-name">
+      <code><a href="#r">r</a></code>
+    </td>
+    <td>
+      
+
+      
+        <p>The red component.</p>
+      
+    </td>
+  </tr>
+  
+</table>
+
+
+
+
+<hr />
+
+
+<h4>Constructor</h4>
+<div class="panel panel-default api-member-details">
+  <div class="panel-heading">
+    <a class="anchor" name="Color4"></a>
+    <h3 class="panel-title member-title">
+      <code>new Zia.Color4
+      <small>
+        
+          (r, g, b, a)
+          
+        
+      </small></code>
+      <span class="label label-default pull-right">constructor</span>
+      
+    </h3>
+  </div>
+  <div class="panel-body">
+    <span class="defined-in">
+      Defined in
+      <a href="https://github.com/tgjones/zia.js/blob/master/src/Color4.js#L14">Color4.js:14</a>
+    </span>
+
+    <div class="description">
+    <p>Constructs a new <code>Color4</code> object.</p>
+    </div>
+
+    
+    <h4>Parameters</h4>
+    <table class="table table-bordered table-striped api-parameters">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td><code>r</code></td>
+          <td><code>Number</code></td>
+          <td>
+            
+            <p>The value for the red component.</p>
+            
+          </td>
+        </tr>
+        
+        <tr>
+          <td><code>g</code></td>
+          <td><code>Number</code></td>
+          <td>
+            
+            <p>The value for the green component.</p>
+            
+          </td>
+        </tr>
+        
+        <tr>
+          <td><code>b</code></td>
+          <td><code>Number</code></td>
+          <td>
+            
+            <p>The value for the blue component.</p>
+            
+          </td>
+        </tr>
+        
+        <tr>
+          <td><code>a</code></td>
+          <td><code>Number</code></td>
+          <td>
+            
+            <p>The value for the alpha component.</p>
+            
+          </td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+
+    
+
+    
+  </div>
+</div>
+<hr />
+
+
+
+<h4>Properties</h4>
+
+<div class="panel panel-default api-member-details">
+  <div class="panel-heading">
+    <a class="anchor" name="a"></a>
+    <h3 class="panel-title member-title">
+      <code>a
+      <small>
+        
+          Number
+        
+      </small></code>
+      <span class="label label-default pull-right">property</span>
+      
+    </h3>
+  </div>
+  <div class="panel-body">
+    <span class="defined-in">
+      Defined in
+      <a href="https://github.com/tgjones/zia.js/blob/master/src/Color4.js#L37">Color4.js:37</a>
+    </span>
+
+    <div class="description">
+    <p>The alpha component.</p>
+    </div>
+
+    
+
+    
+
+    
+  </div>
+</div>
+
+<div class="panel panel-default api-member-details">
+  <div class="panel-heading">
+    <a class="anchor" name="b"></a>
+    <h3 class="panel-title member-title">
+      <code>b
+      <small>
+        
+          Number
+        
+      </small></code>
+      <span class="label label-default pull-right">property</span>
+      
+    </h3>
+  </div>
+  <div class="panel-body">
+    <span class="defined-in">
+      Defined in
+      <a href="https://github.com/tgjones/zia.js/blob/master/src/Color4.js#L31">Color4.js:31</a>
+    </span>
+
+    <div class="description">
+    <p>The blue component.</p>
+    </div>
+
+    
+
+    
+
+    
+  </div>
+</div>
+
+<div class="panel panel-default api-member-details">
+  <div class="panel-heading">
+    <a class="anchor" name="g"></a>
+    <h3 class="panel-title member-title">
+      <code>g
+      <small>
+        
+          Number
+        
+      </small></code>
+      <span class="label label-default pull-right">property</span>
+      
+    </h3>
+  </div>
+  <div class="panel-body">
+    <span class="defined-in">
+      Defined in
+      <a href="https://github.com/tgjones/zia.js/blob/master/src/Color4.js#L25">Color4.js:25</a>
+    </span>
+
+    <div class="description">
+    <p>The green component.</p>
+    </div>
+
+    
+
+    
+
+    
+  </div>
+</div>
+
+<div class="panel panel-default api-member-details">
+  <div class="panel-heading">
+    <a class="anchor" name="r"></a>
+    <h3 class="panel-title member-title">
+      <code>r
+      <small>
+        
+          Number
+        
+      </small></code>
+      <span class="label label-default pull-right">property</span>
+      
+    </h3>
+  </div>
+  <div class="panel-body">
+    <span class="defined-in">
+      Defined in
+      <a href="https://github.com/tgjones/zia.js/blob/master/src/Color4.js#L19">Color4.js:19</a>
+    </span>
+
+    <div class="description">
+    <p>The red component.</p>
+    </div>
+
+    
+
+    
+
+    
+  </div>
+</div>
+
+<hr />
+
+
+
+    </div>
+  </div>
+</div>
+
+    <div class="container footer-container">
+      <div class="footer-copyright text-center">
+        © 2014 <a href="http://timjones.tw">Tim Jones</a>
+      </div>
+    </div>
+  </body>
+</html>

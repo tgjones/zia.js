@@ -23,7 +23,7 @@ var Zia = {
 
 };
 
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -50,6 +50,19 @@ var Zia = {
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new quaternion.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ * @param {Number} [w=0.0] - The value for the w coordinate.
+ *
+ * @classdesc
+ * Represents a 4-dimensional vector which can be used for rotation.
+ */
 Zia.Quaternion = function (x, y, z, w) {
   this._x = x || 0;
   this._y = y || 0;
@@ -505,7 +518,7 @@ Zia.Quaternion.slerp = function (qa, qb, qm, t) {
 }
 
 
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -532,6 +545,18 @@ Zia.Quaternion.slerp = function (qa, qb, qm, t) {
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new 3-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ *
+ * @classdesc
+ * Represents a 3-dimensional vector.
+ */
 Zia.Vector3 = function(x, y, z) {
   this._x = x || 0;
   this._y = y || 0;
@@ -1241,10 +1266,42 @@ Zia.Vector3.prototype = {
 
 };
 
+/**
+ * Constructs a new `Color4` object.
+ *
+ * @constructor
+ * 
+ * @param {Number} r - The value for the red component.
+ * @param {Number} g - The value for the green component.
+ * @param {Number} b - The value for the blue component.
+ * @param {Number} a - The value for the alpha component.
+ *
+ * @classdesc
+ * Represents a 4-component color with red, green, blue and alpha components.
+ */
 Zia.Color4 = function(r, g, b, a) {
+  /**
+   * The red component.
+   * @type {Number}
+   */
   this.r = r;
+
+  /**
+   * The green component.
+   * @type {Number}
+   */
   this.g = g;
+
+  /**
+   * The blue component.
+   * @type {Number}
+   */
   this.b = b;
+
+  /**
+   * The alpha component.
+   * @type {Number}
+   */
   this.a = a;
 };
 
@@ -1737,7 +1794,7 @@ Zia.MathUtil = {
   }
 };
 
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -1764,8 +1821,35 @@ Zia.MathUtil = {
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new 3x3 matrix. Parameters are supplied in row-major order
+ * to aid readability. If called with no parameters, all matrix elements are
+ * initialised to 0. If called with any parameters, make sure you supply
+ * all 9 values.
+ * 
+ * @constructor
+ *
+ * @summary Constructs a new 4x4 matrix.
+ *
+ * @param {Number} [m11=0.0] - The value for row 0, column 0.
+ * @param {Number} [m12=0.0] - The value for row 0, column 1.
+ * @param {Number} [m13=0.0] - The value for row 0, column 2.
+ * @param {Number} [m21=0.0] - The value for row 1, column 0.
+ * @param {Number} [m22=0.0] - The value for row 1, column 1.
+ * @param {Number} [m23=0.0] - The value for row 1, column 2.
+ * @param {Number} [m31=0.0] - The value for row 2, column 0.
+ * @param {Number} [m32=0.0] - The value for row 2, column 1.
+ * @param {Number} [m33=0.0] - The value for row 2, column 2.
+ *
+ * @classdesc
+ * Represents a 3x3 matrix. The elements are stored in a `Float32Array`
+ * in column-major order to optimise handoff to WebGL.
+ */
 Zia.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
-
+  /**
+   * The matrix elements.
+   * @type {Float32Array}
+   */
   this.elements = new Float32Array( 9 );
 
   var te = this.elements;
@@ -2048,32 +2132,58 @@ Zia.Matrix3.prototype = {
 
 /**
  * Constructs a new 4x4 matrix. Parameters are supplied in row-major order
- * to aid readability. If called with no parameters, the matrix is initialised
- * to the identity matrix. If called with any parameters, make sure you call
- * it with all 16 values.
+ * to aid readability. If called with no parameters, all matrix elements are
+ * initialised to 0. If called with any parameters, make sure you supply
+ * all 16 values.
  * 
  * @constructor
  *
+ * @summary Constructs a new 4x4 matrix.
+ *
+ * @param {Number} [m11=0.0] - The value for row 0, column 0.
+ * @param {Number} [m12=0.0] - The value for row 0, column 1.
+ * @param {Number} [m13=0.0] - The value for row 0, column 2.
+ * @param {Number} [m14=0.0] - The value for row 0, column 3.
+ * @param {Number} [m21=0.0] - The value for row 1, column 0.
+ * @param {Number} [m22=0.0] - The value for row 1, column 1.
+ * @param {Number} [m23=0.0] - The value for row 1, column 2.
+ * @param {Number} [m24=0.0] - The value for row 1, column 3.
+ * @param {Number} [m31=0.0] - The value for row 2, column 0.
+ * @param {Number} [m32=0.0] - The value for row 2, column 1.
+ * @param {Number} [m33=0.0] - The value for row 2, column 2.
+ * @param {Number} [m34=0.0] - The value for row 2, column 3.
+ * @param {Number} [m41=0.0] - The value for row 3, column 0.
+ * @param {Number} [m42=0.0] - The value for row 3, column 1.
+ * @param {Number} [m43=0.0] - The value for row 3, column 2.
+ * @param {Number} [m44=0.0] - The value for row 3, column 3.
+ *
  * @classdesc
- * Represents a 4x4 matrix. The elements are stored in a Float32Array
- * in column-major order to optimise passing to WebGL.
+ * Represents a 4x4 matrix. The elements are stored in a `Float32Array`
+ * in column-major order to optimise handoff to WebGL.
  */
-Zia.Matrix4 = function(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) {
-  if (n11 == undefined) {
-    this.elements = new Float32Array([
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1
-    ]);
+Zia.Matrix4 = function(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) {
+  var values;
+  if (m11 === undefined) {
+    values = [
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0
+    ];
   } else {
-    this.elements = new Float32Array([
-      n11, n21, n31, n41,
-      n12, n22, n32, n42,
-      n13, n23, n33, n43,
-      n14, n24, n34, n44
-    ]);
+    values = [
+      m11, m21, m31, m41,
+      m12, m22, m32, m42,
+      m13, m23, m33, m43,
+      m14, m24, m34, m44
+    ];
   }
+
+  /**
+   * The matrix elements.
+   * @type {Float32Array}
+   */
+  this.elements = new Float32Array(values);
 };
 
 Zia.Matrix4.compose = (function() {
@@ -2843,7 +2953,7 @@ Zia.Matrix4.prototype.decompose = (function() {
   };
 })();
 
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -2870,6 +2980,17 @@ Zia.Matrix4.prototype.decompose = (function() {
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new 2-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ *
+ * @classdesc
+ * Represents a 2-dimensional vector.
+ */
 Zia.Vector2 = function(x, y) {
   this._x = x || 0;
   this._y = y || 0;
@@ -3166,7 +3287,7 @@ Zia.Vector2.prototype = {
 
 };
 
-/**
+/*!
  * Original code from Zia.js project. https://github.com/mrdoob/Zia.js
  * Original code published with the following license:
  *
@@ -3193,15 +3314,20 @@ Zia.Vector2.prototype = {
  * THE SOFTWARE.
  */
 
- /**
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author philogb / http://blog.thejit.org/
- * @author mikael emtinger / http://gomo.se/
- * @author egraether / http://egraether.com/
- * @author WestLangley / http://github.com/WestLangley
+/**
+ * Constructs a new 4-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ * @param {Number} [w=0.0] - The value for the w coordinate.
+ *
+ * @classdesc
+ * Represents a 4-dimensional vector.
  */
-
-Zia.Vector4 = function ( x, y, z, w ) {
+Zia.Vector4 = function (x, y, z, w) {
   this._x = x || 0;
   this._y = y || 0;
   this._z = z || 0;
@@ -3977,8 +4103,16 @@ Zia.GeometricPrimitive = {
   }
 
   /**
-   * A wrapper for a WebGL Program object.
+   * Constructs a new program. 
+   *
    * @constructor
+   *
+   * @param {Zia.GraphicsDevice} graphicsDevice - The graphics device.
+   * @param {Zia.VertexShader} vertexShader - The vertex shader.
+   * @param {Zia.FragmentShader} fragmentShader - The fragmentShader.
+   *
+   * @classdesc
+   * Wrapper for a single WebGL Program object.
    */
   Zia.Program = function (graphicsDevice, vertexShader, fragmentShader) {
     this._graphicsDevice = graphicsDevice;
@@ -4302,6 +4436,17 @@ Zia.PrimitiveType = {
   TriangleFan: 6
 };
 
+/**
+ * Constructs a new `GraphicsDevice` object.
+ *
+ * @constructor
+ *
+ * @param {HTMLCanvasElement} canvas - The canvas element.
+ *
+ * @classdesc
+ * Main class in Zia. Manages the WebGL rendering context and associated state,
+ * and performs rendering.
+ */
 Zia.GraphicsDevice = function (canvas, debug) {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
@@ -6570,6 +6715,22 @@ Zia.Viewport.prototype = {
     return result.join('\n');
   }
 
+  /**
+   * Constructs a new `BasicProgram`. 
+   *
+   * @constructor
+   *
+   * @param {Zia.GraphicsDevice} graphicsDevice - The graphics device.
+   * @param {Boolean} [options.lightingEnabled=false] - Should lighting be enabled?
+   * @param {Boolean} [options.perPixelLightingEnabled=true] - Should per-pixel (as opposed to per-vertex) lighting be enabled?.
+   * @param {Boolean} [options.textureEnabled=false] - Should textures be enabled?
+   * @param {Boolean} [options.vertexColorEnabled=false] - Will you be using vertices that contain a color component?
+   *
+   * @classdesc
+   * A basic rendering effect with support for lighting and a single texture.
+   *
+   * @extends Zia.Program
+   */
   Zia.BasicProgram = function (graphicsDevice, options) {
     this._dirtyFlags = Zia.ProgramDirtyFlags.All;
 
@@ -6762,6 +6923,17 @@ Zia.Viewport.prototype = {
   })();
 })();
 
+/**
+ * Constructs a new `DirectionalLight`. 
+ *
+ * @constructor
+ *
+ * @param {Zia.Program} program - The associated program.
+ * @param {Number} index - The index of this light (used to set uniforms correctly).
+ *
+ * @classdesc
+ * A directional light structure, used by several of the built-in `Program` classes.
+ */
 Zia.DirectionalLight = function(program, index) {
   this._program = program;
   this._index = index;
@@ -6976,6 +7148,19 @@ Zia.DirectionalLight.prototype = {
     return result.join('\n');
   }
 
+  /**
+   * Constructs a new `EnvironmentMapProgram`. 
+   *
+   * @constructor
+   *
+   * @param {Zia.GraphicsDevice} graphicsDevice - The graphics device.
+   * @param {Object} [options] - TODO
+   *
+   * @classdesc
+   * A rendering effect with support for an environment map cube texture.
+   *
+   * @extends Zia.Program
+   */
   Zia.EnvironmentMapProgram = function (graphicsDevice, options) {
     this._dirtyFlags = Zia.ProgramDirtyFlags.All;
 

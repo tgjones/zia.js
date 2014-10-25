@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
     new Zia.Vector3(0, 1, 0),
     new Zia.Matrix4());
 
-  var modelMatrix = new Zia.Matrix4();
+  var modelMatrix = Zia.Matrix4.createIdentity(new Zia.Matrix4());
 
   var lastCubeUpdateTime, rotationAngle = 0;
 

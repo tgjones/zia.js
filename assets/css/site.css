@@ -22,6 +22,23 @@ h6 small {
 hr {
   border-top: 1px solid #CCC; }
 
+a {
+  color: #E9573F; }
+
+a:hover {
+  color: #ee7f6d; }
+
+.btn-primary {
+  background-color: #e9573f;
+  border-color: #e9573f; }
+
+.btn-primary:hover {
+  background-color: #ee7f6d;
+  border-color: #ee7f6d; }
+
+.table {
+  background: white; }
+
 .navbar-inverse {
   border: none; }
   .navbar-inverse .navbar-brand {
@@ -32,7 +49,7 @@ hr {
     font-size: 16px;
     text-transform: uppercase; }
   .navbar-inverse li.active > a {
-    border-bottom: 3px solid #3bafda;
+    border-bottom: 3px solid #e9573f;
     height: 50px; }
 
 .page-header {
@@ -41,17 +58,39 @@ hr {
 @media (min-width: 1200px) {
   .container {
     width: 970px; } }
-.sidebar-nav .sidebar-nav-section {
-  border-top: 1px solid #eee; }
-  .sidebar-nav .sidebar-nav-section:first-child {
-    border-top: none; }
-  .sidebar-nav .sidebar-nav-section h3 {
-    text-transform: uppercase;
-    font-size: 14px; }
-  .sidebar-nav .sidebar-nav-section a {
-    font-size: 12px; }
-    .sidebar-nav .sidebar-nav-section a.active {
-      color: #666; }
+a.anchor {
+  display: block;
+  position: relative;
+  top: -80px;
+  visibility: hidden; }
+
+.sidebar-nav {
+  margin-top: 30px;
+  font-size: 12px; }
+  .sidebar-nav .sidebar-group {
+    padding-left: 0;
+    margin-bottom: 20px; }
+  .sidebar-nav .sidebar-group-item {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #FFF;
+    border: 1px solid #ddd; }
+    .sidebar-nav .sidebar-group-item.heading {
+      text-transform: uppercase;
+      background-color: #DDD; }
+  .sidebar-nav a.sidebar-group-item:hover,
+  .sidebar-nav a.sidebar-group-item:focus {
+    color: #555;
+    text-decoration: none;
+    background-color: #fbe3df; }
+  .sidebar-nav .sidebar-group-item.active,
+  .sidebar-nav .sidebar-group-item.active:hover,
+  .sidebar-nav .sidebar-group-item.active:focus {
+    z-index: 2;
+    color: #555;
+    background-color: #fbe3df; }
 
 .hljs {
   word-wrap: normal;
@@ -60,7 +99,7 @@ hr {
 .home-intro {
   text-align: center;
   padding: 40px 0;
-  background: #E9573F;
+  background: #e9573f;
   color: #F5F7FA; }
   .home-intro h1 {
     margin-top: 0; }
@@ -86,21 +125,33 @@ hr {
     .canvas-container .controls-overlay .radio-container {
       margin-left: 25px; }
 
+.api-reference .api-member-details > .panel-body {
+  padding-top: 5px; }
 .api-reference h3.member-title {
-  font-size: 22px;
-  line-height: 22px;
-  margin-top: 0;
-  margin-bottom: 3px; }
+  font-size: 18px;
+  line-height: 18px; }
+  .api-reference h3.member-title code {
+    background: transparent;
+    padding: 0; }
   .api-reference h3.member-title .label {
-    line-height: 22px; }
+    margin-left: 3px; }
 .api-reference .defined-in {
   font-size: 75%; }
 .api-reference .description p {
   margin-top: 15px; }
+.api-reference .api-member-table-name {
+  white-space: nowrap; }
+.api-reference .api-parameters p, .api-reference .api-member-table p, .api-reference .member-returns p {
+  display: inline; }
 .api-reference h4 {
   font-size: 15px;
-  margin-top: 20px; }
+  margin-top: 20px;
+  margin-bottom: 8px; }
 .api-reference table p:last-child {
+  margin-bottom: 0; }
+.api-reference .table:last-child {
+  margin-bottom: 0; }
+.api-reference pre.hljs:last-child {
   margin-bottom: 0; }
 
 :fullscreen {

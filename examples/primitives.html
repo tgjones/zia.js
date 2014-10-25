@@ -32,11 +32,11 @@
         </div>
         <div class="navbar-collapse collapse navbar-right" id="navbar-main">
           <ul class="nav navbar-nav">
+            <li ><a href="../api/index.html">API</a></li>
             <li class="dropdown ">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="../docs/getting-started.html">Getting Started</a></li>
-                <li><a href="../docs/api/index.html">API Reference</a></li>
                 <li class="divider"></li>
                 <li><a href="../docs/test-suite.html">Unit Test Suite</a></li>
               </ul>
@@ -60,39 +60,30 @@
 <div class="row">
   <div class="col-md-3 sidebar-nav">
     
-      <div class="sidebar-nav-section">
-        <h3>Graphics</h3>
-        <ul class="list-unstyled">
-          
-          <li>
-            <a href="primitives.html"
-              class="active">
-              Primitives
-            </a>
-          </li>
-          
-          <li>
-            <a href="programs-basicprogram.html"
-              class="">
-              Programs - BasicProgram
-            </a>
-          </li>
-          
-          <li>
-            <a href="programs-environmentmapprogram.html"
-              class="">
-              Programs - EnvironmentMapProgram
-            </a>
-          </li>
-          
-          <li>
-            <a href="texture-filtering.html"
-              class="">
-              Texture Filtering
-            </a>
-          </li>
-          
-        </ul>
+      <div class="sidebar-group">
+        <span class="sidebar-group-item heading"><strong>Graphics</strong></span>
+
+        
+        <a href="primitives.html"
+          class="sidebar-group-item active">
+          Primitives
+        </a>
+        
+        <a href="programs-basicprogram.html"
+          class="sidebar-group-item ">
+          Programs - BasicProgram
+        </a>
+        
+        <a href="programs-environmentmapprogram.html"
+          class="sidebar-group-item ">
+          Programs - EnvironmentMapProgram
+        </a>
+        
+        <a href="texture-filtering.html"
+          class="sidebar-group-item ">
+          Texture Filtering
+        </a>
+        
       </div>
     
   </div>
@@ -156,7 +147,7 @@
     <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>),
     <span class="hljs-keyword">new</span> Zia.Matrix4());
 
-  <span class="hljs-keyword">var</span> modelMatrix = <span class="hljs-keyword">new</span> Zia.Matrix4();
+  <span class="hljs-keyword">var</span> modelMatrix = Zia.Matrix4.createIdentity(<span class="hljs-keyword">new</span> Zia.Matrix4());
 
   <span class="hljs-keyword">var</span> rotationAxis = <span class="hljs-keyword">new</span> Zia.Vector3(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
   <span class="hljs-keyword">var</span> rotationAngle = <span class="hljs-number">0</span>;
