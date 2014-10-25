@@ -1,0 +1,24 @@
+<table class="table table-bordered table-striped api-member-table">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  {{#each this}}
+  <tr>
+    <td class="api-member-table-name">
+      <code><a href="#{{name}}">{{name}}</a></code>
+    </td>
+    <td>
+      {{#each attribs}}
+      <span class="label label-default">{{this}}</span>
+      {{/each}}
+
+      {{#if summary}}
+        {{summary}}
+      {{else}}
+        {{{description}}}
+      {{/if}}
+    </td>
+  </tr>
+  {{/each}}
+</table>

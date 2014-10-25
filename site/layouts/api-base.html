@@ -1,0 +1,26 @@
+---
+layout: default.html
+---
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 sidebar-nav">
+      {{#each api_types}}
+      <div class="sidebar-group">
+        <span class="sidebar-group-item heading"><strong>{{api_type}}</strong></span>
+
+        {{#each pages}}
+        <a href="{{relative ../../page.dest this.dest}}"
+          class="sidebar-group-item {{#is ../../page.dest this.dest}}active{{/is}}">
+          {{data.nav_title}}
+        </a>
+        {{/each}}
+      </div>
+      {{/each}}
+    </div>
+    <div class="col-md-9 api-reference">
+      <h1>{{title}}</h1>
+      {{> body }}
+    </div>
+  </div>
+</div>

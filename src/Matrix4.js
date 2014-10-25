@@ -33,6 +33,8 @@
  * 
  * @constructor
  *
+ * @summary Constructs a new 4x4 matrix.
+ *
  * @param {Number} [m11=0.0] - The value for row 0, column 0.
  * @param {Number} [m12=0.0] - The value for row 0, column 1.
  * @param {Number} [m13=0.0] - The value for row 0, column 2.

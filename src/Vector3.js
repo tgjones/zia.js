@@ -1,4 +1,4 @@
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -25,6 +25,18 @@
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new 3-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ *
+ * @classdesc
+ * A 3-dimensional vector.
+ */
 Zia.Vector3 = function(x, y, z) {
   this._x = x || 0;
   this._y = y || 0;

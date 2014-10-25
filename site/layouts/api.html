@@ -1,72 +1,58 @@
 ---
-layout: default.html
+layout: api-base.html
 ---
 
-<div class="container">
-  <div class="row">
-    <div class="col-md-3 sidebar-nav">
-      {{#each api_types}}
-      <div class="sidebar-nav-section">
-        <h3>{{api_type}}</h3>
-        <ul class="list-unstyled">
-          {{#each pages}}
-          <li>
-            <a href="{{relative ../../page.dest this.dest}}"
-              class="{{#is ../../page.dest this.dest}}active{{/is}}">
-              {{data.nav_title}}
-            </a>
-          </li>
-          {{/each}}
-        </ul>
-      </div>
-      {{/each}}
-    </div>
-    <div class="col-md-9 api-reference">
-      <h1>{{title}}</h1>
-      {{> body }}
-
-      {{#if page.data.constructor}}
-      <h4>Constructor</h4>
-      <ul>
-        <li><code><a href="#constructor">{{constructor.name}}</a></code></li>
-      </ul>
+{{#if page.data.constructor}}
+<h4>Constructor</h4>
+<table class="table table-bordered table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td class="api-member-table-name">
+      <code><a href="#{{constructor.name}}">{{constructor.displayName}}</a></code>
+    </td>
+    <td>
+      {{#if constructor.summary}}
+        {{constructor.summary}}
+      {{else}}
+        {{{constructor.description}}}
       {{/if}}
+    </td>
+  </tr>
+</table>
+{{/if}}
 
-      {{#gt page.data.properties.length 0}}
-      <h4>Properties</h4>
-      <ul>
-        {{#each page.data.properties}}
-          <li><code><a href="#{{name}}">{{name}}</a></code></li>
-        {{/each}}        
-      </ul>
-      {{/gt}}
+{{#gt page.data.properties.length 0}}
+<h4>Properties</h4>
+{{> api-member-table page.data.properties}}
+{{/gt}}
 
-      {{#gt page.data.methods.length 0}}
-      <h4>Methods</h4>
-      <ul>
-        {{#each page.data.methods}}
-          <li><code><a href="#{{name}}">{{name}}</a></code></li>
-        {{/each}}        
-      </ul>
-      {{/gt}}
+{{#gt page.data.methods.length 0}}
+<h4>Methods</h4>
+{{> api-member-table page.data.methods}}
+{{/gt}}
 
-      <hr />
+<hr />
 
-      {{#if page.data.constructor}}
-      {{> api-member page.data.constructor}}
-      <hr />
-      {{/if}}
+{{#if page.data.constructor}}
+<h4>Constructor</h4>
+{{> api-member page.data.constructor}}
+<hr />
+{{/if}}
 
-      {{#gt page.data.properties.length 0}}
-      {{#each page.data.properties}}
-      {{> api-member}}
-      {{/each}}
-      <hr />
-      {{/gt}}
+{{#gt page.data.properties.length 0}}
+<h4>Properties</h4>
+{{#each page.data.properties}}
+{{> api-member}}
+{{/each}}
+<hr />
+{{/gt}}
 
-      {{#each page.data.methods}}
-      {{> api-member}}
-      {{/each}}
-    </div>
-  </div>
-</div>
+{{#gt page.data.methods.length 0}}
+<h4>Methods</h4>
+{{#each page.data.methods}}
+{{> api-member}}
+{{/each}}
+{{/gt}}

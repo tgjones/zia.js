@@ -1,4 +1,4 @@
-/**
+/*!
  * Original code from Zia.js project. https://github.com/mrdoob/Zia.js
  * Original code published with the following license:
  *
@@ -25,15 +25,20 @@
  * THE SOFTWARE.
  */
 
- /**
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author philogb / http://blog.thejit.org/
- * @author mikael emtinger / http://gomo.se/
- * @author egraether / http://egraether.com/
- * @author WestLangley / http://github.com/WestLangley
+/**
+ * Constructs a new 4-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ * @param {Number} [w=0.0] - The value for the w coordinate.
+ *
+ * @classdesc
+ * A 4-dimensional vector.
  */
-
-Zia.Vector4 = function ( x, y, z, w ) {
+Zia.Vector4 = function (x, y, z, w) {
   this._x = x || 0;
   this._y = y || 0;
   this._z = z || 0;

@@ -5,18 +5,15 @@ layout: page.html
 <div class="row">
   <div class="col-md-3 sidebar-nav">
     {{#each examples}}
-      <div class="sidebar-nav-section">
-        <h3>{{capitalizeFirst example}}</h3>
-        <ul class="list-unstyled">
-          {{#each pages}}
-          <li>
-            <a href="{{relative ../../page.dest this.dest}}"
-              class="{{#is ../../page.dest this.dest}}active{{/is}}">
-              {{data.title}}
-            </a>
-          </li>
-          {{/each}}
-        </ul>
+      <div class="sidebar-group">
+        <span class="sidebar-group-item heading"><strong>{{capitalizeFirst example}}</strong></span>
+
+        {{#each pages}}
+        <a href="{{relative ../../page.dest this.dest}}"
+          class="sidebar-group-item {{#is ../../page.dest this.dest}}active{{/is}}">
+          {{data.title}}
+        </a>
+        {{/each}}
       </div>
     {{/each}}
   </div>

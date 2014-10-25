@@ -505,7 +505,7 @@ Zia.Quaternion.slerp = function (qa, qb, qm, t) {
 }
 
 
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -532,6 +532,18 @@ Zia.Quaternion.slerp = function (qa, qb, qm, t) {
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new 3-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ *
+ * @classdesc
+ * A 3-dimensional vector.
+ */
 Zia.Vector3 = function(x, y, z) {
   this._x = x || 0;
   this._y = y || 0;
@@ -2054,6 +2066,8 @@ Zia.Matrix3.prototype = {
  * 
  * @constructor
  *
+ * @summary Constructs a new 4x4 matrix.
+ *
  * @param {Number} [m11=0.0] - The value for row 0, column 0.
  * @param {Number} [m12=0.0] - The value for row 0, column 1.
  * @param {Number} [m13=0.0] - The value for row 0, column 2.
@@ -2867,7 +2881,7 @@ Zia.Matrix4.prototype.decompose = (function() {
   };
 })();
 
-/**
+/*!
  * Original code from three.js project. https://github.com/mrdoob/three.js
  * Original code published with the following license:
  *
@@ -2894,6 +2908,17 @@ Zia.Matrix4.prototype.decompose = (function() {
  * THE SOFTWARE.
  */
 
+/**
+ * Constructs a new 2-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ *
+ * @classdesc
+ * A 2-dimensional vector.
+ */
 Zia.Vector2 = function(x, y) {
   this._x = x || 0;
   this._y = y || 0;
@@ -3190,7 +3215,7 @@ Zia.Vector2.prototype = {
 
 };
 
-/**
+/*!
  * Original code from Zia.js project. https://github.com/mrdoob/Zia.js
  * Original code published with the following license:
  *
@@ -3217,15 +3242,20 @@ Zia.Vector2.prototype = {
  * THE SOFTWARE.
  */
 
- /**
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author philogb / http://blog.thejit.org/
- * @author mikael emtinger / http://gomo.se/
- * @author egraether / http://egraether.com/
- * @author WestLangley / http://github.com/WestLangley
+/**
+ * Constructs a new 4-dimensional vector.
+ *
+ * @constructor
+ * 
+ * @param {Number} [x=0.0] - The value for the x coordinate.
+ * @param {Number} [y=0.0] - The value for the y coordinate.
+ * @param {Number} [z=0.0] - The value for the z coordinate.
+ * @param {Number} [w=0.0] - The value for the w coordinate.
+ *
+ * @classdesc
+ * A 4-dimensional vector.
  */
-
-Zia.Vector4 = function ( x, y, z, w ) {
+Zia.Vector4 = function (x, y, z, w) {
   this._x = x || 0;
   this._y = y || 0;
   this._z = z || 0;

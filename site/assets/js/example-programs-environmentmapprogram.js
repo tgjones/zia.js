@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var cameraTarget = new Zia.Vector3(0, 0, 0);
   var cameraUp = new Zia.Vector3(0, 1, 0);
   var viewMatrix = new Zia.Matrix4();
-  var modelMatrix = new Zia.Matrix4();
+  var modelMatrix = Zia.Matrix4.createIdentity(new Zia.Matrix4());
 
   var lastCubeUpdateTime, rotationAngle = 0;
   var rotationAxis = new Zia.Vector3(1, 0, 1).normalize();

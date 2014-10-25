@@ -99,6 +99,7 @@ function graft(parentNode, childNodes, parentLongname, parentName) {
                 'access': element.access || '',
                 'attribs': helper.getAttribs(element),
                 'description': element.description || '',
+                'summary': element.summary,
                 'filename': element.meta.shortpath,
                 'line': element.meta.lineno,
                 'parameters': [ ],
@@ -205,6 +206,7 @@ function graft(parentNode, childNodes, parentLongname, parentName) {
                 'constructor': {
                     'name': element.name,
                     'description': element.description || '',
+                    'summary': element.summary,
                     'filename': element.meta.shortpath,
                     'line': element.meta.lineno,
                     'parameters': [],
