@@ -88,7 +88,7 @@ module.exports = function(grunt) {
           ]
         },
         files: {
-          'dist/site/docs/api/': []
+          'dist/site/api/': []
         }
       }
     },

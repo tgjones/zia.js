@@ -2,6 +2,8 @@
 layout: api-base.html
 ---
 
+{{> body}}
+
 {{#if page.data.constructor}}
 <h4>Constructor</h4>
 <table class="table table-bordered table-striped">
@@ -11,7 +13,7 @@ layout: api-base.html
   </tr>
   <tr>
     <td class="api-member-table-name">
-      <code><a href="#{{constructor.name}}">{{constructor.displayName}}</a></code>
+      <code><a href="#{{constructor.name}}">{{constructor.name}}</a></code>
     </td>
     <td>
       {{#if constructor.summary}}

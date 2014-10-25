@@ -32,11 +32,11 @@
         </div>
         <div class="navbar-collapse collapse navbar-right" id="navbar-main">
           <ul class="nav navbar-nav">
+            <li {{#is page.data.section "API"}}class="active"{{/is}}><a href="{{relative page.dest "dist/site/api/index.html"}}">API</a></li>
             <li class="dropdown {{#is page.data.section "Docs"}}active{{/is}}">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{relative page.dest "dist/site/docs/getting-started.html"}}">Getting Started</a></li>
-                <li><a href="{{relative page.dest "dist/site/docs/api/index.html"}}">API Reference</a></li>
                 <li class="divider"></li>
                 <li><a href="{{relative page.dest "dist/site/docs/test-suite.html"}}">Unit Test Suite</a></li>
               </ul>

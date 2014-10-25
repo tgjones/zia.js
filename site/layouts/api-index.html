@@ -1,0 +1,26 @@
+---
+layout: api-base.html
+---
+
+{{#each api_types}}
+  <h4>{{api_type}}</h4>
+
+  <table class="table table-bordered table-striped">
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+    {{#each pages}}
+    <tr>
+      <td class="api-member-table-name">
+        <a href="{{relative ../../page.dest this.dest}}">
+          {{data.nav_title}}
+        </a>
+      </td>
+      <td>
+        {{{data.description}}}
+      </td>
+    </tr>
+    {{/each}}
+  </table>
+{{/each}}
