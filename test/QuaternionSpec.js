@@ -124,7 +124,7 @@ describe('Zia.Quaternion', function() {
       for( var j = 0; j < angles.length; j ++ ) {
         var eulers2 = new Zia.Euler().setFromQuaternion( new Zia.Quaternion().setFromEuler( new Zia.Euler( angles[j].x, angles[j].y, angles[j].z, orders[i] ) ), orders[i] );
         var newAngle = new Zia.Vector3( eulers2.x, eulers2.y, eulers2.z );
-        expect(newAngle.distanceTo(angles[j])).toBeLessThan(0.001);
+        expect(Zia.Vector3.distance(newAngle, angles[j])).toBeLessThan(0.001);
       }
     }
 
@@ -207,10 +207,10 @@ describe('Zia.Quaternion', function() {
         var m = new Zia.Matrix4().makeRotationFromEuler( angles[j], orders[i] );
 
         var v0 = new Zia.Vector3(1, 0, 0);
-        var qv = v0.clone().applyQuaternion( q );
-        var mv = v0.clone().applyMatrix4( m );
+        var qv = v0.clone(new Zia.Vector3()).applyQuaternion( q );
+        var mv = v0.clone(new Zia.Vector3()).applyMatrix4( m );
       
-        expect(qv.distanceTo(mv)).toBeLessThan(0.001);
+        expect(Zia.Vector3.distance(qv, mv)).toBeLessThan(0.001);
       }
     }
 

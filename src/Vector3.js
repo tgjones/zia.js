@@ -745,3 +745,64 @@ Zia.Vector3.prototype = {
   }
 
 };
+
+Zia.Vector3.distance = (function() {
+  var temp = new Zia.Vector3();
+
+  return function(a, b) {
+    Zia.Vector3.subtract(a, b, temp);
+    return temp.length();
+  };
+})(); 
+
+Zia.Vector3.add = function(a, b, result) {
+  result._x = a._x + b._x;
+  result._y = a._y + b._y;
+  result._z = a._z + b._z;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.subtract = function(a, b, result) {
+  result._x = a._x - b._x;
+  result._y = a._y - b._y;
+  result._z = a._z - b._z;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.multiplyScalar = function(v, scalar, result) {
+  result._x = v._x * scalar;
+  result._y = v._y * scalar;
+  result._z = v._z * scalar;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.divideScalar = function(v, scalar, result) {
+  result._x = v._x / scalar;
+  result._y = v._y / scalar;
+  result._z = v._z / scalar;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.cross = function(a, b, result) {
+  var x = a._x, y = a._y, z = a._z;
+
+  result._x = y * b._z - z * b._y;
+  result._y = z * b._x - x * b._z;
+  result._z = x * b._y - y * b._x;
+
+  result._onChangeCallback();
+
+  return result;
+};

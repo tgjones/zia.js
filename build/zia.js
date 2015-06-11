@@ -1266,6 +1266,67 @@ Zia.Vector3.prototype = {
 
 };
 
+Zia.Vector3.distance = (function() {
+  var temp = new Zia.Vector3();
+
+  return function(a, b) {
+    Zia.Vector3.subtract(a, b, temp);
+    return temp.length();
+  };
+})(); 
+
+Zia.Vector3.add = function(a, b, result) {
+  result._x = a._x + b._x;
+  result._y = a._y + b._y;
+  result._z = a._z + b._z;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.subtract = function(a, b, result) {
+  result._x = a._x - b._x;
+  result._y = a._y - b._y;
+  result._z = a._z - b._z;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.multiplyScalar = function(v, scalar, result) {
+  result._x = v._x * scalar;
+  result._y = v._y * scalar;
+  result._z = v._z * scalar;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.divideScalar = function(v, scalar, result) {
+  result._x = v._x / scalar;
+  result._y = v._y / scalar;
+  result._z = v._z / scalar;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
+Zia.Vector3.cross = function(a, b, result) {
+  var x = a._x, y = a._y, z = a._z;
+
+  result._x = y * b._z - z * b._y;
+  result._y = z * b._x - x * b._z;
+  result._z = x * b._y - y * b._x;
+
+  result._onChangeCallback();
+
+  return result;
+};
+
 /**
  * Constructs a new `Color4` object.
  *
@@ -5410,10 +5471,10 @@ Zia.Viewport.prototype = {
       var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
 
       side1.set(normal.x, normal.y, normal.z);
-      side1.cross(basis);
+      Zia.Vector3.cross(side1, basis, side1);
 
       side2.set(normal.x, normal.y, normal.z);
-      side2.cross(side1);
+      Zia.Vector3.cross(side2, side1, side2);
 
       // Six indices (two triangles) per face.
       var vbase = i * 4;
@@ -5428,7 +5489,7 @@ Zia.Viewport.prototype = {
       // Four vertices per face.
 
       // (normal - side1 - side2) * size
-      positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
+      positions.push(normal.clone(new Zia.Vector3()).sub(side1).sub(side2).multiplyScalar(size));
 
       // (normal - side1 + side2) * size
       positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));

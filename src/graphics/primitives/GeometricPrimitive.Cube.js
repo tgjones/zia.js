@@ -117,10 +117,10 @@
       var basis = (i >= 4) ? new Zia.Vector3(0,0,1) : new Zia.Vector3(0,1,0);
 
       side1.set(normal.x, normal.y, normal.z);
-      side1.cross(basis);
+      Zia.Vector3.cross(side1, basis, side1);
 
       side2.set(normal.x, normal.y, normal.z);
-      side2.cross(side1);
+      Zia.Vector3.cross(side2, side1, side2);
 
       // Six indices (two triangles) per face.
       var vbase = i * 4;
@@ -135,7 +135,7 @@
       // Four vertices per face.
 
       // (normal - side1 - side2) * size
-      positions.push(normal.clone().sub(side1).sub(side2).multiplyScalar(size));
+      positions.push(normal.clone(new Zia.Vector3()).sub(side1).sub(side2).multiplyScalar(size));
 
       // (normal - side1 + side2) * size
       positions.push(normal.clone().sub(side1).add(side2).multiplyScalar(size));

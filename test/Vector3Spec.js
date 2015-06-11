@@ -42,24 +42,6 @@ describe('Zia.Vector3', function() {
     expect(a.z).toBe(z);
   });
 
-  describe('copy method', function() {
-    it('copies another vector into this vector', function() {
-      var a = new Zia.Vector3(x, y, z);
-      var b = new Zia.Vector3().copy(a);
-      expect(b.x).toBe(x);
-      expect(b.y).toBe(y);
-      expect(b.z).toBe(z);
-
-      // ensure that it is a true copy
-      a.x = 0;
-      a.y = -1;
-      a.z = -2;
-      expect(b.x).toBe(x);
-      expect(b.y).toBe(y);
-      expect(b.z).toBe(z);
-    });
-  });
-
   describe('set method', function() {
     it("sets another vector into this vector", function() {
       var a = new Zia.Vector3();
@@ -109,12 +91,12 @@ describe('Zia.Vector3', function() {
       var a = new Zia.Vector3(x, y, z);
       var b = new Zia.Vector3(-x, -y, -z);
 
-      a.add(b);
+      Zia.Vector3.add(a, b, a);
       expect(a.x).toBe(0);
       expect(a.y).toBe(0);
       expect(a.z).toBe(0);
 
-      var c = new Zia.Vector3().addVectors(b, b);
+      var c = Zia.Vector3.add(b, b, new Zia.Vector3());
       expect(c.x).toBe(-2*x);
       expect(c.y).toBe(-2*y);
       expect(c.z).toBe(-2*z);
@@ -125,12 +107,12 @@ describe('Zia.Vector3', function() {
     var a = new Zia.Vector3(x, y, z);
     var b = new Zia.Vector3(-x, -y, -z);
 
-    a.sub(b);
+    Zia.Vector3.subtract(a, b, a);
     expect(a.x).toBe(2*x);
     expect(a.y).toBe(2*y);
     expect(a.z).toBe(2*z);
 
-    var c = new Zia.Vector3().subVectors(a, a);
+    var c = Zia.Vector3.subtract(a, a, new Zia.Vector3());
     expect(c.x).toBe(0);
     expect(c.y).toBe(0);
     expect(c.z).toBe(0);
@@ -140,22 +122,22 @@ describe('Zia.Vector3', function() {
     var a = new Zia.Vector3(x, y, z);
     var b = new Zia.Vector3(-x, -y, -z);
 
-    a.multiplyScalar(-2);
+    Zia.Vector3.multiplyScalar(a, -2, a);
     expect(a.x).toBe(x*-2);
     expect(a.y).toBe(y*-2);
     expect(a.z).toBe(z*-2);
 
-    b.multiplyScalar(-2);
+    Zia.Vector3.multiplyScalar(b, -2, b);
     expect(b.x).toBe(x*2);
     expect(b.y).toBe(y*2);
     expect(b.z).toBe(z*2);
 
-    a.divideScalar(-2);
+    Zia.Vector3.divideScalar(a, -2, a);
     expect(a.x).toBe(x);
     expect(a.y).toBe(y);
     expect(a.z).toBe(z);
 
-    b.divideScalar(-2);
+    Zia.Vector3.divideScalar(b, -2, b);
     expect(b.x).toBe(-x);
     expect(b.y).toBe(-y);
     expect(b.z).toBe(-z);
