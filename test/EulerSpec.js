@@ -3,19 +3,19 @@
  * Original code published with the following license:
  *
  * The MIT License
- * 
+ *
  * Copyright &copy; 2010-2014 three.js authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,10 +62,10 @@ describe('Zia.Euler', function() {
     var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
     for( var i = 0; i < testValues.length; i ++ ) {
       var v = testValues[i];
-      var q = new Zia.Quaternion().setFromEuler( v );
+      var q = Zia.Quaternion.createFromEuler( v, new Zia.Quaternion() );
 
       var v2 = new Zia.Euler().setFromQuaternion( q, v.order );
-      var q2 = new Zia.Quaternion().setFromEuler( v2 );
+      var q2 = Zia.Quaternion.createFromEuler( v2, new Zia.Quaternion() );
       expect(q).toEqualQuaternion(q2);
     }
   });
@@ -87,14 +87,14 @@ describe('Zia.Euler', function() {
     var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
     for( var i = 0; i < testValues.length; i ++ ) {
       var v = testValues[i];
-      var q = new Zia.Quaternion().setFromEuler( v );
+      var q = Zia.Quaternion.createFromEuler( v, new Zia.Quaternion() );
 
-      v.reorder( 'YZX' );   
-      var q2 = new Zia.Quaternion().setFromEuler( v );
+      v.reorder( 'YZX' );
+      var q2 = Zia.Quaternion.createFromEuler( v, new Zia.Quaternion() );
       expect(q).toEqualQuaternion(q2);
 
       v.reorder( 'ZXY' );
-      var q3 = new Zia.Quaternion().setFromEuler(v);
+      var q3 = Zia.Quaternion.createFromEuler(v, new Zia.Quaternion());
       expect(q).toEqualQuaternion(q3);
     }
   });

@@ -3,19 +3,19 @@
  * Original code published with the following license:
  *
  * The MIT License
- * 
+ *
  * Copyright &copy; 2010-2014 three.js authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -98,19 +98,19 @@ describe('Zia.Quaternion', function() {
 
     var zero = new Zia.Quaternion();
 
-    var a = new Zia.Quaternion().setFromAxisAngle( new Zia.Vector3( 1, 0, 0 ), 0 );
+    var a = Zia.Quaternion.createFromAxisAngle( new Zia.Vector3( 1, 0, 0 ), 0, new Zia.Quaternion() );
     expect(a).toEqual(zero);
-    a = new Zia.Quaternion().setFromAxisAngle( new Zia.Vector3( 0, 1, 0 ), 0 );
+    a = Zia.Quaternion.createFromAxisAngle( new Zia.Vector3( 0, 1, 0 ), 0, new Zia.Quaternion() );
     expect(a).toEqual(zero);
-    a = new Zia.Quaternion().setFromAxisAngle( new Zia.Vector3( 0, 0, 1 ), 0 );
+    a = Zia.Quaternion.createFromAxisAngle( new Zia.Vector3( 0, 0, 1 ), 0, new Zia.Quaternion() );
     expect(a).toEqual(zero);
 
-    var b1 = new Zia.Quaternion().setFromAxisAngle( new Zia.Vector3( 1, 0, 0 ), Math.PI );
+    var b1 = Zia.Quaternion.createFromAxisAngle( new Zia.Vector3( 1, 0, 0 ), Math.PI, new Zia.Quaternion() );
     expect(a).not.toEqual(b1);
-    var b2 = new Zia.Quaternion().setFromAxisAngle( new Zia.Vector3( 1, 0, 0 ), -Math.PI );
+    var b2 = Zia.Quaternion.createFromAxisAngle( new Zia.Vector3( 1, 0, 0 ), -Math.PI, new Zia.Quaternion() );
     expect(a).not.toEqual(b2);
 
-    b1.multiply( b2 );
+    Zia.Quaternion.multiply(b1, b2, b1);
     expect(a).toEqual(b1);
   });
 
@@ -122,7 +122,7 @@ describe('Zia.Quaternion', function() {
     // ensure euler conversion to/from Quaternion matches.
     for( var i = 0; i < orders.length; i ++ ) {
       for( var j = 0; j < angles.length; j ++ ) {
-        var eulers2 = new Zia.Euler().setFromQuaternion( new Zia.Quaternion().setFromEuler( new Zia.Euler( angles[j].x, angles[j].y, angles[j].z, orders[i] ) ), orders[i] );
+        var eulers2 = new Zia.Euler().setFromQuaternion( Zia.Quaternion.createFromEuler( new Zia.Euler( angles[j].x, angles[j].y, angles[j].z, orders[i] ), new Zia.Quaternion() ), orders[i] );
         var newAngle = new Zia.Vector3( eulers2.x, eulers2.y, eulers2.z );
         expect(Zia.Vector3.distance(newAngle, angles[j])).toBeLessThan(0.001);
       }
@@ -134,9 +134,10 @@ describe('Zia.Quaternion', function() {
 
     // ensure euler conversion for Quaternion matches that of Matrix4
     for( var i = 0; i < orders.length; i ++ ) {
-      var q = new Zia.Quaternion().setFromEuler( eulerAngles, orders[i] );
-      var m = new Zia.Matrix4().makeRotationFromEuler( eulerAngles, orders[i] );
-      var q2 = new Zia.Quaternion().setFromRotationMatrix( m );
+      var euler = new Zia.Euler(eulerAngles.x, eulerAngles.y, eulerAngles.z, orders[i]);
+      var q = Zia.Quaternion.createFromEuler( euler, new Zia.Quaternion() );
+      var m = new Zia.Matrix4().makeRotationFromEuler( euler );
+      var q2 = Zia.Quaternion.createFromRotationMatrix( m, new Zia.Quaternion() );
 
       expect(qSub(q, q2).length()).toBeLessThan(0.001);
     }
@@ -148,16 +149,16 @@ describe('Zia.Quaternion', function() {
     var b = new Zia.Quaternion( -x, -y, -z, -w );
 
     expect(a.length()).not.toBe(1);
-    expect(a.lengthSq()).not.toBe(1);
+    expect(a.lengthSquared()).not.toBe(1);
     a.normalize();
     expect(a.length()).toBe(1);
-    expect(a.lengthSq()).toBe(1);
+    expect(a.lengthSquared()).toBe(1);
 
     a.set( 0, 0, 0, 0 );
-    expect(a.lengthSq()).toBe(0);
+    expect(a.lengthSquared()).toBe(0);
     expect(a.length()).toBe(0);
     a.normalize();
-    expect(a.lengthSq()).toBe(1);
+    expect(a.lengthSquared()).toBe(1);
     expect(a.length()).toBe(1);
   });
 
@@ -179,11 +180,11 @@ describe('Zia.Quaternion', function() {
 
     var angles = [ new Zia.Euler( 1, 0, 0 ), new Zia.Euler( 0, 1, 0 ), new Zia.Euler( 0, 0, 1 ) ];
 
-    var q1 = new Zia.Quaternion().setFromEuler( angles[0], "XYZ" );
-    var q2 = new Zia.Quaternion().setFromEuler( angles[1], "XYZ" );
-    var q3 = new Zia.Quaternion().setFromEuler( angles[2], "XYZ" );
+    var q1 = Zia.Quaternion.createFromEuler( new Zia.Euler(angles[0].x, angles[0].y, angles[0].z, "XYZ"), new Zia.Quaternion() );
+    var q2 = Zia.Quaternion.createFromEuler( new Zia.Euler(angles[1].x, angles[1].y, angles[1].z, "XYZ"), new Zia.Quaternion() );
+    var q3 = Zia.Quaternion.createFromEuler( new Zia.Euler(angles[2].x, angles[2].y, angles[2].z, "XYZ"), new Zia.Quaternion() );
 
-    var q = new Zia.Quaternion().multiplyQuaternions( q1, q2 ).multiply( q3 );
+    var q = Zia.Quaternion.multiply( q1, q2, new Zia.Quaternion() ).multiply( q3 );
 
     var m1 = new Zia.Matrix4().makeRotationFromEuler( angles[0], "XYZ" );
     var m2 = new Zia.Matrix4().makeRotationFromEuler( angles[1], "XYZ" );
@@ -191,25 +192,26 @@ describe('Zia.Quaternion', function() {
 
     var m = m1.multiply(m2).multiply(m3);
 
-    var qFromM = new Zia.Quaternion().setFromRotationMatrix( m );
+    var qFromM = Zia.Quaternion.createFromRotationMatrix( m, new Zia.Quaternion() );
 
     expect(qSub(q, qFromM).length()).toBeLessThan(0.001);
   });
 
   it("multiplyVector3", function() {
-    
+
     var angles = [ new Zia.Euler( 1, 0, 0 ), new Zia.Euler( 0, 1, 0 ), new Zia.Euler( 0, 0, 1 ) ];
 
     // ensure euler conversion for Quaternion matches that of Matrix4
     for( var i = 0; i < orders.length; i ++ ) {
       for( var j = 0; j < angles.length; j ++ ) {
-        var q = new Zia.Quaternion().setFromEuler( angles[j], orders[i] );
-        var m = new Zia.Matrix4().makeRotationFromEuler( angles[j], orders[i] );
+        var euler = new Zia.Euler(angles[j].x, angles[j].y, angles[j].z, orders[i]);
+        var q = Zia.Quaternion.createFromEuler( euler, new Zia.Quaternion() );
+        var m = new Zia.Matrix4().makeRotationFromEuler( euler );
 
         var v0 = new Zia.Vector3(1, 0, 0);
         var qv = v0.clone(new Zia.Vector3()).applyQuaternion( q );
         var mv = v0.clone(new Zia.Vector3()).applyMatrix4( m );
-      
+
         expect(Zia.Vector3.distance(qv, mv)).toBeLessThan(0.001);
       }
     }
@@ -219,7 +221,7 @@ describe('Zia.Quaternion', function() {
   it("equals", function() {
     var a = new Zia.Quaternion( x, y, z, w );
     var b = new Zia.Quaternion( -x, -y, -z, -w );
-    
+
     expect(a.x).not.toEqual(b.x);
     expect(a.y).not.toEqual(b.y);
 

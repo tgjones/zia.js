@@ -8,7 +8,6 @@ module.exports = function(grunt) {
   ];
 
   var srcFiles = [
-    "src/Zia.js",
     "src/Quaternion.js",
     "src/Vector3.js",
     "src/*.js",

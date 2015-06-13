@@ -1,0 +1,63 @@
+{
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"target": "es5"
+	},
+	"files": [
+		"./lib/webgl-debug.d.ts",
+
+		"./src/util/DebugUtil.ts",
+		"./src/util/EnumUtil.ts",
+		"./src/util/HtmlUtil.ts",
+		"./src/util/ObjectUtil.ts",
+
+		"./src/Color4.ts",
+		"./src/Euler.ts",
+		"./src/Math.ts",
+		"./src/MathUtil.ts",
+		"./src/Matrix3.ts",
+		"./src/Matrix4.ts",
+		"./src/Quaternion.ts",
+		"./src/Vector2.ts",
+		"./src/Vector3.ts",
+		"./src/Vector4.ts",
+
+		"./src/graphics/primitives/GeometricPrimitive.ts",
+		"./src/graphics/primitives/GeometricPrimitive.Cube.ts",
+		"./src/graphics/primitives/GeometricPrimitive.Cylinder.ts",
+		"./src/graphics/primitives/GeometricPrimitive.Plane.ts",
+		"./src/graphics/primitives/GeometricPrimitive.Sphere.ts",
+		"./src/graphics/primitives/GeometricPrimitive.Teapot.ts",
+		"./src/graphics/primitives/GeometricPrimitive.Torus.ts",
+
+		"./src/graphics/programs/Program.ts",
+		"./src/graphics/programs/ProgramUtil.ts",
+		"./src/graphics/programs/DirectionalLight.ts",
+		"./src/graphics/programs/SharedProgramCode.ts",
+		"./src/graphics/programs/BasicProgram.ts",
+		"./src/graphics/programs/EnvironmentMapProgram.ts",
+
+		"./src/graphics/Shader.ts",
+
+		"./src/graphics/IndexBuffer.ts",
+		"./src/graphics/VertexDeclaration.ts",
+		"./src/graphics/VertexBuffer.ts",
+
+		"./src/graphics/Model.ts",
+		"./src/graphics/ModelMesh.ts",
+		"./src/graphics/ModelMeshPart.ts",
+
+		"./src/graphics/Viewport.ts",
+
+		"./src/graphics/DepthStencilState.ts",
+		"./src/graphics/RasterizerState.ts",
+
+		"./src/graphics/Texture.ts",
+		"./src/graphics/TextureFilter.ts",
+		"./src/graphics/TextureWrap.ts",
+		"./src/graphics/TextureCube.ts",
+		"./src/graphics/Texture2D.ts",
+
+		"./src/graphics/GraphicsDevice.ts"
+	]
+}

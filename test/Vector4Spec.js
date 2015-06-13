@@ -3,19 +3,19 @@
  * Original code published with the following license:
  *
  * The MIT License
- * 
+ *
  * Copyright &copy; 2010-2014 Zia.js authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -76,23 +76,6 @@ describe('Zia.Vector4', function() {
     expect(a.y).toBe(y);
     expect(a.z).toBe(z);
     expect(a.w).toBe(w);
-  });
-
-  it( "setComponent,getComponent", function() {
-    var a = new Zia.Vector4();
-    expect(a.x).toBe(0);
-    expect(a.y).toBe(0);
-    expect(a.z).toBe(0);
-    expect(a.w).toBe(1);
-
-    a.setComponent( 0, 1 );
-    a.setComponent( 1, 2 );
-    a.setComponent( 2, 3 );
-    a.setComponent( 3, 4 );
-    expect( a.getComponent( 0 )).toBe(1);
-    expect( a.getComponent( 1 )).toBe(2);
-    expect( a.getComponent( 2 )).toBe(3);
-    expect( a.getComponent( 3 )).toBe(4);
   });
 
   it( "add", function() {
@@ -211,7 +194,7 @@ describe('Zia.Vector4', function() {
     var c = new Zia.Vector4( 0, 0, z, 0 );
     var d = new Zia.Vector4( 0, 0, 0, w );
     var e = new Zia.Vector4( 0, 0, 0, 0 );
-    
+
     expect(a.length()).toBe(x);
     expect(a.lengthSq()).toBe(x*x);
     expect(b.length()).toBe(y);
@@ -233,7 +216,7 @@ describe('Zia.Vector4', function() {
     var b = new Zia.Vector4( 0, -y, 0, 0 );
     var c = new Zia.Vector4( 0, 0, z, 0 );
     var d = new Zia.Vector4( 0, 0, 0, -w );
-    
+
     a.normalize();
     expect( a.length()).toBe(1);
     expect( a.x).toBe(1);
@@ -258,7 +241,7 @@ describe('Zia.Vector4', function() {
     var c = new Zia.Vector4( 0, 0, z, 0 );
     var d = new Zia.Vector4( 0, 0, 0, -w );
     var e = new Zia.Vector4();
-    
+
     ok( a.distanceTo( e ) == x, "Passed!" );
     ok( a.distanceToSquared( e ) == x*x, "Passed!" );
 
@@ -272,20 +255,6 @@ describe('Zia.Vector4', function() {
     ok( d.distanceToSquared( e ) == w*w, "Passed!" );
   });
   */
-
-
-  it( "setLength", function() {
-    var a = new Zia.Vector4( x, 0, 0, 0 );
-
-    expect(a.length()).toBe(x);
-    a.setLength( y );
-    expect(a.length()).toBe(y);
-
-    a = new Zia.Vector4( 0, 0, 0, 0 );
-    expect(a.length()).toBe(0);
-    a.setLength( y );
-    expect(a.length()).toBe(0);
-  });
 
   it( "lerp/clone", function() {
     var a = new Zia.Vector4( x, 0, z, 0 );

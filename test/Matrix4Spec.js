@@ -3,19 +3,19 @@
  * Original code published with the following license:
  *
  * The MIT License
- * 
+ *
  * Copyright &copy; 2010-2014 three.js authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,13 +26,13 @@
  */
 
 describe('Zia.Matrix4', function() {
-  
+
   describe("constructor", function() {
     it('initializes to an empty matrix when no parameters are passed', function() {
       var m = new Zia.Matrix4();
       expect(m.determinant()).toBe(0);
     });
-    
+
     it ('initializes to the specified values when parameters are passed', function() {
       var m = new Zia.Matrix4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
       expect(m.elements[0]).toBe(0);
@@ -256,8 +256,8 @@ describe('Zia.Matrix4', function() {
 
     var rValues = [
       new Zia.Quaternion(),
-      new Zia.Quaternion().setFromEuler( new Zia.Euler( 1, 1, 0 ) ),
-      new Zia.Quaternion().setFromEuler( new Zia.Euler( 1, -1, 1 ) ),
+      Zia.Quaternion.createFromEuler( new Zia.Euler( 1, 1, 0 ), new Zia.Quaternion() ),
+      Zia.Quaternion.createFromEuler( new Zia.Euler( 1, -1, 1 ), new Zia.Quaternion() ),
       new Zia.Quaternion( 0, 0.9238795292366128, 0, 0.38268342717215614 )
     ];
 

@@ -3,19 +3,19 @@
  * Original code published with the following license:
  *
  * The MIT License
- * 
+ *
  * Copyright &copy; 2010-2014 three.js authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -71,17 +71,6 @@ describe('Zia.Vector2', function() {
     a.y = y;
     expect(a.x).toBe(x);
     expect(a.y).toBe(y);
-  });
-
-  it("setComponent,getComponent", function() {
-    var a = new Zia.Vector2();
-    expect(a.x).toBe(0);
-    expect(a.y).toBe(0);
-
-    a.setComponent( 0, 1 );
-    a.setComponent( 1, 2 );
-    expect(a.getComponent(0)).toBe(1);
-    expect(a.getComponent(1)).toBe(2);
   });
 
   it("add", function() {
@@ -237,19 +226,6 @@ describe('Zia.Vector2', function() {
 
     expect(b.distanceTo(c)).toBe(y);
     expect(b.distanceToSquared(c)).toBe(y*y);
-  });
-
-  it("setLength", function() {
-    var a = new Zia.Vector2( x, 0 );
-
-    expect(a.length()).toBe(x);
-    a.setLength( y );
-    expect(a.length()).toBe(y);
-
-    a = new Zia.Vector2( 0, 0 );
-    expect(a.length()).toBe(0);
-    a.setLength(y);
-    expect(a.length()).toBe(0);
   });
 
   it("lerp/clone", function() {

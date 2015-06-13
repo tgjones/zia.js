@@ -3,19 +3,19 @@
  * Original code published with the following license:
  *
  * The MIT License
- * 
+ *
  * Copyright &copy; 2010-2014 three.js authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -68,22 +68,6 @@ describe('Zia.Vector3', function() {
     expect(a.x).toBe(x);
     expect(a.y).toBe(y);
     expect(a.z).toBe(z);
-  });
-
-  describe('setComponent method and getComponent method', function() {
-    it("sets or gets values at specified index", function() {
-      var a = new Zia.Vector3();
-      expect(a.x).toBe(0);
-      expect(a.y).toBe(0);
-      expect(a.z).toBe(0);
-
-      a.setComponent(0, 1);
-      a.setComponent(1, 2);
-      a.setComponent(2, 3);
-      expect(a.getComponent(0)).toBe(1);
-      expect(a.getComponent(1)).toBe(2);
-      expect(a.getComponent(2)).toBe(3);
-    });
   });
 
   describe('add method and addVector method', function() {
@@ -240,19 +224,6 @@ describe('Zia.Vector3', function() {
     expect(c.distanceToSquared(d)).toBe(z*z);
   });
 
-  it("setLength", function() {
-    var a = new Zia.Vector3(x, 0, 0);
-
-    expect(a.length()).toBe(x);
-    a.setLength(y);
-    expect(a.length()).toBe(y);
-
-    a = new Zia.Vector3(0, 0, 0);
-    expect(a.length()).toBe(0);
-    a.setLength(y);
-    expect(a.length()).toBe(0);
-  });
-
   it("projectOnVector", function() {
     var a = new Zia.Vector3(1, 0, 0);
     var b = new Zia.Vector3();
@@ -329,13 +300,13 @@ describe('Zia.Vector3', function() {
     expect(a.lerp(a, 0)).toEqual(a.lerp(a, 0.5));
     expect(a.lerp(a, 0)).toEqual(a.lerp(a, 1));
 
-    expect(a.clone().lerp(b, 0)).toEqual(a);
+    expect(a.clone(new Zia.Vector3()).lerp(b, 0)).toEqual(a);
 
-    expect(a.clone().lerp(b, 0.5).x).toEqual(x*0.5);
-    expect(a.clone().lerp(b, 0.5).y).toEqual(-y*0.5);
-    expect(a.clone().lerp(b, 0.5).z).toEqual(z*0.5);
+    expect(a.clone(new Zia.Vector3()).lerp(b, 0.5).x).toEqual(x*0.5);
+    expect(a.clone(new Zia.Vector3()).lerp(b, 0.5).y).toEqual(-y*0.5);
+    expect(a.clone(new Zia.Vector3()).lerp(b, 0.5).z).toEqual(z*0.5);
 
-    expect(a.clone().lerp(b, 1)).toEqual(b);
+    expect(a.clone(new Zia.Vector3()).lerp(b, 1)).toEqual(b);
   });
 
   it("equals", function() {
