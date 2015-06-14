@@ -1,0 +1,21 @@
+---
+layout: example_base.html
+---
+
+<div class="panel">
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#example-output" data-toggle="tab">Example</a></li>
+    <li><a href="#example-script" data-toggle="tab">Javascript</a></li>
+  </ul>
+
+  <div id="hello" class="tab-content">
+    <div class="tab-pane active" id="example-output">
+      {{> body }}
+    </div>
+    <div class="tab-pane" id="example-script">
+      {{ exampleCode page.basename }}
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="{{assets}}/js/example-{{page.basename}}.js"></script>

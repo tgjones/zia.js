@@ -58,6 +58,10 @@
 		"./src/graphics/TextureCube.ts",
 		"./src/graphics/Texture2D.ts",
 
-		"./src/graphics/GraphicsDevice.ts"
+		"./src/graphics/GraphicsDevice.ts",
+
+		"./src/input/KeyboardState.ts",
+		"./src/input/Keyboard.ts",
+		"./src/input/Mouse.ts"
 	]
 }
