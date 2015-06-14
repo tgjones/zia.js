@@ -16,6 +16,7 @@
     "grunt-jsdoc": "^0.6.1",
     "grunt-karma": "^0.8.3",
     "grunt-newer": "^0.7.0",
+    "grunt-typedoc": "^0.2.2",
     "handlebars-helpers": "^0.5.8",
     "highlight.js": "^8.3.0",
     "karma": "^0.12.16",

@@ -248,21 +248,32 @@ module.exports = function(grunt) {
         tasks: ['load-api-pages', 'assemble'],
         options: { livereload: true }
       },
-      "jsdoc-assemble": {
-        files: ['lib/tasks/jsdoc-assemble.js', '.tmp/jsdoc/jsdoc.json'],
-        tasks: ['jsdoc-assemble']
-      },
+      // "jsdoc-assemble": {
+      //   files: ['lib/tasks/jsdoc-assemble.js', '.tmp/jsdoc/jsdoc.json'],
+      //   tasks: ['jsdoc-assemble']
+      // },
       site_assets: {
         files: ['**/*'],
         tasks: ['copy'],
         options: { cwd: 'site/assets/', livereload: true }
       },
-      jsdoc: {
-        files: [srcFiles, 'site/jsdoc/**/*.*'],
-        tasks: ['jsdoc'],
-        options: { livereload: true }
-      }
+      // jsdoc: {
+      //   files: [srcFiles, 'site/jsdoc/**/*.*'],
+      //   tasks: ['jsdoc'],
+      //   options: { livereload: true }
+      // }
     },
+
+    typedoc: {
+      build: {
+        options: {
+          target: 'es5',
+          out: 'dist/site/api/',
+          name: 'Zia.js'
+        },
+        src: 'src/**/*.ts'
+      }
+    }
   });
 
   grunt.loadNpmTasks('assemble');
@@ -278,6 +289,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks('grunt-newer');
+  grunt.loadNpmTasks('grunt-typedoc');
 
   grunt.loadTasks('lib/tasks');
 

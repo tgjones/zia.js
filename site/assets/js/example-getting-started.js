@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    
+
   var canvas = document.getElementById('mainCanvas');
-  
+
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
   var program = new Zia.BasicProgram(graphicsDevice, {
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     Zia.Matrix4.createFromAxisAngle(
       rotationAxis,
-      Zia.Math.degToRad(rotationAngle),
+      Zia.MathUtil.degToRad(rotationAngle),
       modelMatrix);
 
     cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);

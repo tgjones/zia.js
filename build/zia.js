@@ -2778,7 +2778,7 @@ var Zia;
             }
             for (var i = 0; i < vertexCount; i++) {
                 for (var j = 0; j < arrays.length; j++) {
-                    Array.prototype.push.apply(vertexData, arrays[j][i].toJS());
+                    Array.prototype.push.apply(vertexData, arrays[j][i].toArray());
                 }
             }
             return vertexData;
@@ -3764,14 +3764,20 @@ var Zia;
 
 var Zia;
 (function (Zia) {
+    (function (TextureWrap) {
+        TextureWrap[TextureWrap["Repeat"] = 0] = "Repeat";
+        TextureWrap[TextureWrap["ClampToEdge"] = 1] = "ClampToEdge";
+        TextureWrap[TextureWrap["MirroredRepeat"] = 2] = "MirroredRepeat";
+    })(Zia.TextureWrap || (Zia.TextureWrap = {}));
+    var TextureWrap = Zia.TextureWrap;
     Zia.TextureWrapUtil = {
         _map: function (gl, wrap) {
             switch (wrap) {
-                case 0 /* Repeat */:
+                case TextureWrap.Repeat:
                     return gl.REPEAT;
-                case 1 /* ClampToEdge */:
+                case TextureWrap.ClampToEdge:
                     return gl.CLAMP_TO_EDGE;
-                case 2 /* MirroredRepeat */:
+                case TextureWrap.MirroredRepeat:
                     return gl.MIRRORED_REPEAT;
                 default:
                     throw "Invalid value: " + wrap;
