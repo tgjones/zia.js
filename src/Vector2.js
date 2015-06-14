@@ -68,10 +68,7 @@ var Zia;
             return this;
         };
         Vector2.prototype.add = function (v) {
-            this._x += v._x;
-            this._y += v._y;
-            this._onChangeCallback();
-            return this;
+            return Zia.Vector2.add(this, v, this);
         };
         Vector2.prototype.addVectors = function (a, b) {
             this._x = a._x + b._x;
@@ -85,17 +82,8 @@ var Zia;
             this._onChangeCallback();
             return this;
         };
-        Vector2.prototype.sub = function (v) {
-            this._x -= v._x;
-            this._y -= v._y;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector2.prototype.subVectors = function (a, b) {
-            this._x = a._x - b._x;
-            this._y = a._y - b._y;
-            this._onChangeCallback();
-            return this;
+        Vector2.prototype.subtract = function (v) {
+            return Zia.Vector2.subtract(this, v, this);
         };
         Vector2.prototype.multiply = function (v) {
             this._x *= v._x;
@@ -247,6 +235,21 @@ var Zia;
         Vector2.prototype.toArray = function () {
             return this.toJS();
         };
+        Vector2.add = function (value1, value2, result) {
+            if (result === void 0) { result = new Vector2(); }
+            result._x = value1._x + value2._x;
+            result._y = value1._y + value2._y;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector2.subtract = function (value1, value2, result) {
+            if (result === void 0) { result = new Vector2(); }
+            result._x = value1._x - value2._x;
+            result._y = value1._y - value2._y;
+            result._onChangeCallback();
+            return result;
+        };
+        ;
         Vector2._clampScalarMinTemp = new Vector2();
         Vector2._clampScalarMaxTemp = new Vector2();
         return Vector2;

@@ -76,17 +76,14 @@ var Zia;
 (function (Zia) {
     var GeometricPrimitive;
     (function (GeometricPrimitive) {
-        // Computes a point on a unit circle, aligned to the x/z plane and centered on the origin.
         function getCircleVector(i, tessellation) {
             var angle = i * 2.0 * Math.PI / tessellation;
             var dx = Math.sin(angle);
             var dz = Math.cos(angle);
             return new Zia.Vector3(dx, 0, dz);
         }
-        // Helper creates a triangle fan to close the end of a cylinder.
         var createCylinderCapTemp1 = new Zia.Vector3();
         function createCylinderCap(positions, normals, texCoords, indices, tessellation, height, radius, isTop) {
-            // Create cap indices.
             for (var i = 0; i < tessellation - 2; i++) {
                 var i1 = (i + 1) % tessellation;
                 var i2 = (i + 2) % tessellation;
@@ -98,17 +95,14 @@ var Zia;
                 indices.push(vbase + i2);
                 indices.push(vbase + i1);
             }
-            // Which end of the cylinder is this?
             var normal = new Zia.Vector3(0, 1, 0);
             var textureScale = new Zia.Vector2(-0.5, -0.5);
             if (!isTop) {
                 normal.negate();
                 textureScale.x = -textureScale.x;
             }
-            // Create cap vertices.
             for (var i = 0; i < tessellation; i++) {
                 var circleVector = getCircleVector(i, tessellation);
-                // (circleVector*radius) + (normal*height)
                 var position = circleVector.clone(new Zia.Vector3()).multiplyScalar(radius);
                 createCylinderCapTemp1.set(normal.x, normal.y, normal.z);
                 createCylinderCapTemp1.multiplyScalar(height);
@@ -119,7 +113,6 @@ var Zia;
             }
         }
         var vector2UnitY = new Zia.Vector2(0, 1);
-        /** Creates a cylinder primitive. */
         function createCylinder(height, diameter, tessellation) {
             if (height === void 0) { height = 1.0; }
             if (diameter === void 0) { diameter = 1.0; }
@@ -135,7 +128,6 @@ var Zia;
             var topOffset = new Zia.Vector3(0, 1, 0).multiplyScalar(height);
             var radius = diameter / 2;
             var stride = tessellation + 1;
-            // Create a ring of triangles around the outside of the cylinder.
             for (var i = 0; i <= tessellation; i++) {
                 var normal = getCircleVector(i, tessellation);
                 var sideOffset = normal.clone(new Zia.Vector3()).multiplyScalar(radius);
@@ -143,9 +135,9 @@ var Zia;
                 positions.push(sideOffset.clone(new Zia.Vector3()).add(topOffset));
                 normals.push(normal);
                 texCoords.push(textureCoordinate);
-                positions.push(sideOffset.clone(new Zia.Vector3()).sub(topOffset));
+                positions.push(sideOffset.clone(new Zia.Vector3()).subtract(topOffset));
                 normals.push(normal);
-                texCoords.push(textureCoordinate.clone().sub(vector2UnitY));
+                texCoords.push(textureCoordinate.clone().subtract(vector2UnitY));
                 indices.push(i * 2);
                 indices.push(i * 2 + 1);
                 indices.push((i * 2 + 2) % (stride * 2));
@@ -153,7 +145,6 @@ var Zia;
                 indices.push((i * 2 + 3) % (stride * 2));
                 indices.push((i * 2 + 2) % (stride * 2));
             }
-            // Create flat triangle fan caps to seal the top and bottom.
             createCylinderCap(positions, normals, texCoords, indices, tessellation, height, radius, true);
             createCylinderCap(positions, normals, texCoords, indices, tessellation, height, radius, false);
             return {

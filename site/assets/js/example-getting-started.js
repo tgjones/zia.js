@@ -21,13 +21,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var projectionMatrix = Zia.Matrix4.createPerspectiveFieldOfView(
-    Zia.MathUtil.PI_OVER_FOUR, graphicsDevice.viewport.aspectRatio, 0.1, 100,
-    new Zia.Matrix4());
+    Zia.MathUtil.PI_OVER_FOUR, graphicsDevice.viewport.aspectRatio, 0.1, 100);
   var viewMatrix = Zia.Matrix4.createLookAt(
     new Zia.Vector3(0, 1, -2),
     new Zia.Vector3(0, 0, 0),
-    new Zia.Vector3(0, 1, 0),
-    new Zia.Matrix4());
+    new Zia.Vector3(0, 1, 0));
   var modelMatrix = new Zia.Matrix4();
 
   var rotationAxis = new Zia.Vector3(0, 1, 0);

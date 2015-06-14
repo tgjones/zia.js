@@ -93,7 +93,6 @@ var Zia;
         ];
         var side1 = new Zia.Vector3();
         var side2 = new Zia.Vector3();
-        /** Creates a cube primitive. */
         function createCube(size) {
             if (size === void 0) { size = 1.0; }
             var positions = [];
@@ -101,16 +100,13 @@ var Zia;
             var texCoords = [];
             var indices = [];
             size /= 2.0;
-            // Create each face in turn.
             for (var i = 0; i < cubeFaceCount; i++) {
                 var normal = faceNormals[i];
-                // Get two vectors perpendicular both to the face normal and to each other.
                 var basis = (i >= 4) ? new Zia.Vector3(0, 0, 1) : new Zia.Vector3(0, 1, 0);
                 side1.set(normal.x, normal.y, normal.z);
                 Zia.Vector3.cross(side1, basis, side1);
                 side2.set(normal.x, normal.y, normal.z);
                 Zia.Vector3.cross(side2, side1, side2);
-                // Six indices (two triangles) per face.
                 var vbase = i * 4;
                 indices.push(vbase + 0);
                 indices.push(vbase + 2);
@@ -118,15 +114,10 @@ var Zia;
                 indices.push(vbase + 0);
                 indices.push(vbase + 3);
                 indices.push(vbase + 2);
-                // Four vertices per face.
-                // (normal - side1 - side2) * size
-                positions.push(normal.clone(new Zia.Vector3()).sub(side1).sub(side2).multiplyScalar(size));
-                // (normal - side1 + side2) * size
-                positions.push(normal.clone(new Zia.Vector3()).sub(side1).add(side2).multiplyScalar(size));
-                // (normal + side1 + side2) * size
+                positions.push(normal.clone(new Zia.Vector3()).subtract(side1).subtract(side2).multiplyScalar(size));
+                positions.push(normal.clone(new Zia.Vector3()).subtract(side1).add(side2).multiplyScalar(size));
                 positions.push(normal.clone(new Zia.Vector3()).add(side1).add(side2).multiplyScalar(size));
-                // (normal + side1 - side2) * size
-                positions.push(normal.clone(new Zia.Vector3()).add(side1).sub(side2).multiplyScalar(size));
+                positions.push(normal.clone(new Zia.Vector3()).add(side1).subtract(side2).multiplyScalar(size));
                 normals.push(normal);
                 normals.push(normal);
                 normals.push(normal);

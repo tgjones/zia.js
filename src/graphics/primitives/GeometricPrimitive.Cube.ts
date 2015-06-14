@@ -130,16 +130,16 @@ module Zia.GeometricPrimitive {
       // Four vertices per face.
 
       // (normal - side1 - side2) * size
-      positions.push(normal.clone(new Vector3()).sub(side1).sub(side2).multiplyScalar(size));
+      positions.push(normal.clone(new Vector3()).subtract(side1).subtract(side2).multiplyScalar(size));
 
       // (normal - side1 + side2) * size
-      positions.push(normal.clone(new Vector3()).sub(side1).add(side2).multiplyScalar(size));
+      positions.push(normal.clone(new Vector3()).subtract(side1).add(side2).multiplyScalar(size));
 
       // (normal + side1 + side2) * size
       positions.push(normal.clone(new Vector3()).add(side1).add(side2).multiplyScalar(size));
 
       // (normal + side1 - side2) * size
-      positions.push(normal.clone(new Vector3()).add(side1).sub(side2).multiplyScalar(size));
+      positions.push(normal.clone(new Vector3()).add(side1).subtract(side2).multiplyScalar(size));
 
       normals.push(normal);
       normals.push(normal);

@@ -17,16 +17,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var projectionMatrix = Zia.Matrix4.createPerspectiveFieldOfView(
     Zia.MathUtil.PI_OVER_FOUR,
-    graphicsDevice.viewport.aspectRatio, 0.1, 100,
-    new Zia.Matrix4());
+    graphicsDevice.viewport.aspectRatio, 0.1, 100);
 
   var viewMatrix = Zia.Matrix4.createLookAt(
     new Zia.Vector3(1, 1, -1),
     new Zia.Vector3(0, 0, 0),
-    new Zia.Vector3(0, 1, 0),
-    new Zia.Matrix4());
+    new Zia.Vector3(0, 1, 0));
 
-  var modelMatrix = Zia.Matrix4.createIdentity(new Zia.Matrix4());
+  var modelMatrix = Zia.Matrix4.createIdentity();
 
   var lastCubeUpdateTime, rotationAngle = 0;
 
@@ -69,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function vector3ToColorArray(v) {
-    return v.toArray().map(function(x) {
+    return v.toJS().map(function(x) {
       return x * 255.0;
     });
   }

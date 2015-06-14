@@ -77,10 +77,7 @@ module Zia {
     }
 
     add(v: Vector2) {
-      this._x += v._x;
-      this._y += v._y;
-      this._onChangeCallback();
-      return this;
+      return Zia.Vector2.add(this, v, this);
     }
 
     addVectors(a: Vector2, b: Vector2) {
@@ -97,18 +94,8 @@ module Zia {
       return this;
     }
 
-    sub(v: Vector2) {
-      this._x -= v._x;
-      this._y -= v._y;
-      this._onChangeCallback();
-      return this;
-    }
-
-    subVectors(a: Vector2, b: Vector2) {
-      this._x = a._x - b._x;
-      this._y = a._y - b._y;
-      this._onChangeCallback();
-      return this;
+    subtract(v: Vector2) {
+      return Zia.Vector2.subtract(this, v, this);
     }
 
     multiply(v: Vector2) {
@@ -300,5 +287,37 @@ module Zia {
     toArray() {
       return this.toJS();
     }
+
+    /**
+     * Adds two vectors.
+     * @method
+     *
+     * @param {Zia.Vector2} value1 - The first vector.
+     * @param {Zia.Vector2} value2 - The second vector.
+     * @param {Zia.Vector2} result - The object in which to store the result.
+     * @returns {Zia.Vector2} The modified result parameter.
+     */
+    static add(value1: Vector2, value2: Vector2, result = new Vector2()) {
+      result._x = value1._x + value2._x;
+      result._y = value1._y + value2._y;
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Subtracts one vector from another.
+     * @method
+     *
+     * @param {Zia.Vector2} value1 - The first vector.
+     * @param {Zia.Vector2} value2 - The second vector.
+     * @param {Zia.Vector2} result - The object in which to store the result.
+     * @returns {Zia.Vector2} The modified result parameter.
+     */
+    static subtract(value1: Vector2, value2: Vector2, result = new Vector2()) {
+      result._x = value1._x - value2._x;
+      result._y = value1._y - value2._y;
+      result._onChangeCallback();
+      return result;
+    };
   }
 }

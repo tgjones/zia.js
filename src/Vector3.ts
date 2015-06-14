@@ -82,96 +82,6 @@ module Zia {
       return this;
     }
 
-    copy(v: Vector3) {
-      this._x = v._x;
-      this._y = v._y;
-      this._z = v._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    add(v: Vector3) {
-      this._x += v._x;
-      this._y += v._y;
-      this._z += v._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    addScalar(s: number) {
-      this._x += s;
-      this._y += s;
-      this._z += s;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    addVectors(a: Vector3, b: Vector3) {
-      this._x = a._x + b._x;
-      this._y = a._y + b._y;
-      this._z = a._z + b._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    sub(v: Vector3) {
-      this._x -= v._x;
-      this._y -= v._y;
-      this._z -= v._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    subVectors(a: Vector3, b: Vector3) {
-      this._x = a._x - b._x;
-      this._y = a._y - b._y;
-      this._z = a._z - b._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    multiply(v: Vector3) {
-      this._x *= v._x;
-      this._y *= v._y;
-      this._z *= v._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    multiplyScalar(scalar: number) {
-      this._x *= scalar;
-      this._y *= scalar;
-      this._z *= scalar;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    multiplyVectors(a: Vector3, b: Vector3) {
-      this._x = a._x * b._x;
-      this._y = a._y * b._y;
-      this._z = a._z * b._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
     private static _quaternionTemp = new Quaternion();
 
     applyEuler(euler: Euler) {
@@ -268,7 +178,6 @@ module Zia {
     }
 
     transformDirection(m: Matrix4) {
-
       // input: Zia.Matrix4 affine matrix
       // vector interpreted as a direction
 
@@ -285,156 +194,6 @@ module Zia {
       this.normalize();
 
       return this;
-
-    }
-
-    divide(v: Vector3) {
-      this._x /= v._x;
-      this._y /= v._y;
-      this._z /= v._z;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    divideScalar(scalar: number) {
-      if ( scalar !== 0 ) {
-        var invScalar = 1 / scalar;
-        this._x *= invScalar;
-        this._y *= invScalar;
-        this._z *= invScalar;
-      } else {
-        this._x = 0;
-        this._y = 0;
-        this._z = 0;
-      }
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    min(v: Vector3) {
-
-      if ( this._x > v._x ) {
-        this._x = v._x;
-      }
-
-      if ( this._y > v._y ) {
-        this._y = v._y;
-      }
-
-      if ( this._z > v._z ) {
-        this._z = v._z;
-      }
-
-      this._onChangeCallback();
-
-      return this;
-
-    }
-
-    max( v: Vector3 ) {
-
-      if ( this._x < v._x ) {
-        this._x = v._x;
-      }
-
-      if ( this._y < v._y ) {
-        this._y = v._y;
-      }
-
-      if ( this._z < v._z ) {
-        this._z = v._z;
-      }
-
-      this._onChangeCallback();
-
-      return this;
-
-    }
-
-    clamp( min: Vector3, max: Vector3 ) {
-
-      // This function assumes min < max, if this assumption isn't true it will not operate correctly
-
-      if (this._x < min._x) {
-        this._x = min._x;
-      } else if (this._x > max._x) {
-        this._x = max._x;
-      }
-
-      if (this._y < min._y) {
-        this._y = min._y;
-      } else if (this._y > max._y) {
-        this._y = max._y;
-      }
-
-      if (this._z < min._z) {
-        this._z = min._z;
-      } else if (this._z > max._z) {
-        this._z = max._z;
-      }
-
-      this._onChangeCallback();
-
-      return this;
-
-    }
-
-    private static _clampScalarMinTemp = new Vector3();
-    private static _clampScalarMaxTemp = new Vector3();
-
-    clampScalar(minVal: number, maxVal: number) {
-      Vector3._clampScalarMinTemp.set(minVal, minVal, minVal);
-      Vector3._clampScalarMaxTemp.set(maxVal, maxVal, maxVal);
-
-      return this.clamp(Vector3._clampScalarMinTemp, Vector3._clampScalarMaxTemp);
-    }
-
-    floor() {
-      this._x = Math.floor(this._x);
-      this._y = Math.floor(this._y);
-      this._z = Math.floor(this._z);
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    ceil() {
-      this._x = Math.ceil(this._x);
-      this._y = Math.ceil(this._y);
-      this._z = Math.ceil(this._z);
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    round() {
-      this._x = Math.round(this._x);
-      this._y = Math.round(this._y);
-      this._z = Math.round(this._z);
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    roundToZero() {
-      this._x = (this._x < 0) ? Math.ceil(this._x) : Math.floor(this._x);
-      this._y = (this._y < 0) ? Math.ceil(this._y) : Math.floor(this._y);
-      this._z = (this._z < 0) ? Math.ceil(this._z) : Math.floor(this._z);
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    negate() {
-      return this.multiplyScalar(-1);
     }
 
     nearEqual(right: Vector3, epsilon: Vector3) {
@@ -443,139 +202,63 @@ module Zia {
         Zia.MathUtil.withinEpsilon(this._z, right._z, epsilon._z);
     }
 
-    dot(v: Vector3) {
-      return this._x * v._x + this._y * v._y + this._z * v._z;
+    add(value: Vector3) {
+      return Vector3.add(this, value, this);
     }
 
-    lengthSq() {
+    subtract(value: Vector3) {
+      return Vector3.subtract(this, value, this);
+    }
+
+    multiply(value: Vector3) {
+      return Vector3.multiply(this, value, this);
+    }
+
+    multiplyScalar(value: number) {
+      return Vector3.multiplyScalar(this, value, this);
+    }
+
+    negate() {
+      return Zia.Vector3.negate(this, this);
+    }
+
+    /**
+     * Returns the square of the length of this vector.
+     * @method
+     *
+     * @returns {Zia.Vector3} The square of the length of this vector.
+     */
+    lengthSquared() {
       return this._x * this._x + this._y * this._y + this._z * this._z;
     }
 
+    /**
+     * Returns the length of this vector.
+     * @method
+     *
+     * @returns {Zia.Vector3} The square of the length of this vector.
+     */
     length() {
       return Math.sqrt(this._x * this._x + this._y * this._y + this._z * this._z);
     }
 
+    /**
+     * Turns this vector into a unit vector.
+     * @method
+     */
     normalize() {
-      return this.divideScalar(this.length());
+      return Zia.Vector3.normalize(this, this);
     }
 
-    lerp(v: Vector3, alpha: number) {
-      this._x += (v._x - this._x) * alpha;
-      this._y += (v._y - this._y) * alpha;
-      this._z += (v._z - this._z) * alpha;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    cross(v: Vector3) {
-      var x = this._x, y = this._y, z = this._z;
-
-      this._x = y * v._z - z * v._y;
-      this._y = z * v._x - x * v._z;
-      this._z = x * v._y - y * v._x;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    crossVectors(a: Vector3, b: Vector3) {
-      var ax = a._x, ay = a._y, az = a._z;
-      var bx = b._x, by = b._y, bz = b._z;
-
-      this._x = ay * bz - az * by;
-      this._y = az * bx - ax * bz;
-      this._z = ax * by - ay * bx;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    private static _projectOnVectorTemp = new Vector3();
-
-    projectOnVector(vector: Vector3) {
-      Vector3._projectOnVectorTemp.copy(vector).normalize();
-      var dot = this.dot(Vector3._projectOnVectorTemp);
-      return this.copy(Vector3._projectOnVectorTemp).multiplyScalar(dot);
-    }
-
-    private static _projectOnPlaneTemp = new Vector3();
-
-    projectOnPlane(planeNormal: Vector3) {
-      Vector3._projectOnPlaneTemp.copy(this).projectOnVector(planeNormal);
-      return this.sub(Vector3._projectOnPlaneTemp);
-    }
-
-    private static _reflectTemp = new Vector3();
-
-    reflect(normal: Vector3) {
-      // reflect incident vector off plane orthogonal to normal
-      // normal is assumed to have unit length
-      return this.sub(Vector3._reflectTemp.copy(normal).multiplyScalar(2 * this.dot(normal)));
-    }
-
-    angleTo(v: Vector3) {
-      var theta = this.dot(v) / (this.length() * v.length());
-
-      // clamp, to handle numerical problems
-      return Math.acos(MathUtil.clamp(theta, -1, 1));
-    }
-
-    distanceTo(v: Vector3) {
-      return Math.sqrt(this.distanceToSquared(v));
-    }
-
-    distanceToSquared(v: Vector3) {
-      var dx = this._x - v._x;
-      var dy = this._y - v._y;
-      var dz = this._z - v._z;
-
-      return dx * dx + dy * dy + dz * dz;
-    }
-
-    setFromMatrixPosition(m: Matrix4) {
-      this._x = m.elements[12];
-      this._y = m.elements[13];
-      this._z = m.elements[14];
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    setFromMatrixScale(m: Matrix4) {
-      var sx = this.set(m.elements[0], m.elements[1], m.elements[ 2]).length();
-      var sy = this.set(m.elements[4], m.elements[5], m.elements[ 6]).length();
-      var sz = this.set(m.elements[8], m.elements[9], m.elements[10]).length();
-
-      this._x = sx;
-      this._y = sy;
-      this._z = sz;
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
-    setFromMatrixColumn(index: number, matrix: Matrix4) {
-      var offset = index * 4;
-
-      var me = matrix.elements;
-
-      this._x = me[offset];
-      this._y = me[offset + 1];
-      this._z = me[offset + 2];
-
-      this._onChangeCallback();
-
-      return this;
-    }
-
+    /**
+     * Tests if this vector and the specified vector have the same coordinates.
+     * @method
+     *
+     * @param {Zia.Vector3} other - The other vector to test for equality against.
+     * @returns {Boolean} True if the vectors have the same coordinates, otherwise false.
+     */
     equals(v: Vector3) {
-      return ((v._x === this._x) && (v._y === this._y) && (v._z === this._z));
+      return (v._x === this._x) && (v._y === this._y) && (v._z === this._z);
     }
 
     onChange(callback: () => void) {
@@ -592,7 +275,14 @@ module Zia {
       this._onChangeCallback = temp;
     }
 
-    clone(result: Vector3) {
+    /**
+     * Duplicates the current Vector3 instance.
+     * @method
+     *
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    clone(result = new Vector3()) {
       result.set(this._x, this._y, this._z);
       return result;
     }
@@ -605,43 +295,147 @@ module Zia {
       return this.toJS();
     }
 
-    private static _distanceTemp = new Vector3();
-
-    static distance(a: Vector3, b: Vector3) {
-      Zia.Vector3.subtract(a, b, Vector3._distanceTemp);
-      return Vector3._distanceTemp.length();
-    }
-
+    /**
+     * Adds two vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
     static add(a: Vector3, b: Vector3, result: Vector3) {
       result._x = a._x + b._x;
       result._y = a._y + b._y;
       result._z = a._z + b._z;
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Calls Math.ceil on each of the components of the specified vector.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The vector to perform the ceil operation on.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static ceil(value: Vector3, result: Vector3) {
+      result._x = Math.ceil(value._x);
+      result._y = Math.ceil(value._y);
+      result._z = Math.ceil(value._z);
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Restricts a value to be within a specified range.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The value to clamp.
+     * @param {Zia.Vector3} min - The minimum value.
+     * @param {Zia.Vector3} max - The maximum value.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static clamp(value: Vector3, min: Vector3, max: Vector3, result: Vector3) {
+      if (value._x < min._x) {
+        result._x = min._x;
+      } else if (value._x > max._x) {
+        result._x = max._x;
+      }
+
+      if (value._y < min._y) {
+        result._y = min._y;
+      } else if (value._y > max._y) {
+        result._y = max._y;
+      }
+
+      if (value._z < min._z) {
+        result._z = min._z;
+      } else if (value._z > max._z) {
+        result._z = max._z;
+      }
+
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Calculates the cross product of two vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static cross(a: Vector3, b: Vector3, result = new Vector3()) {
+      var x = a._x, y = a._y, z = a._z;
+
+      result._x = y * b._z - z * b._y;
+      result._y = z * b._x - x * b._z;
+      result._z = x * b._y - y * b._x;
 
       result._onChangeCallback();
 
       return result;
     }
 
-    static subtract(a: Vector3, b: Vector3, result: Vector3) {
-      result._x = a._x - b._x;
-      result._y = a._y - b._y;
-      result._z = a._z - b._z;
+    /**
+     * Calculates the distance between two vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @returns {Number} The distance between the two vectors.
+     */
+    static distance(value1: Vector3, value2: Vector3) {
+      return Math.sqrt(Vector3.distanceSquared(value1, value2));
+    }
 
+    /**
+     * Calculates the square of the distance between two vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @returns {Number} Square of the distance between the two vectors.
+     */
+    static distanceSquared(value1: Vector3, value2: Vector3) {
+      var dx = value1._x - value2._x;
+      var dy = value1._y - value2._y;
+      var dz = value1._z - value2._z;
+      return dx * dx + dy * dy + dz * dz;
+    }
+
+    /**
+     * Divides two vectors. This is a simple division of the corresponding
+     * components of each vector.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static divide(value1: Vector3, value2: Vector3, result: Vector3) {
+      result._x = value1._x / value2._x;
+      result._y = value1._y / value2._y;
+      result._z = value1._z / value2._z;
       result._onChangeCallback();
-
       return result;
     }
 
-    static multiplyScalar(v: Vector3, scalar: number, result: Vector3) {
-      result._x = v._x * scalar;
-      result._y = v._y * scalar;
-      result._z = v._z * scalar;
-
-      result._onChangeCallback();
-
-      return result;
-    }
-
+    /**
+     * Divides a vector by a scalar value.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The vector.
+     * @param {Number} scalar - The scalar value.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
     static divideScalar(v: Vector3, scalar: number, result: Vector3) {
       result._x = v._x / scalar;
       result._y = v._y / scalar;
@@ -652,12 +446,182 @@ module Zia {
       return result;
     }
 
-    static cross(a: Vector3, b: Vector3, result: Vector3) {
-      var x = a._x, y = a._y, z = a._z;
+    /**
+     * Calculates the dot product of two vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @returns {Number} The dot product.
+     */
+    static dot(value1: Vector3, value2: Vector3) {
+      return value1._x * value2._x
+           + value1._y * value2._y
+           + value1._z * value2._z;
+    }
 
-      result._x = y * b._z - z * b._y;
-      result._y = z * b._x - x * b._z;
-      result._z = x * b._y - y * b._x;
+    /**
+     * Calls Math.floor on each of the components of the specified vector.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The vector to perform the floor operation on.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static floor(value: Vector3, result: Vector3) {
+      result._x = Math.floor(value._x);
+      result._y = Math.floor(value._y);
+      result._z = Math.floor(value._z);
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Performs a linear interpolation between two vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static lerp(value1: Vector3, value2: Vector3, amount: number, result = new Vector3()) {
+      result._x = value1._x + (value2._x - value1._x) * amount;
+      result._y = value1._y + (value2._y - value1._y) * amount;
+      result._z = value1._z + (value2._z - value1._z) * amount;
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Computes a vector that contains the largest components of the specified vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static max(value1: Vector3, value2: Vector3, result: Vector3) {
+      result._x = (value1._x > value2._x) ? value1._x : value2._x;
+      result._y = (value1._y > value2._y) ? value1._y : value2._y;
+      result._z = (value1._z > value2._z) ? value1._z : value2._z;
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Computes a vector that contains the smallest components of the specified vectors.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static min(value1: Vector3, value2: Vector3, result: Vector3) {
+      result._x = (value1._x < value2._x) ? value1._x : value2._x;
+      result._y = (value1._y < value2._y) ? value1._y : value2._y;
+      result._z = (value1._z < value2._z) ? value1._z : value2._z;
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Multiplies two vectors. Note that this is not a dot product or cross product,
+     * but a simple multiplication of the components of each vector.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static multiply(value1: Vector3, value2: Vector3, result: Vector3) {
+      result._x = value1._x * value2._x;
+      result._y = value1._y * value2._y;
+      result._z = value1._z * value2._z;
+      result._onChangeCallback();
+      return result;
+    }
+
+    /**
+     * Multiplies a vector by a scalar value.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The vector.
+     * @param {Number} scalar - The scalar value.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static multiplyScalar(v: Vector3, scalar: number, result: Vector3) {
+      result._x = v._x * scalar;
+      result._y = v._y * scalar;
+      result._z = v._z * scalar;
+
+      result._onChangeCallback();
+
+      return result;
+    }
+
+    /**
+     * Calculates a vector pointing in the opposite direction.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The vector to negate.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static negate(value: Vector3, result: Vector3) {
+      return Vector3.multiplyScalar(value, -1, result);
+    }
+
+    /**
+     * Turns a vector into a unit vector.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The vector to normalize.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static normalize(value: Vector3, result: Vector3) {
+      return Vector3.divideScalar(value, value.length(), result);
+    }
+
+    /**
+     * Computes the reflection of a vector from a surface with the specified normal.
+     * @method
+     *
+     * @param {Zia.Vector3} value - The vector.
+     * @param {Zia.Vector3} value - The surface normal.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static reflect = (function() {
+      // reflect incident vector off plane orthogonal to normal
+      // normal is assumed to have unit length
+      var v1 = new Vector3();
+
+      return function(value: Vector3, normal: Vector3, result = new Vector3()) {
+        normal.clone(v1);
+        Vector3.multiplyScalar(v1, 2 * Vector3.dot(value, normal), v1);
+        return Vector3.subtract(value, v1, result);
+      };
+    })();
+
+    /**
+     * Subtracts one vector from another.
+     * @method
+     *
+     * @param {Zia.Vector3} value1 - The first vector.
+     * @param {Zia.Vector3} value2 - The second vector.
+     * @param {Zia.Vector3} result - The object in which to store the result.
+     * @returns {Zia.Vector3} The modified result parameter.
+     */
+    static subtract(a: Vector3, b: Vector3, result: Vector3) {
+      result._x = a._x - b._x;
+      result._y = a._y - b._y;
+      result._z = a._z - b._z;
 
       result._onChangeCallback();
 

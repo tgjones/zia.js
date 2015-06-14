@@ -76,69 +76,6 @@ var Zia;
             this._onChangeCallback();
             return this;
         };
-        Vector3.prototype.copy = function (v) {
-            this._x = v._x;
-            this._y = v._y;
-            this._z = v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.add = function (v) {
-            this._x += v._x;
-            this._y += v._y;
-            this._z += v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.addScalar = function (s) {
-            this._x += s;
-            this._y += s;
-            this._z += s;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.addVectors = function (a, b) {
-            this._x = a._x + b._x;
-            this._y = a._y + b._y;
-            this._z = a._z + b._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.sub = function (v) {
-            this._x -= v._x;
-            this._y -= v._y;
-            this._z -= v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.subVectors = function (a, b) {
-            this._x = a._x - b._x;
-            this._y = a._y - b._y;
-            this._z = a._z - b._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.multiply = function (v) {
-            this._x *= v._x;
-            this._y *= v._y;
-            this._z *= v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.multiplyScalar = function (scalar) {
-            this._x *= scalar;
-            this._y *= scalar;
-            this._z *= scalar;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.multiplyVectors = function (a, b) {
-            this._x = a._x * b._x;
-            this._y = a._y * b._y;
-            this._z = a._z * b._z;
-            this._onChangeCallback();
-            return this;
-        };
         Vector3.prototype.applyEuler = function (euler) {
             Zia.Quaternion.createFromEuler(euler, Vector3._quaternionTemp);
             this.applyQuaternion(Vector3._quaternionTemp);
@@ -211,207 +148,37 @@ var Zia;
             this.normalize();
             return this;
         };
-        Vector3.prototype.divide = function (v) {
-            this._x /= v._x;
-            this._y /= v._y;
-            this._z /= v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.divideScalar = function (scalar) {
-            if (scalar !== 0) {
-                var invScalar = 1 / scalar;
-                this._x *= invScalar;
-                this._y *= invScalar;
-                this._z *= invScalar;
-            }
-            else {
-                this._x = 0;
-                this._y = 0;
-                this._z = 0;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.min = function (v) {
-            if (this._x > v._x) {
-                this._x = v._x;
-            }
-            if (this._y > v._y) {
-                this._y = v._y;
-            }
-            if (this._z > v._z) {
-                this._z = v._z;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.max = function (v) {
-            if (this._x < v._x) {
-                this._x = v._x;
-            }
-            if (this._y < v._y) {
-                this._y = v._y;
-            }
-            if (this._z < v._z) {
-                this._z = v._z;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.clamp = function (min, max) {
-            // This function assumes min < max, if this assumption isn't true it will not operate correctly
-            if (this._x < min._x) {
-                this._x = min._x;
-            }
-            else if (this._x > max._x) {
-                this._x = max._x;
-            }
-            if (this._y < min._y) {
-                this._y = min._y;
-            }
-            else if (this._y > max._y) {
-                this._y = max._y;
-            }
-            if (this._z < min._z) {
-                this._z = min._z;
-            }
-            else if (this._z > max._z) {
-                this._z = max._z;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.clampScalar = function (minVal, maxVal) {
-            Vector3._clampScalarMinTemp.set(minVal, minVal, minVal);
-            Vector3._clampScalarMaxTemp.set(maxVal, maxVal, maxVal);
-            return this.clamp(Vector3._clampScalarMinTemp, Vector3._clampScalarMaxTemp);
-        };
-        Vector3.prototype.floor = function () {
-            this._x = Math.floor(this._x);
-            this._y = Math.floor(this._y);
-            this._z = Math.floor(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.ceil = function () {
-            this._x = Math.ceil(this._x);
-            this._y = Math.ceil(this._y);
-            this._z = Math.ceil(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.round = function () {
-            this._x = Math.round(this._x);
-            this._y = Math.round(this._y);
-            this._z = Math.round(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.roundToZero = function () {
-            this._x = (this._x < 0) ? Math.ceil(this._x) : Math.floor(this._x);
-            this._y = (this._y < 0) ? Math.ceil(this._y) : Math.floor(this._y);
-            this._z = (this._z < 0) ? Math.ceil(this._z) : Math.floor(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.negate = function () {
-            return this.multiplyScalar(-1);
-        };
         Vector3.prototype.nearEqual = function (right, epsilon) {
             return Zia.MathUtil.withinEpsilon(this._x, right._x, epsilon._x) &&
                 Zia.MathUtil.withinEpsilon(this._y, right._y, epsilon._y) &&
                 Zia.MathUtil.withinEpsilon(this._z, right._z, epsilon._z);
         };
-        Vector3.prototype.dot = function (v) {
-            return this._x * v._x + this._y * v._y + this._z * v._z;
+        Vector3.prototype.add = function (value) {
+            return Vector3.add(this, value, this);
         };
-        Vector3.prototype.lengthSq = function () {
+        Vector3.prototype.subtract = function (value) {
+            return Vector3.subtract(this, value, this);
+        };
+        Vector3.prototype.multiply = function (value) {
+            return Vector3.multiply(this, value, this);
+        };
+        Vector3.prototype.multiplyScalar = function (value) {
+            return Vector3.multiplyScalar(this, value, this);
+        };
+        Vector3.prototype.negate = function () {
+            return Zia.Vector3.negate(this, this);
+        };
+        Vector3.prototype.lengthSquared = function () {
             return this._x * this._x + this._y * this._y + this._z * this._z;
         };
         Vector3.prototype.length = function () {
             return Math.sqrt(this._x * this._x + this._y * this._y + this._z * this._z);
         };
         Vector3.prototype.normalize = function () {
-            return this.divideScalar(this.length());
-        };
-        Vector3.prototype.lerp = function (v, alpha) {
-            this._x += (v._x - this._x) * alpha;
-            this._y += (v._y - this._y) * alpha;
-            this._z += (v._z - this._z) * alpha;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.cross = function (v) {
-            var x = this._x, y = this._y, z = this._z;
-            this._x = y * v._z - z * v._y;
-            this._y = z * v._x - x * v._z;
-            this._z = x * v._y - y * v._x;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.crossVectors = function (a, b) {
-            var ax = a._x, ay = a._y, az = a._z;
-            var bx = b._x, by = b._y, bz = b._z;
-            this._x = ay * bz - az * by;
-            this._y = az * bx - ax * bz;
-            this._z = ax * by - ay * bx;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.projectOnVector = function (vector) {
-            Vector3._projectOnVectorTemp.copy(vector).normalize();
-            var dot = this.dot(Vector3._projectOnVectorTemp);
-            return this.copy(Vector3._projectOnVectorTemp).multiplyScalar(dot);
-        };
-        Vector3.prototype.projectOnPlane = function (planeNormal) {
-            Vector3._projectOnPlaneTemp.copy(this).projectOnVector(planeNormal);
-            return this.sub(Vector3._projectOnPlaneTemp);
-        };
-        Vector3.prototype.reflect = function (normal) {
-            return this.sub(Vector3._reflectTemp.copy(normal).multiplyScalar(2 * this.dot(normal)));
-        };
-        Vector3.prototype.angleTo = function (v) {
-            var theta = this.dot(v) / (this.length() * v.length());
-            return Math.acos(Zia.MathUtil.clamp(theta, -1, 1));
-        };
-        Vector3.prototype.distanceTo = function (v) {
-            return Math.sqrt(this.distanceToSquared(v));
-        };
-        Vector3.prototype.distanceToSquared = function (v) {
-            var dx = this._x - v._x;
-            var dy = this._y - v._y;
-            var dz = this._z - v._z;
-            return dx * dx + dy * dy + dz * dz;
-        };
-        Vector3.prototype.setFromMatrixPosition = function (m) {
-            this._x = m.elements[12];
-            this._y = m.elements[13];
-            this._z = m.elements[14];
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.setFromMatrixScale = function (m) {
-            var sx = this.set(m.elements[0], m.elements[1], m.elements[2]).length();
-            var sy = this.set(m.elements[4], m.elements[5], m.elements[6]).length();
-            var sz = this.set(m.elements[8], m.elements[9], m.elements[10]).length();
-            this._x = sx;
-            this._y = sy;
-            this._z = sz;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.setFromMatrixColumn = function (index, matrix) {
-            var offset = index * 4;
-            var me = matrix.elements;
-            this._x = me[offset];
-            this._y = me[offset + 1];
-            this._z = me[offset + 2];
-            this._onChangeCallback();
-            return this;
+            return Zia.Vector3.normalize(this, this);
         };
         Vector3.prototype.equals = function (v) {
-            return ((v._x === this._x) && (v._y === this._y) && (v._z === this._z));
+            return (v._x === this._x) && (v._y === this._y) && (v._z === this._z);
         };
         Vector3.prototype.onChange = function (callback) {
             this._onChangeCallback = callback;
@@ -425,6 +192,7 @@ var Zia;
             this._onChangeCallback = temp;
         };
         Vector3.prototype.clone = function (result) {
+            if (result === void 0) { result = new Vector3(); }
             result.set(this._x, this._y, this._z);
             return result;
         };
@@ -434,10 +202,6 @@ var Zia;
         Vector3.prototype.toArray = function () {
             return this.toJS();
         };
-        Vector3.distance = function (a, b) {
-            Zia.Vector3.subtract(a, b, Vector3._distanceTemp);
-            return Vector3._distanceTemp.length();
-        };
         Vector3.add = function (a, b, result) {
             result._x = a._x + b._x;
             result._y = a._y + b._y;
@@ -445,17 +209,57 @@ var Zia;
             result._onChangeCallback();
             return result;
         };
-        Vector3.subtract = function (a, b, result) {
-            result._x = a._x - b._x;
-            result._y = a._y - b._y;
-            result._z = a._z - b._z;
+        Vector3.ceil = function (value, result) {
+            result._x = Math.ceil(value._x);
+            result._y = Math.ceil(value._y);
+            result._z = Math.ceil(value._z);
             result._onChangeCallback();
             return result;
         };
-        Vector3.multiplyScalar = function (v, scalar, result) {
-            result._x = v._x * scalar;
-            result._y = v._y * scalar;
-            result._z = v._z * scalar;
+        Vector3.clamp = function (value, min, max, result) {
+            if (value._x < min._x) {
+                result._x = min._x;
+            }
+            else if (value._x > max._x) {
+                result._x = max._x;
+            }
+            if (value._y < min._y) {
+                result._y = min._y;
+            }
+            else if (value._y > max._y) {
+                result._y = max._y;
+            }
+            if (value._z < min._z) {
+                result._z = min._z;
+            }
+            else if (value._z > max._z) {
+                result._z = max._z;
+            }
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.cross = function (a, b, result) {
+            if (result === void 0) { result = new Vector3(); }
+            var x = a._x, y = a._y, z = a._z;
+            result._x = y * b._z - z * b._y;
+            result._y = z * b._x - x * b._z;
+            result._z = x * b._y - y * b._x;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.distance = function (value1, value2) {
+            return Math.sqrt(Vector3.distanceSquared(value1, value2));
+        };
+        Vector3.distanceSquared = function (value1, value2) {
+            var dx = value1._x - value2._x;
+            var dy = value1._y - value2._y;
+            var dz = value1._z - value2._z;
+            return dx * dx + dy * dy + dz * dz;
+        };
+        Vector3.divide = function (value1, value2, result) {
+            result._x = value1._x / value2._x;
+            result._y = value1._y / value2._y;
+            result._z = value1._z / value2._z;
             result._onChangeCallback();
             return result;
         };
@@ -466,21 +270,77 @@ var Zia;
             result._onChangeCallback();
             return result;
         };
-        Vector3.cross = function (a, b, result) {
-            var x = a._x, y = a._y, z = a._z;
-            result._x = y * b._z - z * b._y;
-            result._y = z * b._x - x * b._z;
-            result._z = x * b._y - y * b._x;
+        Vector3.dot = function (value1, value2) {
+            return value1._x * value2._x
+                + value1._y * value2._y
+                + value1._z * value2._z;
+        };
+        Vector3.floor = function (value, result) {
+            result._x = Math.floor(value._x);
+            result._y = Math.floor(value._y);
+            result._z = Math.floor(value._z);
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.lerp = function (value1, value2, amount, result) {
+            if (result === void 0) { result = new Vector3(); }
+            result._x = value1._x + (value2._x - value1._x) * amount;
+            result._y = value1._y + (value2._y - value1._y) * amount;
+            result._z = value1._z + (value2._z - value1._z) * amount;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.max = function (value1, value2, result) {
+            result._x = (value1._x > value2._x) ? value1._x : value2._x;
+            result._y = (value1._y > value2._y) ? value1._y : value2._y;
+            result._z = (value1._z > value2._z) ? value1._z : value2._z;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.min = function (value1, value2, result) {
+            result._x = (value1._x < value2._x) ? value1._x : value2._x;
+            result._y = (value1._y < value2._y) ? value1._y : value2._y;
+            result._z = (value1._z < value2._z) ? value1._z : value2._z;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.multiply = function (value1, value2, result) {
+            result._x = value1._x * value2._x;
+            result._y = value1._y * value2._y;
+            result._z = value1._z * value2._z;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.multiplyScalar = function (v, scalar, result) {
+            result._x = v._x * scalar;
+            result._y = v._y * scalar;
+            result._z = v._z * scalar;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.negate = function (value, result) {
+            return Vector3.multiplyScalar(value, -1, result);
+        };
+        Vector3.normalize = function (value, result) {
+            return Vector3.divideScalar(value, value.length(), result);
+        };
+        Vector3.subtract = function (a, b, result) {
+            result._x = a._x - b._x;
+            result._y = a._y - b._y;
+            result._z = a._z - b._z;
             result._onChangeCallback();
             return result;
         };
         Vector3._quaternionTemp = new Zia.Quaternion();
-        Vector3._clampScalarMinTemp = new Vector3();
-        Vector3._clampScalarMaxTemp = new Vector3();
-        Vector3._projectOnVectorTemp = new Vector3();
-        Vector3._projectOnPlaneTemp = new Vector3();
-        Vector3._reflectTemp = new Vector3();
-        Vector3._distanceTemp = new Vector3();
+        Vector3.reflect = (function () {
+            var v1 = new Vector3();
+            return function (value, normal, result) {
+                if (result === void 0) { result = new Vector3(); }
+                normal.clone(v1);
+                Vector3.multiplyScalar(v1, 2 * Vector3.dot(value, normal), v1);
+                return Vector3.subtract(value, v1, result);
+            };
+        })();
         return Vector3;
     })();
     Zia.Vector3 = Vector3;

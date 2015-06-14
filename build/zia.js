@@ -385,69 +385,6 @@ var Zia;
             this._onChangeCallback();
             return this;
         };
-        Vector3.prototype.copy = function (v) {
-            this._x = v._x;
-            this._y = v._y;
-            this._z = v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.add = function (v) {
-            this._x += v._x;
-            this._y += v._y;
-            this._z += v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.addScalar = function (s) {
-            this._x += s;
-            this._y += s;
-            this._z += s;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.addVectors = function (a, b) {
-            this._x = a._x + b._x;
-            this._y = a._y + b._y;
-            this._z = a._z + b._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.sub = function (v) {
-            this._x -= v._x;
-            this._y -= v._y;
-            this._z -= v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.subVectors = function (a, b) {
-            this._x = a._x - b._x;
-            this._y = a._y - b._y;
-            this._z = a._z - b._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.multiply = function (v) {
-            this._x *= v._x;
-            this._y *= v._y;
-            this._z *= v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.multiplyScalar = function (scalar) {
-            this._x *= scalar;
-            this._y *= scalar;
-            this._z *= scalar;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.multiplyVectors = function (a, b) {
-            this._x = a._x * b._x;
-            this._y = a._y * b._y;
-            this._z = a._z * b._z;
-            this._onChangeCallback();
-            return this;
-        };
         Vector3.prototype.applyEuler = function (euler) {
             Zia.Quaternion.createFromEuler(euler, Vector3._quaternionTemp);
             this.applyQuaternion(Vector3._quaternionTemp);
@@ -520,207 +457,37 @@ var Zia;
             this.normalize();
             return this;
         };
-        Vector3.prototype.divide = function (v) {
-            this._x /= v._x;
-            this._y /= v._y;
-            this._z /= v._z;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.divideScalar = function (scalar) {
-            if (scalar !== 0) {
-                var invScalar = 1 / scalar;
-                this._x *= invScalar;
-                this._y *= invScalar;
-                this._z *= invScalar;
-            }
-            else {
-                this._x = 0;
-                this._y = 0;
-                this._z = 0;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.min = function (v) {
-            if (this._x > v._x) {
-                this._x = v._x;
-            }
-            if (this._y > v._y) {
-                this._y = v._y;
-            }
-            if (this._z > v._z) {
-                this._z = v._z;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.max = function (v) {
-            if (this._x < v._x) {
-                this._x = v._x;
-            }
-            if (this._y < v._y) {
-                this._y = v._y;
-            }
-            if (this._z < v._z) {
-                this._z = v._z;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.clamp = function (min, max) {
-            // This function assumes min < max, if this assumption isn't true it will not operate correctly
-            if (this._x < min._x) {
-                this._x = min._x;
-            }
-            else if (this._x > max._x) {
-                this._x = max._x;
-            }
-            if (this._y < min._y) {
-                this._y = min._y;
-            }
-            else if (this._y > max._y) {
-                this._y = max._y;
-            }
-            if (this._z < min._z) {
-                this._z = min._z;
-            }
-            else if (this._z > max._z) {
-                this._z = max._z;
-            }
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.clampScalar = function (minVal, maxVal) {
-            Vector3._clampScalarMinTemp.set(minVal, minVal, minVal);
-            Vector3._clampScalarMaxTemp.set(maxVal, maxVal, maxVal);
-            return this.clamp(Vector3._clampScalarMinTemp, Vector3._clampScalarMaxTemp);
-        };
-        Vector3.prototype.floor = function () {
-            this._x = Math.floor(this._x);
-            this._y = Math.floor(this._y);
-            this._z = Math.floor(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.ceil = function () {
-            this._x = Math.ceil(this._x);
-            this._y = Math.ceil(this._y);
-            this._z = Math.ceil(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.round = function () {
-            this._x = Math.round(this._x);
-            this._y = Math.round(this._y);
-            this._z = Math.round(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.roundToZero = function () {
-            this._x = (this._x < 0) ? Math.ceil(this._x) : Math.floor(this._x);
-            this._y = (this._y < 0) ? Math.ceil(this._y) : Math.floor(this._y);
-            this._z = (this._z < 0) ? Math.ceil(this._z) : Math.floor(this._z);
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.negate = function () {
-            return this.multiplyScalar(-1);
-        };
         Vector3.prototype.nearEqual = function (right, epsilon) {
             return Zia.MathUtil.withinEpsilon(this._x, right._x, epsilon._x) &&
                 Zia.MathUtil.withinEpsilon(this._y, right._y, epsilon._y) &&
                 Zia.MathUtil.withinEpsilon(this._z, right._z, epsilon._z);
         };
-        Vector3.prototype.dot = function (v) {
-            return this._x * v._x + this._y * v._y + this._z * v._z;
+        Vector3.prototype.add = function (value) {
+            return Vector3.add(this, value, this);
         };
-        Vector3.prototype.lengthSq = function () {
+        Vector3.prototype.subtract = function (value) {
+            return Vector3.subtract(this, value, this);
+        };
+        Vector3.prototype.multiply = function (value) {
+            return Vector3.multiply(this, value, this);
+        };
+        Vector3.prototype.multiplyScalar = function (value) {
+            return Vector3.multiplyScalar(this, value, this);
+        };
+        Vector3.prototype.negate = function () {
+            return Zia.Vector3.negate(this, this);
+        };
+        Vector3.prototype.lengthSquared = function () {
             return this._x * this._x + this._y * this._y + this._z * this._z;
         };
         Vector3.prototype.length = function () {
             return Math.sqrt(this._x * this._x + this._y * this._y + this._z * this._z);
         };
         Vector3.prototype.normalize = function () {
-            return this.divideScalar(this.length());
-        };
-        Vector3.prototype.lerp = function (v, alpha) {
-            this._x += (v._x - this._x) * alpha;
-            this._y += (v._y - this._y) * alpha;
-            this._z += (v._z - this._z) * alpha;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.cross = function (v) {
-            var x = this._x, y = this._y, z = this._z;
-            this._x = y * v._z - z * v._y;
-            this._y = z * v._x - x * v._z;
-            this._z = x * v._y - y * v._x;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.crossVectors = function (a, b) {
-            var ax = a._x, ay = a._y, az = a._z;
-            var bx = b._x, by = b._y, bz = b._z;
-            this._x = ay * bz - az * by;
-            this._y = az * bx - ax * bz;
-            this._z = ax * by - ay * bx;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.projectOnVector = function (vector) {
-            Vector3._projectOnVectorTemp.copy(vector).normalize();
-            var dot = this.dot(Vector3._projectOnVectorTemp);
-            return this.copy(Vector3._projectOnVectorTemp).multiplyScalar(dot);
-        };
-        Vector3.prototype.projectOnPlane = function (planeNormal) {
-            Vector3._projectOnPlaneTemp.copy(this).projectOnVector(planeNormal);
-            return this.sub(Vector3._projectOnPlaneTemp);
-        };
-        Vector3.prototype.reflect = function (normal) {
-            return this.sub(Vector3._reflectTemp.copy(normal).multiplyScalar(2 * this.dot(normal)));
-        };
-        Vector3.prototype.angleTo = function (v) {
-            var theta = this.dot(v) / (this.length() * v.length());
-            return Math.acos(Zia.MathUtil.clamp(theta, -1, 1));
-        };
-        Vector3.prototype.distanceTo = function (v) {
-            return Math.sqrt(this.distanceToSquared(v));
-        };
-        Vector3.prototype.distanceToSquared = function (v) {
-            var dx = this._x - v._x;
-            var dy = this._y - v._y;
-            var dz = this._z - v._z;
-            return dx * dx + dy * dy + dz * dz;
-        };
-        Vector3.prototype.setFromMatrixPosition = function (m) {
-            this._x = m.elements[12];
-            this._y = m.elements[13];
-            this._z = m.elements[14];
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.setFromMatrixScale = function (m) {
-            var sx = this.set(m.elements[0], m.elements[1], m.elements[2]).length();
-            var sy = this.set(m.elements[4], m.elements[5], m.elements[6]).length();
-            var sz = this.set(m.elements[8], m.elements[9], m.elements[10]).length();
-            this._x = sx;
-            this._y = sy;
-            this._z = sz;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector3.prototype.setFromMatrixColumn = function (index, matrix) {
-            var offset = index * 4;
-            var me = matrix.elements;
-            this._x = me[offset];
-            this._y = me[offset + 1];
-            this._z = me[offset + 2];
-            this._onChangeCallback();
-            return this;
+            return Zia.Vector3.normalize(this, this);
         };
         Vector3.prototype.equals = function (v) {
-            return ((v._x === this._x) && (v._y === this._y) && (v._z === this._z));
+            return (v._x === this._x) && (v._y === this._y) && (v._z === this._z);
         };
         Vector3.prototype.onChange = function (callback) {
             this._onChangeCallback = callback;
@@ -734,6 +501,7 @@ var Zia;
             this._onChangeCallback = temp;
         };
         Vector3.prototype.clone = function (result) {
+            if (result === void 0) { result = new Vector3(); }
             result.set(this._x, this._y, this._z);
             return result;
         };
@@ -743,10 +511,6 @@ var Zia;
         Vector3.prototype.toArray = function () {
             return this.toJS();
         };
-        Vector3.distance = function (a, b) {
-            Zia.Vector3.subtract(a, b, Vector3._distanceTemp);
-            return Vector3._distanceTemp.length();
-        };
         Vector3.add = function (a, b, result) {
             result._x = a._x + b._x;
             result._y = a._y + b._y;
@@ -754,17 +518,57 @@ var Zia;
             result._onChangeCallback();
             return result;
         };
-        Vector3.subtract = function (a, b, result) {
-            result._x = a._x - b._x;
-            result._y = a._y - b._y;
-            result._z = a._z - b._z;
+        Vector3.ceil = function (value, result) {
+            result._x = Math.ceil(value._x);
+            result._y = Math.ceil(value._y);
+            result._z = Math.ceil(value._z);
             result._onChangeCallback();
             return result;
         };
-        Vector3.multiplyScalar = function (v, scalar, result) {
-            result._x = v._x * scalar;
-            result._y = v._y * scalar;
-            result._z = v._z * scalar;
+        Vector3.clamp = function (value, min, max, result) {
+            if (value._x < min._x) {
+                result._x = min._x;
+            }
+            else if (value._x > max._x) {
+                result._x = max._x;
+            }
+            if (value._y < min._y) {
+                result._y = min._y;
+            }
+            else if (value._y > max._y) {
+                result._y = max._y;
+            }
+            if (value._z < min._z) {
+                result._z = min._z;
+            }
+            else if (value._z > max._z) {
+                result._z = max._z;
+            }
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.cross = function (a, b, result) {
+            if (result === void 0) { result = new Vector3(); }
+            var x = a._x, y = a._y, z = a._z;
+            result._x = y * b._z - z * b._y;
+            result._y = z * b._x - x * b._z;
+            result._z = x * b._y - y * b._x;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.distance = function (value1, value2) {
+            return Math.sqrt(Vector3.distanceSquared(value1, value2));
+        };
+        Vector3.distanceSquared = function (value1, value2) {
+            var dx = value1._x - value2._x;
+            var dy = value1._y - value2._y;
+            var dz = value1._z - value2._z;
+            return dx * dx + dy * dy + dz * dz;
+        };
+        Vector3.divide = function (value1, value2, result) {
+            result._x = value1._x / value2._x;
+            result._y = value1._y / value2._y;
+            result._z = value1._z / value2._z;
             result._onChangeCallback();
             return result;
         };
@@ -775,21 +579,77 @@ var Zia;
             result._onChangeCallback();
             return result;
         };
-        Vector3.cross = function (a, b, result) {
-            var x = a._x, y = a._y, z = a._z;
-            result._x = y * b._z - z * b._y;
-            result._y = z * b._x - x * b._z;
-            result._z = x * b._y - y * b._x;
+        Vector3.dot = function (value1, value2) {
+            return value1._x * value2._x
+                + value1._y * value2._y
+                + value1._z * value2._z;
+        };
+        Vector3.floor = function (value, result) {
+            result._x = Math.floor(value._x);
+            result._y = Math.floor(value._y);
+            result._z = Math.floor(value._z);
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.lerp = function (value1, value2, amount, result) {
+            if (result === void 0) { result = new Vector3(); }
+            result._x = value1._x + (value2._x - value1._x) * amount;
+            result._y = value1._y + (value2._y - value1._y) * amount;
+            result._z = value1._z + (value2._z - value1._z) * amount;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.max = function (value1, value2, result) {
+            result._x = (value1._x > value2._x) ? value1._x : value2._x;
+            result._y = (value1._y > value2._y) ? value1._y : value2._y;
+            result._z = (value1._z > value2._z) ? value1._z : value2._z;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.min = function (value1, value2, result) {
+            result._x = (value1._x < value2._x) ? value1._x : value2._x;
+            result._y = (value1._y < value2._y) ? value1._y : value2._y;
+            result._z = (value1._z < value2._z) ? value1._z : value2._z;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.multiply = function (value1, value2, result) {
+            result._x = value1._x * value2._x;
+            result._y = value1._y * value2._y;
+            result._z = value1._z * value2._z;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.multiplyScalar = function (v, scalar, result) {
+            result._x = v._x * scalar;
+            result._y = v._y * scalar;
+            result._z = v._z * scalar;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector3.negate = function (value, result) {
+            return Vector3.multiplyScalar(value, -1, result);
+        };
+        Vector3.normalize = function (value, result) {
+            return Vector3.divideScalar(value, value.length(), result);
+        };
+        Vector3.subtract = function (a, b, result) {
+            result._x = a._x - b._x;
+            result._y = a._y - b._y;
+            result._z = a._z - b._z;
             result._onChangeCallback();
             return result;
         };
         Vector3._quaternionTemp = new Zia.Quaternion();
-        Vector3._clampScalarMinTemp = new Vector3();
-        Vector3._clampScalarMaxTemp = new Vector3();
-        Vector3._projectOnVectorTemp = new Vector3();
-        Vector3._projectOnPlaneTemp = new Vector3();
-        Vector3._reflectTemp = new Vector3();
-        Vector3._distanceTemp = new Vector3();
+        Vector3.reflect = (function () {
+            var v1 = new Vector3();
+            return function (value, normal, result) {
+                if (result === void 0) { result = new Vector3(); }
+                normal.clone(v1);
+                Vector3.multiplyScalar(v1, 2 * Vector3.dot(value, normal), v1);
+                return Vector3.subtract(value, v1, result);
+            };
+        })();
         return Vector3;
     })();
     Zia.Vector3 = Vector3;
@@ -1335,36 +1195,7 @@ var Zia;
  */
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 4x4 matrix. The elements are stored in a `Float32Array`
-     * in column-major order to optimise handoff to WebGL.
-     */
     var Matrix4 = (function () {
-        /**
-         * Constructs a new 4x4 matrix. Parameters are supplied in row-major order
-         * to aid readability. If called with no parameters, all matrix elements are
-         * initialised to 0. If called with any parameters, make sure you supply
-         * all 16 values.
-         *
-         * @summary Constructs a new 4x4 matrix.
-         *
-         * @param m11 The value for row 0, column 0.
-         * @param m12 The value for row 0, column 1.
-         * @param m13 The value for row 0, column 2.
-         * @param m14 The value for row 0, column 3.
-         * @param m21 The value for row 1, column 0.
-         * @param m22 The value for row 1, column 1.
-         * @param m23 The value for row 1, column 2.
-         * @param m24 The value for row 1, column 3.
-         * @param m31 The value for row 2, column 0.
-         * @param m32 The value for row 2, column 1.
-         * @param m33 The value for row 2, column 2.
-         * @param m34 The value for row 2, column 3.
-         * @param m41 The value for row 3, column 0.
-         * @param m42 The value for row 3, column 1.
-         * @param m43 The value for row 3, column 2.
-         * @param m44 The value for row 3, column 3.
-         */
         function Matrix4(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) {
             if (m11 === void 0) { m11 = 0.0; }
             if (m12 === void 0) { m12 = 0.0; }
@@ -1396,81 +1227,21 @@ var Zia;
             result.setTranslation(translation);
             return result;
         };
-        /**
-         * Creates a matrix that can be used to translate vectors.
-         *
-         * @param translation - Amounts to translate by on the x, y and z axes.
-         * @param result - The object in which to place the calculated result.
-         *
-         * @returns The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createTranslation(
-         *   new Zia.Vector3(1, 2, -5),
-         *   new Zia.Matrix4());
-         */
         Matrix4.createTranslation = function (translation, result) {
             return result.set(1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around the x-axis.
-         *
-         * @param {Number} angle - The amount, in radians, by which to rotate around the x-axis.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4());
-         */
         Matrix4.createRotationX = function (angle, result) {
             var c = Math.cos(angle), s = Math.sin(angle);
             return result.set(1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around the y-axis.
-         *
-         * @param {Number} angle - The amount, in radians, by which to rotate around the y-axis.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createRotationY(Math.PI, new Zia.Matrix4());
-         */
         Matrix4.createRotationY = function (angle, result) {
             var c = Math.cos(angle), s = Math.sin(angle);
             return result.set(c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around the z-axis.
-         *
-         * @param {Number} angle - The amount, in radians, by which to rotate around the z-axis.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createRotationZ(Math.PI, new Zia.Matrix4());
-         */
         Matrix4.createRotationZ = function (angle, result) {
             var c = Math.cos(angle), s = Math.sin(angle);
             return result.set(c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around an arbitrary axis.
-         *
-         * @param {Zia.Vector3} axis - The axis to rotate around.
-         * @param {Number} angle - The amount, in radians, by which to rotate around the vector.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createFromAxisAngle(
-         *   new Zia.Vector3(1, 0, 1).normalize(), Math.PI,
-         *   new Zia.Matrix4());
-         */
         Matrix4.createFromAxisAngle = function (axis, angle, result) {
             // Based on http://www.gamedev.net/reference/articles/article1199.asp
             var c = Math.cos(angle);
@@ -1496,36 +1267,17 @@ var Zia;
             te[2] = xz - wy;
             te[6] = yz + wx;
             te[10] = 1 - (xx + yy);
-            // last column
             te[3] = 0;
             te[7] = 0;
             te[11] = 0;
-            // bottom row
             te[12] = 0;
             te[13] = 0;
             te[14] = 0;
             te[15] = 1;
             return result;
         };
-        /**
-         * Creates an orthographic projection matrix.
-         *
-         * @param {Number} left - The minimum x value of the view volume.
-         * @param {Number} right - The maximum x value of the view volume.
-         * @param {Number} bottom - The minimum y value of the view volume.
-         * @param {Number} top - The maximum y value of the view volume.
-         * @param {Number} near - The minimum z value of the view volume.
-         * @param {Number} far - The maximum z value of the view volume.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createOrthographicOffCenter(
-         *   -100, 100, -40, 40, -100, 100,
-         *   new Zia.Matrix4());
-         */
         Matrix4.createOrthographicOffCenter = function (left, right, bottom, top, near, far, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = result.elements;
             var w = right - left;
             var h = top - bottom;
@@ -1552,6 +1304,7 @@ var Zia;
             return result;
         };
         Matrix4.createPerspectiveOffCenter = function (left, right, bottom, top, near, far, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = result.elements;
             var x = 2 * near / (right - left);
             var y = 2 * near / (top - bottom);
@@ -1578,72 +1331,28 @@ var Zia;
             return result;
         };
         Matrix4.createPerspectiveFieldOfView = function (fieldOfView, aspectRatio, near, far, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var ymax = near * Math.tan(fieldOfView * 0.5);
             var ymin = -ymax;
             var xmin = ymin * aspectRatio;
             var xmax = ymax * aspectRatio;
-            return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
+            return Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
         };
-        /**
-         * Creates a scaling matrix.
-         *
-         * @param {Zia.Vector3} scale - Amounts to scale by on the x, y and z axes.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createScale(
-         *   new Zia.Vector3(1.5, 1, 2),
-         *   new Zia.Matrix4());
-         */
         Matrix4.createScale = function (scale, result) {
+            if (result === void 0) { result = new Matrix4(); }
             return result.set(scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a uniform scaling matrix.
-         *
-         * @param {Number} scale - Amount to scale by on all axes.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createUniformScale(2, new Zia.Matrix4());
-         */
         Matrix4.createUniformScale = function (scale, result) {
+            if (result === void 0) { result = new Matrix4(); }
             return result.set(scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates an identity matrix.
-         *
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createIdentity(new Zia.Matrix4());
-         */
         Matrix4.createIdentity = function (result) {
+            if (result === void 0) { result = new Matrix4(); }
             return result.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         };
         ;
-        /**
-         * Multiplies a matrix by another matrix.
-         *
-         * @param {Zia.Matrix4} left - The first matrix.
-         * @param {Zia.Matrix4} right - The second matrix.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.multiply(
-         *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()),
-         *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4(),
-         *   new Zia.Matrix4());
-         */
         Matrix4.multiply = function (left, right, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var ae = left.elements;
             var be = right.elements;
             var te = result.elements;
@@ -1673,21 +1382,8 @@ var Zia;
             te[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
             return result;
         };
-        /**
-         * Multiplies a matrix by a scalar value.
-         *
-         * @param {Zia.Matrix4} matrix - The matrix.
-         * @param {Number} scalar - The scalar value.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.multiplyByScalar(
-         *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()), 0.5,
-         *   new Zia.Matrix4());
-         */
         Matrix4.multiplyByScalar = function (matrix, scalar, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = matrix.elements;
             var re = result.elements;
             re[0] = te[0] * scalar;
@@ -1708,22 +1404,8 @@ var Zia;
             re[15] = te[15] * scalar;
             return result;
         };
-        /**
-         * Inverts a matrix. If the determinant is zero, then the matrix cannot be
-         * inverted and an exception will be thrown.
-         *
-         * @param {Zia.Matrix4} matrix - The matrix to invert.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.invert(
-         *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()),
-         *   new Zia.Matrix4());
-         */
         Matrix4.invert = function (matrix, result) {
-            // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+            if (result === void 0) { result = new Matrix4(); }
             var te = matrix.elements;
             var me = result.elements;
             var n11 = me[0], n12 = me[4], n13 = me[8], n14 = me[12];
@@ -1750,23 +1432,11 @@ var Zia;
             if (det === 0) {
                 throw new Error("Can't invert matrix, determinant is 0");
             }
-            Zia.Matrix4.multiplyByScalar(result, 1 / det, result);
+            Matrix4.multiplyByScalar(result, 1 / det, result);
             return result;
         };
-        /**
-         * Transposes a matrix.
-         *
-         * @param {Zia.Matrix4} matrix - The matrix to transpose.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.transpose(
-         *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4()),
-         *   new Zia.Matrix4());
-         */
         Matrix4.transpose = function (matrix, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = matrix.elements;
             var re = result.elements;
             var tmp;
@@ -1791,19 +1461,14 @@ var Zia;
             return result;
         };
         ;
-        /**
-         * Gets the translation component of the current transformation matrix.
-         */
         Matrix4.prototype.getTranslation = function (result) {
+            if (result === void 0) { result = new Zia.Vector3(); }
             var te = this.elements;
             result.x = te[12];
             result.y = te[13];
             result.z = te[14];
             return result;
         };
-        /**
-         * Sets the translation component of the current transformation matrix.
-         */
         Matrix4.prototype.setTranslation = function (translation) {
             var te = this.elements;
             te[12] = translation.x;
@@ -1908,11 +1573,9 @@ var Zia;
                 te[6] = b * e;
                 te[10] = bd * f + ac;
             }
-            // last column
             te[3] = 0;
             te[7] = 0;
             te[11] = 0;
-            // bottom row
             te[12] = 0;
             te[13] = 0;
             te[14] = 0;
@@ -1922,12 +1585,6 @@ var Zia;
         Matrix4.prototype.multiply = function (m) {
             return Zia.Matrix4.multiply(this, m, this);
         };
-        /**
-         * Calculates the determinant of the current Matrix4 instance.
-         * @method
-         *
-         * @returns {Number} The determinant.
-         */
         Matrix4.prototype.determinant = function () {
             var te = this.elements;
             var n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
@@ -1959,27 +1616,11 @@ var Zia;
                     - n12 * n21 * n33
                     + n12 * n23 * n31));
         };
-        /**
-         * Duplicates the current Matrix4 instance.
-         * @method
-         *
-         * @param {Zia.Matrix4} result - The object in which to store the result.
-         * @returns {Zia.Matrix4} The modified result parameter.
-         */
         Matrix4.prototype.clone = function (result) {
+            if (result === void 0) { result = new Matrix4(); }
             result.elements.set(this.elements);
             return result;
         };
-        /**
-         * Extracts the scale, rotation, and translation components of the current
-         * Matrix4 instance. Assumes this is a transform matrix.
-         * @method
-         *
-         * @param {Zia.Vector3} scale - The scale component of the transform matrix.
-         * @param {Zia.Quaternion} rotation - The rotation component of the transform matrix.
-         * @param {Zia.Vector3} translation - The translation component of the transform matrix.
-         * @returns {Boolean} True if the matrix can be decomposed, otherwise false.
-         */
         Matrix4.prototype.decompose = function (scale, rotation, translation) {
             var te = this.elements;
             var vector = Matrix4._decomposeVectorTemp;
@@ -1987,7 +1628,6 @@ var Zia;
             var sx = vector.set(te[0], te[1], te[2]).length();
             var sy = vector.set(te[4], te[5], te[6]).length();
             var sz = vector.set(te[8], te[9], te[10]).length();
-            // if determinant is negative, we need to invert one scale
             var det = this.determinant();
             if (det < 0) {
                 sx = -sx;
@@ -1995,8 +1635,7 @@ var Zia;
             translation.x = te[12];
             translation.y = te[13];
             translation.z = te[14];
-            // scale the rotation part
-            matrix.elements.set(this.elements); // at this point matrix is incomplete so we can't use .copy()
+            matrix.elements.set(this.elements);
             var invSX = 1 / sx;
             var invSY = 1 / sy;
             var invSZ = 1 / sz;
@@ -2013,7 +1652,7 @@ var Zia;
             scale.x = sx;
             scale.y = sy;
             scale.z = sz;
-            return true; // TODO: In what situation should we return false?
+            return true;
         };
         Matrix4._composeTemp = new Matrix4();
         Matrix4.createLookAt = (function () {
@@ -2021,13 +1660,14 @@ var Zia;
             var y = new Zia.Vector3();
             var z = new Zia.Vector3();
             return function (eye, target, up, result) {
+                if (result === void 0) { result = new Matrix4(); }
                 var te = result.elements;
-                z.subVectors(eye, target).normalize();
-                x.crossVectors(up, z).normalize();
-                y.crossVectors(z, x);
-                var translateX = x.dot(eye);
-                var translateY = y.dot(eye);
-                var translateZ = z.dot(eye);
+                Zia.Vector3.subtract(eye, target, z).normalize();
+                Zia.Vector3.cross(up, z, x).normalize();
+                Zia.Vector3.cross(z, x, y);
+                var translateX = Zia.Vector3.dot(x, eye);
+                var translateY = Zia.Vector3.dot(y, eye);
+                var translateZ = Zia.Vector3.dot(z, eye);
                 te[0] = x.x;
                 te[4] = x.y;
                 te[8] = x.z;
@@ -2125,10 +1765,7 @@ var Zia;
             return this;
         };
         Vector2.prototype.add = function (v) {
-            this._x += v._x;
-            this._y += v._y;
-            this._onChangeCallback();
-            return this;
+            return Zia.Vector2.add(this, v, this);
         };
         Vector2.prototype.addVectors = function (a, b) {
             this._x = a._x + b._x;
@@ -2142,17 +1779,8 @@ var Zia;
             this._onChangeCallback();
             return this;
         };
-        Vector2.prototype.sub = function (v) {
-            this._x -= v._x;
-            this._y -= v._y;
-            this._onChangeCallback();
-            return this;
-        };
-        Vector2.prototype.subVectors = function (a, b) {
-            this._x = a._x - b._x;
-            this._y = a._y - b._y;
-            this._onChangeCallback();
-            return this;
+        Vector2.prototype.subtract = function (v) {
+            return Zia.Vector2.subtract(this, v, this);
         };
         Vector2.prototype.multiply = function (v) {
             this._x *= v._x;
@@ -2304,6 +1932,21 @@ var Zia;
         Vector2.prototype.toArray = function () {
             return this.toJS();
         };
+        Vector2.add = function (value1, value2, result) {
+            if (result === void 0) { result = new Vector2(); }
+            result._x = value1._x + value2._x;
+            result._y = value1._y + value2._y;
+            result._onChangeCallback();
+            return result;
+        };
+        Vector2.subtract = function (value1, value2, result) {
+            if (result === void 0) { result = new Vector2(); }
+            result._x = value1._x - value2._x;
+            result._y = value1._y - value2._y;
+            result._onChangeCallback();
+            return result;
+        };
+        ;
         Vector2._clampScalarMinTemp = new Vector2();
         Vector2._clampScalarMaxTemp = new Vector2();
         return Vector2;
@@ -2778,7 +2421,7 @@ var Zia;
             }
             for (var i = 0; i < vertexCount; i++) {
                 for (var j = 0; j < arrays.length; j++) {
-                    Array.prototype.push.apply(vertexData, arrays[j][i].toArray());
+                    Array.prototype.push.apply(vertexData, arrays[j][i].toJS());
                 }
             }
             return vertexData;
@@ -2975,44 +2618,47 @@ var Zia;
 //-----------------------------------------------------------------------------
 var Zia;
 (function (Zia) {
+    (function (ProgramDirtyFlags) {
+        ProgramDirtyFlags[ProgramDirtyFlags["ModelViewProj"] = 1] = "ModelViewProj";
+        ProgramDirtyFlags[ProgramDirtyFlags["Model"] = 2] = "Model";
+        ProgramDirtyFlags[ProgramDirtyFlags["EyePosition"] = 4] = "EyePosition";
+        ProgramDirtyFlags[ProgramDirtyFlags["MaterialColor"] = 8] = "MaterialColor";
+        ProgramDirtyFlags[ProgramDirtyFlags["SpecularColor"] = 16] = "SpecularColor";
+        ProgramDirtyFlags[ProgramDirtyFlags["SpecularPower"] = 32] = "SpecularPower";
+        ProgramDirtyFlags[ProgramDirtyFlags["EnvironmentMapAmount"] = 64] = "EnvironmentMapAmount";
+        ProgramDirtyFlags[ProgramDirtyFlags["EnvironmentMapSpecular"] = 128] = "EnvironmentMapSpecular";
+        ProgramDirtyFlags[ProgramDirtyFlags["FresnelFactor"] = 256] = "FresnelFactor";
+        ProgramDirtyFlags[ProgramDirtyFlags["All"] = -1] = "All";
+    })(Zia.ProgramDirtyFlags || (Zia.ProgramDirtyFlags = {}));
+    var ProgramDirtyFlags = Zia.ProgramDirtyFlags;
     Zia.ProgramUtil = {
-        /** Sets up the standard key/fill/back lighting rig. */
         enableDefaultLighting: function (light0, light1, light2) {
-            // Key light.
             light0.direction = new Zia.Vector3(-0.5265408, -0.5735765, -0.6275069);
             light0.diffuseColor = new Zia.Vector3(1, 0.9607844, 0.8078432);
             light0.specularColor = new Zia.Vector3(1, 0.9607844, 0.8078432);
             light0.enabled = true;
-            // Fill light.
             light1.direction = new Zia.Vector3(0.7198464, 0.3420201, 0.6040227);
             light1.diffuseColor = new Zia.Vector3(0.9647059, 0.7607844, 0.4078432);
             light1.specularColor = new Zia.Vector3();
             light1.enabled = true;
-            // Back light.
             light2.direction = new Zia.Vector3(0.4545195, -0.7660444, 0.4545195);
             light2.diffuseColor = new Zia.Vector3(0.3231373, 0.3607844, 0.3937255);
             light2.specularColor = new Zia.Vector3(0.3231373, 0.3607844, 0.3937255);
             light2.enabled = true;
-            // Ambient light.
             return new Zia.Vector3(0.05333332, 0.09882354, 0.1819608);
         },
-        /** Lazily recomputes the model+view+projection matrix based on
-         *  the current effect parameter settings.
-         */
         setModelViewProj: (function () {
             var modelViewProjectionMatrix = new Zia.Matrix4();
             return function (program, dirtyFlags, model, view, projection, modelView) {
-                // Recompute the model+view+projection matrix?
-                if ((dirtyFlags & 1 /* ModelViewProj */) != 0) {
+                if ((dirtyFlags & 1) != 0) {
                     Zia.Matrix4.multiply(view, model, modelView);
                     Zia.Matrix4.multiply(projection, modelView, modelViewProjectionMatrix);
                     program.setUniform('uMVPMatrix', modelViewProjectionMatrix);
-                    dirtyFlags &= ~1 /* ModelViewProj */;
+                    dirtyFlags &= ~1;
                 }
                 return dirtyFlags;
             };
         })(),
-        /** Sets the diffuse/emissive/alpha material color parameters. */
         setMaterialColor: function (program, lightingEnabled, alpha, diffuseColor, emissiveColor, ambientLightColor) {
             // Desired lighting model:
             //
@@ -3050,19 +2696,17 @@ var Zia;
             var viewInverseMatrix = new Zia.Matrix4();
             var eyePosition = new Zia.Vector3();
             return function (program, dirtyFlags, model, view) {
-                // Set the world and world inverse transpose matrices.
-                if ((dirtyFlags & 2 /* Model */) != 0) {
+                if ((dirtyFlags & 2) != 0) {
                     program.setUniform('uMMatrix', model);
                     modelInverseTransposeMatrix.getNormalMatrix(model);
                     program.setUniform('uMMatrixInverseTranspose', modelInverseTransposeMatrix);
-                    dirtyFlags &= ~2 /* Model */;
+                    dirtyFlags &= ~2;
                 }
-                // Set the eye position.
-                if ((dirtyFlags & 4 /* EyePosition */) != 0) {
+                if ((dirtyFlags & 4) != 0) {
                     Zia.Matrix4.invert(viewInverseMatrix, view);
-                    eyePosition.setFromMatrixColumn(3, viewInverseMatrix);
+                    viewInverseMatrix.getTranslation(eyePosition);
                     program.setUniform('uEyePosition', eyePosition);
-                    dirtyFlags &= ~4 /* EyePosition */;
+                    dirtyFlags &= ~4;
                 }
                 return dirtyFlags;
             };
@@ -4052,7 +3696,6 @@ var Zia;
         ];
         var side1 = new Zia.Vector3();
         var side2 = new Zia.Vector3();
-        /** Creates a cube primitive. */
         function createCube(size) {
             if (size === void 0) { size = 1.0; }
             var positions = [];
@@ -4060,16 +3703,13 @@ var Zia;
             var texCoords = [];
             var indices = [];
             size /= 2.0;
-            // Create each face in turn.
             for (var i = 0; i < cubeFaceCount; i++) {
                 var normal = faceNormals[i];
-                // Get two vectors perpendicular both to the face normal and to each other.
                 var basis = (i >= 4) ? new Zia.Vector3(0, 0, 1) : new Zia.Vector3(0, 1, 0);
                 side1.set(normal.x, normal.y, normal.z);
                 Zia.Vector3.cross(side1, basis, side1);
                 side2.set(normal.x, normal.y, normal.z);
                 Zia.Vector3.cross(side2, side1, side2);
-                // Six indices (two triangles) per face.
                 var vbase = i * 4;
                 indices.push(vbase + 0);
                 indices.push(vbase + 2);
@@ -4077,15 +3717,10 @@ var Zia;
                 indices.push(vbase + 0);
                 indices.push(vbase + 3);
                 indices.push(vbase + 2);
-                // Four vertices per face.
-                // (normal - side1 - side2) * size
-                positions.push(normal.clone(new Zia.Vector3()).sub(side1).sub(side2).multiplyScalar(size));
-                // (normal - side1 + side2) * size
-                positions.push(normal.clone(new Zia.Vector3()).sub(side1).add(side2).multiplyScalar(size));
-                // (normal + side1 + side2) * size
+                positions.push(normal.clone(new Zia.Vector3()).subtract(side1).subtract(side2).multiplyScalar(size));
+                positions.push(normal.clone(new Zia.Vector3()).subtract(side1).add(side2).multiplyScalar(size));
                 positions.push(normal.clone(new Zia.Vector3()).add(side1).add(side2).multiplyScalar(size));
-                // (normal + side1 - side2) * size
-                positions.push(normal.clone(new Zia.Vector3()).add(side1).sub(side2).multiplyScalar(size));
+                positions.push(normal.clone(new Zia.Vector3()).add(side1).subtract(side2).multiplyScalar(size));
                 normals.push(normal);
                 normals.push(normal);
                 normals.push(normal);
@@ -4186,17 +3821,14 @@ var Zia;
 (function (Zia) {
     var GeometricPrimitive;
     (function (GeometricPrimitive) {
-        // Computes a point on a unit circle, aligned to the x/z plane and centered on the origin.
         function getCircleVector(i, tessellation) {
             var angle = i * 2.0 * Math.PI / tessellation;
             var dx = Math.sin(angle);
             var dz = Math.cos(angle);
             return new Zia.Vector3(dx, 0, dz);
         }
-        // Helper creates a triangle fan to close the end of a cylinder.
         var createCylinderCapTemp1 = new Zia.Vector3();
         function createCylinderCap(positions, normals, texCoords, indices, tessellation, height, radius, isTop) {
-            // Create cap indices.
             for (var i = 0; i < tessellation - 2; i++) {
                 var i1 = (i + 1) % tessellation;
                 var i2 = (i + 2) % tessellation;
@@ -4208,17 +3840,14 @@ var Zia;
                 indices.push(vbase + i2);
                 indices.push(vbase + i1);
             }
-            // Which end of the cylinder is this?
             var normal = new Zia.Vector3(0, 1, 0);
             var textureScale = new Zia.Vector2(-0.5, -0.5);
             if (!isTop) {
                 normal.negate();
                 textureScale.x = -textureScale.x;
             }
-            // Create cap vertices.
             for (var i = 0; i < tessellation; i++) {
                 var circleVector = getCircleVector(i, tessellation);
-                // (circleVector*radius) + (normal*height)
                 var position = circleVector.clone(new Zia.Vector3()).multiplyScalar(radius);
                 createCylinderCapTemp1.set(normal.x, normal.y, normal.z);
                 createCylinderCapTemp1.multiplyScalar(height);
@@ -4229,7 +3858,6 @@ var Zia;
             }
         }
         var vector2UnitY = new Zia.Vector2(0, 1);
-        /** Creates a cylinder primitive. */
         function createCylinder(height, diameter, tessellation) {
             if (height === void 0) { height = 1.0; }
             if (diameter === void 0) { diameter = 1.0; }
@@ -4245,7 +3873,6 @@ var Zia;
             var topOffset = new Zia.Vector3(0, 1, 0).multiplyScalar(height);
             var radius = diameter / 2;
             var stride = tessellation + 1;
-            // Create a ring of triangles around the outside of the cylinder.
             for (var i = 0; i <= tessellation; i++) {
                 var normal = getCircleVector(i, tessellation);
                 var sideOffset = normal.clone(new Zia.Vector3()).multiplyScalar(radius);
@@ -4253,9 +3880,9 @@ var Zia;
                 positions.push(sideOffset.clone(new Zia.Vector3()).add(topOffset));
                 normals.push(normal);
                 texCoords.push(textureCoordinate);
-                positions.push(sideOffset.clone(new Zia.Vector3()).sub(topOffset));
+                positions.push(sideOffset.clone(new Zia.Vector3()).subtract(topOffset));
                 normals.push(normal);
-                texCoords.push(textureCoordinate.clone().sub(vector2UnitY));
+                texCoords.push(textureCoordinate.clone().subtract(vector2UnitY));
                 indices.push(i * 2);
                 indices.push(i * 2 + 1);
                 indices.push((i * 2 + 2) % (stride * 2));
@@ -4263,7 +3890,6 @@ var Zia;
                 indices.push((i * 2 + 3) % (stride * 2));
                 indices.push((i * 2 + 2) % (stride * 2));
             }
-            // Create flat triangle fan caps to seal the top and bottom.
             createCylinderCap(positions, normals, texCoords, indices, tessellation, height, radius, true);
             createCylinderCap(positions, normals, texCoords, indices, tessellation, height, radius, false);
             return {
@@ -4634,11 +4260,6 @@ var Zia;
 (function (Zia) {
     var GeometricPrimitive;
     (function (GeometricPrimitive) {
-        // The teapot model consists of 10 bezier patches. Each patch has 16 control
-        // points, plus a flag indicating whether it should be mirrored in the Z axis
-        // as well as in X (all of the teapot is symmetrical from left to right, but
-        // only some parts are symmetrical from front to back). The control points
-        // are stored as integer indices into the TeapotControlPoints array.
         var TeapotPatch = (function () {
             function TeapotPatch(mirrorZ, indices) {
                 this.mirrorZ = mirrorZ;
@@ -4646,26 +4267,18 @@ var Zia;
             }
             return TeapotPatch;
         })();
-        // Static data array defines the bezier patches that make up the teapot.
         var teapotPatches = [
-            // Rim.
             new TeapotPatch(true, [102, 103, 104, 105, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
-            // Body.
             new TeapotPatch(true, [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]),
             new TeapotPatch(true, [24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40]),
-            // Lid.
             new TeapotPatch(true, [96, 96, 96, 96, 97, 98, 99, 100, 101, 101, 101, 101, 0, 1, 2, 3]),
             new TeapotPatch(true, [0, 1, 2, 3, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117]),
-            // Handle.
             new TeapotPatch(false, [41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56]),
             new TeapotPatch(false, [53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 28, 65, 66, 67]),
-            // Spout.
             new TeapotPatch(false, [68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83]),
             new TeapotPatch(false, [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]),
-            // Bottom.
             new TeapotPatch(true, [118, 118, 118, 118, 124, 122, 119, 121, 123, 126, 125, 120, 40, 39, 38, 37])
         ];
-        // Static array deines the control point positions that make up the teapot.
         var teapotControlPoints = [
             new Zia.Vector3(0, 0.345, -0.05),
             new Zia.Vector3(-0.028, 0.345, -0.05),
@@ -4795,11 +4408,8 @@ var Zia;
             new Zia.Vector3(-0.21, -0.31125, -0.375),
             new Zia.Vector3(-0.375, -0.31125, -0.21)
         ];
-        // Creates indices for a patch that is tessellated at the specified level.
-        // Calls the specified outputIndex function for each generated index value.
         function createPatchIndices(tessellation, isMirrored, baseIndex) {
             var stride = tessellation + 1;
-            // Make a list of six index values (two triangles).
             var indices = new Array(6);
             var result = [];
             for (var i = 0; i < tessellation; i++) {
@@ -4810,7 +4420,6 @@ var Zia;
                     indices[3] = baseIndex + i * stride + j;
                     indices[5] = baseIndex + (i + 1) * stride + j + 1;
                     indices[4] = baseIndex + i * stride + j + 1;
-                    // If this patch is mirrored, reverse indices to fix the winding order.
                     if (isMirrored) {
                         indices.reverse();
                     }
@@ -4821,10 +4430,6 @@ var Zia;
             }
             return result;
         }
-        // Performs a cubic bezier interpolation between four control points,
-        // returning the value at the specified time (t ranges 0 to 1).
-        // This template implementation can be used to interpolate Zia.Vector3,
-        // float, or any other types that define suitable * and + operators.
         var cubicInterpolateTemp1 = new Zia.Vector3();
         var cubicInterpolateTemp2 = new Zia.Vector3();
         var cubicInterpolateTemp3 = new Zia.Vector3();
@@ -4832,10 +4437,6 @@ var Zia;
         function cubicInterpolate(p1, p2, p3, p4, t) {
             var t2 = t * t;
             var onet2 = (1 - t) * (1 - t);
-            // return p1*(1 - t)*onet2 +
-            //        p2*3*t*onet2 +
-            //        p3*3*t2*(1 - t) +
-            //        p4*t*t2;
             cubicInterpolateTemp1.set(p1.x, p1.y, p1.z).multiplyScalar((1 - t) * onet2);
             cubicInterpolateTemp2.set(p2.x, p2.y, p2.z).multiplyScalar(3 * t * onet2);
             cubicInterpolateTemp3.set(p3.x, p3.y, p3.z).multiplyScalar(3 * t2 * (1 - t));
@@ -4845,18 +4446,12 @@ var Zia;
                 add(cubicInterpolateTemp3).
                 add(cubicInterpolateTemp4);
         }
-        // Computes the tangent of a cubic bezier curve at the specified time.
-        // Template supports Zia.Vector3, float, or any other types with * and + operators.
         var cubicTangentTemp1 = new Zia.Vector3();
         var cubicTangentTemp2 = new Zia.Vector3();
         var cubicTangentTemp3 = new Zia.Vector3();
         var cubicTangentTemp4 = new Zia.Vector3();
         function cubicTangent(p1, p2, p3, p4, t) {
             var t2 = t * t;
-            // return p1*(-1 + 2*t - t2) +
-            //        p2*(1 - 4*t + 3*t2) +
-            //        p3*(2*t - 3*t2) +
-            //        p4*(t2);
             cubicTangentTemp1.set(p1.x, p1.y, p1.z).multiplyScalar(-1 + 2 * t - t2);
             cubicTangentTemp2.set(p2.x, p2.y, p2.z).multiplyScalar(1 - 4 * t + 3 * t2);
             cubicTangentTemp3.set(p3.x, p3.y, p3.z).multiplyScalar(2 * t - 3 * t2);
@@ -4866,80 +4461,51 @@ var Zia;
                 add(cubicTangentTemp3).
                 add(cubicTangentTemp4);
         }
-        // Creates vertices for a patch that is tessellated at the specified level.
-        // Calls the specified outputVertex function for each generated vertex,
-        // passing the position, normal, and texture coordinate as parameters.
         function createPatchVertices(patch, tessellation, isMirrored, positions, normals, textureCoordinates) {
             for (var i = 0; i <= tessellation; i++) {
                 var u = i / tessellation;
                 for (var j = 0; j <= tessellation; j++) {
                     var v = j / tessellation;
-                    // Perform four horizontal bezier interpolations
-                    // between the control points of this patch.
                     var p1 = cubicInterpolate(patch[0], patch[1], patch[2], patch[3], u);
                     var p2 = cubicInterpolate(patch[4], patch[5], patch[6], patch[7], u);
                     var p3 = cubicInterpolate(patch[8], patch[9], patch[10], patch[11], u);
                     var p4 = cubicInterpolate(patch[12], patch[13], patch[14], patch[15], u);
-                    // Perform a vertical interpolation between the results of the
-                    // previous horizontal interpolations, to compute the position.
                     var position = cubicInterpolate(p1, p2, p3, p4, v);
-                    // Perform another four bezier interpolations between the control
-                    // points, but this time vertically rather than horizontally.
                     var q1 = cubicInterpolate(patch[0], patch[4], patch[8], patch[12], v);
                     var q2 = cubicInterpolate(patch[1], patch[5], patch[9], patch[13], v);
                     var q3 = cubicInterpolate(patch[2], patch[6], patch[10], patch[14], v);
                     var q4 = cubicInterpolate(patch[3], patch[7], patch[11], patch[15], v);
-                    // Compute vertical and horizontal tangent vectors.
                     var tangent1 = cubicTangent(p1, p2, p3, p4, v);
                     var tangent2 = cubicTangent(q1, q2, q3, q4, u);
-                    // Cross the two tangent vectors to compute the normal.
-                    var normal = new Zia.Vector3().crossVectors(tangent1, tangent2);
+                    var normal = Zia.Vector3.cross(tangent1, tangent2);
                     if (!normal.nearEqual(new Zia.Vector3(), new Zia.Vector3(1e-7))) {
                         normal.normalize();
-                        // If this patch is mirrored, we must invert the normal.
                         if (isMirrored) {
                             normal.negate();
                         }
                     }
                     else {
-                        // In a tidy and well constructed bezier patch, the preceding
-                        // normal computation will always work. But the classic teapot
-                        // model is not tidy or well constructed! At the top and bottom
-                        // of the teapot, it contains degenerate geometry where a patch
-                        // has several control points in the same place, which causes
-                        // the tangent computation to fail and produce a zero normal.
-                        // We 'fix' these cases by just hard-coding a normal that points
-                        // either straight up or straight down, depending on whether we
-                        // are on the top or bottom of the teapot. This is not a robust
-                        // solution for all possible degenerate bezier patches, but hey,
-                        // it's good enough to make the teapot work correctly!
                         normal.x = 0.0;
                         normal.y = position.y < 0.0 ? -1.0 : 1.0;
                         normal.z = 0.0;
                     }
-                    // Compute the texture coordinate.
                     var mirroredU = isMirrored ? 1 - u : u;
                     var textureCoordinate = new Zia.Vector2(mirroredU, 1 - v);
-                    // Output this vertex.
                     positions.push(position);
                     normals.push(normal);
                     textureCoordinates.push(textureCoordinate);
                 }
             }
         }
-        // Tessellates the specified bezier patch.
         function tessellatePatch(positions, normals, textureCoordinates, indices, patch, tessellation, scale, isMirrored) {
-            // Look up the 16 control points for this patch.
             var controlPoints = new Array(16);
             for (var i = 0; i < 16; i++) {
                 controlPoints[i] = teapotControlPoints[patch.indices[i]].clone(new Zia.Vector3()).multiply(scale);
             }
-            // Create the index data.
             var vbase = positions.length;
             Array.prototype.push.apply(indices, createPatchIndices(tessellation, isMirrored, vbase));
             createPatchVertices(controlPoints, tessellation, isMirrored, positions, normals, textureCoordinates);
         }
-        /** Creates a teapot primitive. */
         function createTeapot(size, tessellation) {
             if (size === void 0) { size = 1.0; }
             if (tessellation === void 0) { tessellation = 8; }
@@ -4958,14 +4524,9 @@ var Zia;
             var scaleNegateXZ = new Zia.Vector3(-size, size, -size);
             for (var i = 0; i < teapotPatches.length; i++) {
                 var patch = teapotPatches[i];
-                // Because the teapot is symmetrical from left to right, we only store
-                // data for one side, then tessellate each patch twice, mirroring in X.
                 tessellatePatch(positions, normals, textureCoordinates, indices, patch, tessellation, scaleVector, false);
                 tessellatePatch(positions, normals, textureCoordinates, indices, patch, tessellation, scaleNegateX, true);
                 if (patch.mirrorZ) {
-                    // Some parts of the teapot (the body, lid, and rim, but not the
-                    // handle or spout) are also symmetrical from front to back, so
-                    // we tessellate them four times, mirroring in Z as well as X.
                     tessellatePatch(positions, normals, textureCoordinates, indices, patch, tessellation, scaleNegateZ, true);
                     tessellatePatch(positions, normals, textureCoordinates, indices, patch, tessellation, scaleNegateXZ, false);
                 }

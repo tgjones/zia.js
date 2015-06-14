@@ -357,7 +357,7 @@ module Zia.GeometricPrimitive {
         var tangent2 = cubicTangent(q1, q2, q3, q4, u);
 
         // Cross the two tangent vectors to compute the normal.
-        var normal = new Zia.Vector3().crossVectors(tangent1, tangent2);
+        var normal = Vector3.cross(tangent1, tangent2);
 
         if (!normal.nearEqual(new Zia.Vector3(), new Zia.Vector3(1e-7))) {
           normal.normalize();

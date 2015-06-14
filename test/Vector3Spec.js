@@ -132,18 +132,18 @@ describe('Zia.Vector3', function() {
     var b = new Zia.Vector3(-x, -y, -z);
     var c = new Zia.Vector3();
 
-    c.copy(a).min(b);
+    Zia.Vector3.min(a.clone(c), b, c);
     expect(c.x).toBe(-x);
     expect(c.y).toBe(-y);
     expect(c.z).toBe(-z);
 
-    c.copy(a).max(b);
+    Zia.Vector3.max(a.clone(c), b, c);
     expect(c.x).toBe(x);
     expect(c.y).toBe(y);
     expect(c.z).toBe(z);
 
     c.set(-2*x, 2*y, -2*z);
-    c.clamp(b, a);
+    Zia.Vector3.clamp(c, b, a, c);
     expect(c.x).toBe(-x);
     expect(c.y).toBe(y);
     expect(c.z).toBe(-z);
@@ -152,7 +152,7 @@ describe('Zia.Vector3', function() {
   it("negate", function() {
     var a = new Zia.Vector3(x, y, z);
 
-    a.negate();
+    Zia.Vector3.negate(a, a);
     expect(a.x).toBe(-x);
     expect(a.y).toBe(-y);
     expect(a.z).toBe(-z);
@@ -163,10 +163,10 @@ describe('Zia.Vector3', function() {
     var b = new Zia.Vector3(-x, -y, -z);
     var c = new Zia.Vector3();
 
-    var result = a.dot(b);
+    var result = Zia.Vector3.dot(a, b);
     expect(result).toBe(-x*x-y*y-z*z);
 
-    result = a.dot(c);
+    result = Zia.Vector3.dot(a, c);
     expect(result).toBe(0);
   });
 
@@ -177,17 +177,17 @@ describe('Zia.Vector3', function() {
     var d = new Zia.Vector3();
 
     expect(a.length()).toBe(x);
-    expect(a.lengthSq()).toBe(x*x);
+    expect(a.lengthSquared()).toBe(x*x);
     expect(b.length()).toBe(y);
-    expect(b.lengthSq()).toBe(y*y);
+    expect(b.lengthSquared()).toBe(y*y);
     expect(c.length()).toBe(z);
-    expect(c.lengthSq()).toBe(z*z);
+    expect(c.lengthSquared()).toBe(z*z);
     expect(d.length()).toBe(0);
-    expect(d.lengthSq()).toBe(0);
+    expect(d.lengthSquared()).toBe(0);
 
     a.set(x, y, z);
     expect(a.length()).toBe(Math.sqrt(x*x + y*y + z*z));
-    expect(a.lengthSq()).toBe(x*x + y*y + z*z);
+    expect(a.lengthSquared()).toBe(x*x + y*y + z*z);
   });
 
   it("normalize", function() {
@@ -195,15 +195,15 @@ describe('Zia.Vector3', function() {
     var b = new Zia.Vector3(0, -y, 0);
     var c = new Zia.Vector3(0, 0, z);
 
-    a.normalize();
+    Zia.Vector3.normalize(a, a);
     expect(a.length()).toBe(1);
     expect(a.x).toBe(1);
 
-    b.normalize();
+    Zia.Vector3.normalize(b, b);
     expect(b.length()).toBe(1);
     expect(b.y).toBe(-1);
 
-    c.normalize();
+    Zia.Vector3.normalize(c, c);
     expect(c.length()).toBe(1);
     expect(c.z).toBe(1);
   });
@@ -214,48 +214,14 @@ describe('Zia.Vector3', function() {
     var c = new Zia.Vector3(0, 0, z);
     var d = new Zia.Vector3();
 
-    expect(a.distanceTo(d)).toBe(x);
-    expect(a.distanceToSquared(d)).toBe(x*x);
+    expect(Zia.Vector3.distance(a, d)).toBe(x);
+    expect(Zia.Vector3.distanceSquared(a, d)).toBe(x*x);
 
-    expect(b.distanceTo(d)).toBe(y);
-    expect(b.distanceToSquared(d)).toBe(y*y);
+    expect(Zia.Vector3.distance(b, d)).toBe(y);
+    expect(Zia.Vector3.distanceSquared(b, d)).toBe(y*y);
 
-    expect(c.distanceTo(d)).toBe(z);
-    expect(c.distanceToSquared(d)).toBe(z*z);
-  });
-
-  it("projectOnVector", function() {
-    var a = new Zia.Vector3(1, 0, 0);
-    var b = new Zia.Vector3();
-    var normal = new Zia.Vector3(10, 0, 0);
-
-    expect(b.copy(a).projectOnVector(normal)).toEqual(new Zia.Vector3(1, 0, 0));
-
-    a.set(0, 1, 0);
-    expect(b.copy(a).projectOnVector(normal)).toEqual(new Zia.Vector3(0, 0, 0));
-
-    a.set(0, 0, -1);
-    expect(b.copy(a).projectOnVector(normal)).toEqual(new Zia.Vector3(0, 0, 0));
-
-    a.set(-1, 0, 0);
-    expect(b.copy(a).projectOnVector(normal)).toEqualVector3(new Zia.Vector3(-1, 0, 0));
-  });
-
-  it("projectOnPlane", function() {
-    var a = new Zia.Vector3(1, 0, 0);
-    var b = new Zia.Vector3();
-    var normal = new Zia.Vector3(1, 0, 0);
-
-    expect(b.copy(a).projectOnPlane(normal)).toEqual(new Zia.Vector3(0, 0, 0));
-
-    a.set(0, 1, 0);
-    expect(b.copy(a).projectOnPlane(normal)).toEqual(new Zia.Vector3(0, 1, 0));
-
-    a.set(0, 0, -1);
-    expect(b.copy(a).projectOnPlane(normal)).toEqual(new Zia.Vector3(0, 0, -1));
-
-    a.set(-1, 0, 0);
-    expect(b.copy(a).projectOnPlane(normal)).toEqual(new Zia.Vector3(0, 0, 0));
+    expect(Zia.Vector3.distance(c, d)).toBe(z);
+    expect(Zia.Vector3.distanceSquared(c, d)).toBe(z*z);
   });
 
   it("reflect", function() {
@@ -264,49 +230,30 @@ describe('Zia.Vector3', function() {
     var b = new Zia.Vector3();
 
     a.set(0, -1, 0);
-    expect(b.copy(a).reflect(normal)).toEqual(new Zia.Vector3(0, 1, 0));
+    expect(Zia.Vector3.reflect(a.clone(b), normal)).toEqual(new Zia.Vector3(0, 1, 0));
 
     a.set(1, -1, 0);
-    expect(b.copy(a).reflect(normal)).toEqual(new Zia.Vector3(1, 1, 0));
+    expect(Zia.Vector3.reflect(a.clone(b), normal)).toEqual(new Zia.Vector3(1, 1, 0));
 
     a.set(1, -1, 0);
     normal.set(0, -1, 0);
-    expect(b.copy(a).reflect(normal)).toEqual(new Zia.Vector3(1, 1, 0));
-  });
-
-  it("angleTo", function() {
-    var a = new Zia.Vector3( 0, -0.18851655680720186, 0.9820700116639124 );
-    var b = new Zia.Vector3( 0, 0.18851655680720186, -0.9820700116639124 );
-
-    expect(a.angleTo(a)).toBe(0);
-    expect(a.angleTo(b)).toBe(Math.PI);
-
-    var x = new Zia.Vector3(1, 0, 0);
-    var y = new Zia.Vector3(0, 1, 0);
-    var z = new Zia.Vector3(0, 0, 1);
-
-    expect(x.angleTo(y)).toBe(Math.PI / 2);
-    expect(x.angleTo(z)).toBe(Math.PI / 2);
-    expect(z.angleTo(x)).toBe(Math.PI / 2);
-
-    expect(Math.abs(x.angleTo(new Zia.Vector3(1, 1, 0)) - (Math.PI / 4)))
-      .toBeLessThan(0.0000001);
+    expect(Zia.Vector3.reflect(a.clone(b), normal)).toEqual(new Zia.Vector3(1, 1, 0));
   });
 
   it("lerp/clone", function() {
     var a = new Zia.Vector3(x, 0, z);
     var b = new Zia.Vector3(0, -y, 0);
 
-    expect(a.lerp(a, 0)).toEqual(a.lerp(a, 0.5));
-    expect(a.lerp(a, 0)).toEqual(a.lerp(a, 1));
+    expect(Zia.Vector3.lerp(a, a, 0)).toEqual(Zia.Vector3.lerp(a, a, 0.5));
+    expect(Zia.Vector3.lerp(a, a, 0)).toEqual(Zia.Vector3.lerp(a, a, 1));
 
-    expect(a.clone(new Zia.Vector3()).lerp(b, 0)).toEqual(a);
+    expect(Zia.Vector3.lerp(a.clone(), b, 0)).toEqual(a);
 
-    expect(a.clone(new Zia.Vector3()).lerp(b, 0.5).x).toEqual(x*0.5);
-    expect(a.clone(new Zia.Vector3()).lerp(b, 0.5).y).toEqual(-y*0.5);
-    expect(a.clone(new Zia.Vector3()).lerp(b, 0.5).z).toEqual(z*0.5);
+    expect(Zia.Vector3.lerp(a.clone(), b, 0.5).x).toEqual(x*0.5);
+    expect(Zia.Vector3.lerp(a.clone(), b, 0.5).y).toEqual(-y*0.5);
+    expect(Zia.Vector3.lerp(a.clone(), b, 0.5).z).toEqual(z*0.5);
 
-    expect(a.clone(new Zia.Vector3()).lerp(b, 1)).toEqual(b);
+    expect(Zia.Vector3.lerp(a.clone(), b, 1)).toEqual(b);
   });
 
   it("equals", function() {
@@ -320,7 +267,7 @@ describe('Zia.Vector3', function() {
     expect(a.equals(b)).toBe(false);
     expect(b.equals(a)).toBe(false);
 
-    a.copy(b);
+    b.clone(a);
     expect(a.x).toEqual(b.x);
     expect(a.y).toEqual(b.y);
     expect(a.z).toEqual(b.z);

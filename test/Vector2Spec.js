@@ -81,20 +81,20 @@ describe('Zia.Vector2', function() {
     expect(a.x).toBe(0);
     expect(a.y).toBe(0);
 
-    var c = new Zia.Vector2().addVectors( b, b );
+    var c = Zia.Vector2.add( b, b );
     expect(c.x).toBe(-2*x);
     expect(c.y).toBe(-2*y);
   });
 
-  it("sub", function() {
+  it("subtract", function() {
     var a = new Zia.Vector2( x, y );
     var b = new Zia.Vector2( -x, -y );
 
-    a.sub( b );
+    a.subtract( b );
     expect(a.x).toBe(2*x);
     expect(a.y).toBe(2*y);
 
-    var c = new Zia.Vector2().subVectors( a, a );
+    var c = Zia.Vector2.subtract( a, a );
     expect(c.x).toBe(0);
     expect(c.y).toBe(0);
   });

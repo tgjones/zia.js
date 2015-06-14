@@ -1,6 +1,6 @@
 module Zia.GeometricPrimitive {
   export interface IVector {
-    toArray: () => number[];
+    toJS: () => number[];
   }
 
   export function mergeVertexData(...arrays: IVector[][]) {
@@ -19,7 +19,7 @@ module Zia.GeometricPrimitive {
 
     for (var i = 0; i < vertexCount; i++) {
       for (var j = 0; j < arrays.length; j++) {
-        Array.prototype.push.apply(vertexData, arrays[j][i].toArray());
+        Array.prototype.push.apply(vertexData, arrays[j][i].toJS());
       }
     }
 

@@ -240,16 +240,16 @@ module Zia {
       var y = new Zia.Vector3();
       var z = new Zia.Vector3();
 
-      return function(eye: Vector3, target: Vector3, up: Vector3, result: Matrix4) {
+      return function(eye: Vector3, target: Vector3, up: Vector3, result = new Matrix4()) {
         var te = result.elements;
 
-        z.subVectors(eye, target).normalize();
-        x.crossVectors(up, z).normalize();
-        y.crossVectors(z, x);
+        Vector3.subtract(eye, target, z).normalize();
+        Vector3.cross(up, z, x).normalize();
+        Vector3.cross(z, x, y);
 
-        var translateX = x.dot(eye);
-        var translateY = y.dot(eye);
-        var translateZ = z.dot(eye);
+        var translateX = Vector3.dot(x, eye);
+        var translateY = Vector3.dot(y, eye);
+        var translateZ = Vector3.dot(z, eye);
 
         te[0] = x.x; te[4] = x.y; te[8] = x.z;  te[12] = -translateX;
         te[1] = y.x; te[5] = y.y; te[9] = y.z;  te[13] = -translateY;
@@ -278,7 +278,7 @@ module Zia {
      *   -100, 100, -40, 40, -100, 100,
      *   new Zia.Matrix4());
      */
-    static createOrthographicOffCenter(left: number, right: number, bottom: number, top: number, near: number, far: number, result: Matrix4) {
+    static createOrthographicOffCenter(left: number, right: number, bottom: number, top: number, near: number, far: number, result = new Matrix4()) {
       var te = result.elements;
       var w = right - left;
       var h = top - bottom;
@@ -296,7 +296,7 @@ module Zia {
       return result;
     }
 
-    static createPerspectiveOffCenter(left: number, right: number, bottom: number, top: number, near: number, far: number, result: Matrix4) {
+    static createPerspectiveOffCenter(left: number, right: number, bottom: number, top: number, near: number, far: number, result = new Matrix4()) {
       var te = result.elements;
       var x = 2 * near / ( right - left );
       var y = 2 * near / ( top - bottom );
@@ -314,12 +314,12 @@ module Zia {
       return result;
     }
 
-    static createPerspectiveFieldOfView(fieldOfView: number, aspectRatio: number, near: number, far: number, result: Matrix4) {
+    static createPerspectiveFieldOfView(fieldOfView: number, aspectRatio: number, near: number, far: number, result = new Matrix4()) {
       var ymax = near * Math.tan(fieldOfView * 0.5);
       var ymin = -ymax;
       var xmin = ymin * aspectRatio;
       var xmax = ymax * aspectRatio;
-      return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
+      return Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
     }
 
     /**
@@ -335,7 +335,7 @@ module Zia {
      *   new Zia.Vector3(1.5, 1, 2),
      *   new Zia.Matrix4());
      */
-    static createScale(scale: Vector3, result: Matrix4) {
+    static createScale(scale: Vector3, result = new Matrix4()) {
       return result.set(
         scale.x, 0,       0,       0,
         0,       scale.y, 0,       0,
@@ -355,7 +355,7 @@ module Zia {
      * @example
      * var result = Zia.Matrix4.createUniformScale(2, new Zia.Matrix4());
      */
-    static createUniformScale(scale: number, result: Matrix4) {
+    static createUniformScale(scale: number, result = new Matrix4()) {
       return result.set(
         scale, 0,     0,     0,
         0,     scale, 0,     0,
@@ -374,7 +374,7 @@ module Zia {
      * @example
      * var result = Zia.Matrix4.createIdentity(new Zia.Matrix4());
      */
-    static createIdentity(result: Matrix4) {
+    static createIdentity(result = new Matrix4()) {
       return result.set(
         1, 0, 0, 0,
         0, 1, 0, 0,
@@ -398,7 +398,7 @@ module Zia {
      *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4(),
      *   new Zia.Matrix4());
      */
-    static multiply(left: Matrix4, right: Matrix4, result: Matrix4) {
+    static multiply(left: Matrix4, right: Matrix4, result = new Matrix4()) {
       var ae = left.elements;
       var be = right.elements;
       var te = result.elements;
@@ -450,7 +450,7 @@ module Zia {
      *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()), 0.5,
      *   new Zia.Matrix4());
      */
-    static multiplyByScalar(matrix: Matrix4, scalar: number, result: Matrix4) {
+    static multiplyByScalar(matrix: Matrix4, scalar: number, result = new Matrix4()) {
       var te = matrix.elements;
       var re = result.elements;
 
@@ -488,7 +488,7 @@ module Zia {
      *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()),
      *   new Zia.Matrix4());
      */
-    static invert(matrix: Matrix4, result: Matrix4) {
+    static invert(matrix: Matrix4, result = new Matrix4()) {
       // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
       var te = matrix.elements;
       var me = result.elements;
@@ -521,7 +521,7 @@ module Zia {
         throw new Error("Can't invert matrix, determinant is 0");
       }
 
-      Zia.Matrix4.multiplyByScalar(result, 1 / det, result);
+      Matrix4.multiplyByScalar(result, 1 / det, result);
 
       return result;
     }
@@ -539,7 +539,7 @@ module Zia {
      *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4()),
      *   new Zia.Matrix4());
      */
-    static transpose(matrix: Matrix4, result: Matrix4) {
+    static transpose(matrix: Matrix4, result = new Matrix4()) {
       var te = matrix.elements;
       var re = result.elements;
       var tmp: number;
@@ -558,7 +558,7 @@ module Zia {
     /**
      * Gets the translation component of the current transformation matrix.
      */
-    getTranslation(result: Vector3) {
+    getTranslation(result = new Vector3()) {
       var te = this.elements;
       result.x = te[12];
       result.y = te[13];
@@ -766,7 +766,7 @@ module Zia {
      * @param {Zia.Matrix4} result - The object in which to store the result.
      * @returns {Zia.Matrix4} The modified result parameter.
      */
-    clone(result: Matrix4) {
+    clone(result = new Matrix4()) {
       result.elements.set(this.elements);
       return result;
     }

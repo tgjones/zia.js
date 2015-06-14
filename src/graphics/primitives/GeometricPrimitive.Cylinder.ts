@@ -161,9 +161,9 @@ module Zia.GeometricPrimitive {
       normals.push(normal);
       texCoords.push(textureCoordinate);
 
-      positions.push(sideOffset.clone(new Vector3()).sub(topOffset));
+      positions.push(sideOffset.clone(new Vector3()).subtract(topOffset));
       normals.push(normal);
-      texCoords.push(textureCoordinate.clone().sub(vector2UnitY));
+      texCoords.push(textureCoordinate.clone().subtract(vector2UnitY));
 
       indices.push(i*2);
       indices.push(i*2 + 1);

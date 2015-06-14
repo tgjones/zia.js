@@ -115,13 +115,13 @@ module Zia {
     },
 
     setLightingMatrices: (function() {
-      var modelInverseTransposeMatrix = new Zia.Matrix3();
-      var viewInverseMatrix = new Zia.Matrix4();
-      var eyePosition = new Zia.Vector3();
+      var modelInverseTransposeMatrix = new Matrix3();
+      var viewInverseMatrix = new Matrix4();
+      var eyePosition = new Vector3();
 
       return function(program: Program, dirtyFlags: ProgramDirtyFlags, model: Matrix4, view: Matrix4) {
         // Set the world and world inverse transpose matrices.
-        if ((dirtyFlags & Zia.ProgramDirtyFlags.Model) != 0) {
+        if ((dirtyFlags & ProgramDirtyFlags.Model) != 0) {
           program.setUniform('uMMatrix', model);
 
           modelInverseTransposeMatrix.getNormalMatrix(model);
@@ -132,8 +132,8 @@ module Zia {
 
         // Set the eye position.
         if ((dirtyFlags & Zia.ProgramDirtyFlags.EyePosition) != 0) {
-          Zia.Matrix4.invert(viewInverseMatrix, view);
-          eyePosition.setFromMatrixColumn(3, viewInverseMatrix);
+          Matrix4.invert(viewInverseMatrix, view);
+          viewInverseMatrix.getTranslation(eyePosition);
           program.setUniform('uEyePosition', eyePosition);
 
           dirtyFlags &= ~Zia.ProgramDirtyFlags.EyePosition;

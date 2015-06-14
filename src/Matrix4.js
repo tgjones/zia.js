@@ -26,36 +26,7 @@
  */
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 4x4 matrix. The elements are stored in a `Float32Array`
-     * in column-major order to optimise handoff to WebGL.
-     */
     var Matrix4 = (function () {
-        /**
-         * Constructs a new 4x4 matrix. Parameters are supplied in row-major order
-         * to aid readability. If called with no parameters, all matrix elements are
-         * initialised to 0. If called with any parameters, make sure you supply
-         * all 16 values.
-         *
-         * @summary Constructs a new 4x4 matrix.
-         *
-         * @param m11 The value for row 0, column 0.
-         * @param m12 The value for row 0, column 1.
-         * @param m13 The value for row 0, column 2.
-         * @param m14 The value for row 0, column 3.
-         * @param m21 The value for row 1, column 0.
-         * @param m22 The value for row 1, column 1.
-         * @param m23 The value for row 1, column 2.
-         * @param m24 The value for row 1, column 3.
-         * @param m31 The value for row 2, column 0.
-         * @param m32 The value for row 2, column 1.
-         * @param m33 The value for row 2, column 2.
-         * @param m34 The value for row 2, column 3.
-         * @param m41 The value for row 3, column 0.
-         * @param m42 The value for row 3, column 1.
-         * @param m43 The value for row 3, column 2.
-         * @param m44 The value for row 3, column 3.
-         */
         function Matrix4(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) {
             if (m11 === void 0) { m11 = 0.0; }
             if (m12 === void 0) { m12 = 0.0; }
@@ -87,81 +58,21 @@ var Zia;
             result.setTranslation(translation);
             return result;
         };
-        /**
-         * Creates a matrix that can be used to translate vectors.
-         *
-         * @param translation - Amounts to translate by on the x, y and z axes.
-         * @param result - The object in which to place the calculated result.
-         *
-         * @returns The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createTranslation(
-         *   new Zia.Vector3(1, 2, -5),
-         *   new Zia.Matrix4());
-         */
         Matrix4.createTranslation = function (translation, result) {
             return result.set(1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around the x-axis.
-         *
-         * @param {Number} angle - The amount, in radians, by which to rotate around the x-axis.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4());
-         */
         Matrix4.createRotationX = function (angle, result) {
             var c = Math.cos(angle), s = Math.sin(angle);
             return result.set(1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around the y-axis.
-         *
-         * @param {Number} angle - The amount, in radians, by which to rotate around the y-axis.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createRotationY(Math.PI, new Zia.Matrix4());
-         */
         Matrix4.createRotationY = function (angle, result) {
             var c = Math.cos(angle), s = Math.sin(angle);
             return result.set(c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around the z-axis.
-         *
-         * @param {Number} angle - The amount, in radians, by which to rotate around the z-axis.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createRotationZ(Math.PI, new Zia.Matrix4());
-         */
         Matrix4.createRotationZ = function (angle, result) {
             var c = Math.cos(angle), s = Math.sin(angle);
             return result.set(c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a matrix that can be used to rotate vectors around an arbitrary axis.
-         *
-         * @param {Zia.Vector3} axis - The axis to rotate around.
-         * @param {Number} angle - The amount, in radians, by which to rotate around the vector.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createFromAxisAngle(
-         *   new Zia.Vector3(1, 0, 1).normalize(), Math.PI,
-         *   new Zia.Matrix4());
-         */
         Matrix4.createFromAxisAngle = function (axis, angle, result) {
             // Based on http://www.gamedev.net/reference/articles/article1199.asp
             var c = Math.cos(angle);
@@ -187,36 +98,17 @@ var Zia;
             te[2] = xz - wy;
             te[6] = yz + wx;
             te[10] = 1 - (xx + yy);
-            // last column
             te[3] = 0;
             te[7] = 0;
             te[11] = 0;
-            // bottom row
             te[12] = 0;
             te[13] = 0;
             te[14] = 0;
             te[15] = 1;
             return result;
         };
-        /**
-         * Creates an orthographic projection matrix.
-         *
-         * @param {Number} left - The minimum x value of the view volume.
-         * @param {Number} right - The maximum x value of the view volume.
-         * @param {Number} bottom - The minimum y value of the view volume.
-         * @param {Number} top - The maximum y value of the view volume.
-         * @param {Number} near - The minimum z value of the view volume.
-         * @param {Number} far - The maximum z value of the view volume.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createOrthographicOffCenter(
-         *   -100, 100, -40, 40, -100, 100,
-         *   new Zia.Matrix4());
-         */
         Matrix4.createOrthographicOffCenter = function (left, right, bottom, top, near, far, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = result.elements;
             var w = right - left;
             var h = top - bottom;
@@ -243,6 +135,7 @@ var Zia;
             return result;
         };
         Matrix4.createPerspectiveOffCenter = function (left, right, bottom, top, near, far, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = result.elements;
             var x = 2 * near / (right - left);
             var y = 2 * near / (top - bottom);
@@ -269,72 +162,28 @@ var Zia;
             return result;
         };
         Matrix4.createPerspectiveFieldOfView = function (fieldOfView, aspectRatio, near, far, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var ymax = near * Math.tan(fieldOfView * 0.5);
             var ymin = -ymax;
             var xmin = ymin * aspectRatio;
             var xmax = ymax * aspectRatio;
-            return Zia.Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
+            return Matrix4.createPerspectiveOffCenter(xmin, xmax, ymin, ymax, near, far, result);
         };
-        /**
-         * Creates a scaling matrix.
-         *
-         * @param {Zia.Vector3} scale - Amounts to scale by on the x, y and z axes.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createScale(
-         *   new Zia.Vector3(1.5, 1, 2),
-         *   new Zia.Matrix4());
-         */
         Matrix4.createScale = function (scale, result) {
+            if (result === void 0) { result = new Matrix4(); }
             return result.set(scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates a uniform scaling matrix.
-         *
-         * @param {Number} scale - Amount to scale by on all axes.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createUniformScale(2, new Zia.Matrix4());
-         */
         Matrix4.createUniformScale = function (scale, result) {
+            if (result === void 0) { result = new Matrix4(); }
             return result.set(scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, 1);
         };
-        /**
-         * Creates an identity matrix.
-         *
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.createIdentity(new Zia.Matrix4());
-         */
         Matrix4.createIdentity = function (result) {
+            if (result === void 0) { result = new Matrix4(); }
             return result.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         };
         ;
-        /**
-         * Multiplies a matrix by another matrix.
-         *
-         * @param {Zia.Matrix4} left - The first matrix.
-         * @param {Zia.Matrix4} right - The second matrix.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.multiply(
-         *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()),
-         *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4(),
-         *   new Zia.Matrix4());
-         */
         Matrix4.multiply = function (left, right, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var ae = left.elements;
             var be = right.elements;
             var te = result.elements;
@@ -364,21 +213,8 @@ var Zia;
             te[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
             return result;
         };
-        /**
-         * Multiplies a matrix by a scalar value.
-         *
-         * @param {Zia.Matrix4} matrix - The matrix.
-         * @param {Number} scalar - The scalar value.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.multiplyByScalar(
-         *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()), 0.5,
-         *   new Zia.Matrix4());
-         */
         Matrix4.multiplyByScalar = function (matrix, scalar, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = matrix.elements;
             var re = result.elements;
             re[0] = te[0] * scalar;
@@ -399,22 +235,8 @@ var Zia;
             re[15] = te[15] * scalar;
             return result;
         };
-        /**
-         * Inverts a matrix. If the determinant is zero, then the matrix cannot be
-         * inverted and an exception will be thrown.
-         *
-         * @param {Zia.Matrix4} matrix - The matrix to invert.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.invert(
-         *   Zia.Matrix4.createUniformScale(2, new Zia.Matrix4()),
-         *   new Zia.Matrix4());
-         */
         Matrix4.invert = function (matrix, result) {
-            // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+            if (result === void 0) { result = new Matrix4(); }
             var te = matrix.elements;
             var me = result.elements;
             var n11 = me[0], n12 = me[4], n13 = me[8], n14 = me[12];
@@ -441,23 +263,11 @@ var Zia;
             if (det === 0) {
                 throw new Error("Can't invert matrix, determinant is 0");
             }
-            Zia.Matrix4.multiplyByScalar(result, 1 / det, result);
+            Matrix4.multiplyByScalar(result, 1 / det, result);
             return result;
         };
-        /**
-         * Transposes a matrix.
-         *
-         * @param {Zia.Matrix4} matrix - The matrix to transpose.
-         * @param {Zia.Matrix4} result - The object in which to place the calculated result.
-         *
-         * @returns {Zia.Matrix4} The modified result parameter.
-         *
-         * @example
-         * var result = Zia.Matrix4.transpose(
-         *   Zia.Matrix4.createRotationX(Math.PI, new Zia.Matrix4()),
-         *   new Zia.Matrix4());
-         */
         Matrix4.transpose = function (matrix, result) {
+            if (result === void 0) { result = new Matrix4(); }
             var te = matrix.elements;
             var re = result.elements;
             var tmp;
@@ -482,19 +292,14 @@ var Zia;
             return result;
         };
         ;
-        /**
-         * Gets the translation component of the current transformation matrix.
-         */
         Matrix4.prototype.getTranslation = function (result) {
+            if (result === void 0) { result = new Zia.Vector3(); }
             var te = this.elements;
             result.x = te[12];
             result.y = te[13];
             result.z = te[14];
             return result;
         };
-        /**
-         * Sets the translation component of the current transformation matrix.
-         */
         Matrix4.prototype.setTranslation = function (translation) {
             var te = this.elements;
             te[12] = translation.x;
@@ -599,11 +404,9 @@ var Zia;
                 te[6] = b * e;
                 te[10] = bd * f + ac;
             }
-            // last column
             te[3] = 0;
             te[7] = 0;
             te[11] = 0;
-            // bottom row
             te[12] = 0;
             te[13] = 0;
             te[14] = 0;
@@ -613,12 +416,6 @@ var Zia;
         Matrix4.prototype.multiply = function (m) {
             return Zia.Matrix4.multiply(this, m, this);
         };
-        /**
-         * Calculates the determinant of the current Matrix4 instance.
-         * @method
-         *
-         * @returns {Number} The determinant.
-         */
         Matrix4.prototype.determinant = function () {
             var te = this.elements;
             var n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
@@ -650,27 +447,11 @@ var Zia;
                     - n12 * n21 * n33
                     + n12 * n23 * n31));
         };
-        /**
-         * Duplicates the current Matrix4 instance.
-         * @method
-         *
-         * @param {Zia.Matrix4} result - The object in which to store the result.
-         * @returns {Zia.Matrix4} The modified result parameter.
-         */
         Matrix4.prototype.clone = function (result) {
+            if (result === void 0) { result = new Matrix4(); }
             result.elements.set(this.elements);
             return result;
         };
-        /**
-         * Extracts the scale, rotation, and translation components of the current
-         * Matrix4 instance. Assumes this is a transform matrix.
-         * @method
-         *
-         * @param {Zia.Vector3} scale - The scale component of the transform matrix.
-         * @param {Zia.Quaternion} rotation - The rotation component of the transform matrix.
-         * @param {Zia.Vector3} translation - The translation component of the transform matrix.
-         * @returns {Boolean} True if the matrix can be decomposed, otherwise false.
-         */
         Matrix4.prototype.decompose = function (scale, rotation, translation) {
             var te = this.elements;
             var vector = Matrix4._decomposeVectorTemp;
@@ -678,7 +459,6 @@ var Zia;
             var sx = vector.set(te[0], te[1], te[2]).length();
             var sy = vector.set(te[4], te[5], te[6]).length();
             var sz = vector.set(te[8], te[9], te[10]).length();
-            // if determinant is negative, we need to invert one scale
             var det = this.determinant();
             if (det < 0) {
                 sx = -sx;
@@ -686,8 +466,7 @@ var Zia;
             translation.x = te[12];
             translation.y = te[13];
             translation.z = te[14];
-            // scale the rotation part
-            matrix.elements.set(this.elements); // at this point matrix is incomplete so we can't use .copy()
+            matrix.elements.set(this.elements);
             var invSX = 1 / sx;
             var invSY = 1 / sy;
             var invSZ = 1 / sz;
@@ -704,7 +483,7 @@ var Zia;
             scale.x = sx;
             scale.y = sy;
             scale.z = sz;
-            return true; // TODO: In what situation should we return false?
+            return true;
         };
         Matrix4._composeTemp = new Matrix4();
         Matrix4.createLookAt = (function () {
@@ -712,13 +491,14 @@ var Zia;
             var y = new Zia.Vector3();
             var z = new Zia.Vector3();
             return function (eye, target, up, result) {
+                if (result === void 0) { result = new Matrix4(); }
                 var te = result.elements;
-                z.subVectors(eye, target).normalize();
-                x.crossVectors(up, z).normalize();
-                y.crossVectors(z, x);
-                var translateX = x.dot(eye);
-                var translateY = y.dot(eye);
-                var translateZ = z.dot(eye);
+                Zia.Vector3.subtract(eye, target, z).normalize();
+                Zia.Vector3.cross(up, z, x).normalize();
+                Zia.Vector3.cross(z, x, y);
+                var translateX = Zia.Vector3.dot(x, eye);
+                var translateY = Zia.Vector3.dot(y, eye);
+                var translateZ = Zia.Vector3.dot(z, eye);
                 te[0] = x.x;
                 te[4] = x.y;
                 te[8] = x.z;
