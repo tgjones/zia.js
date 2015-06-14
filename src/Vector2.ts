@@ -296,5 +296,9 @@ module Zia {
     toJS() {
       return [ this._x, this._y ];
     }
+
+    toArray() {
+      return this.toJS();
+    }
   }
 }

@@ -1,5 +1,5 @@
 module Zia {
-  export const enum TextureWrap {
+  export enum TextureWrap {
     Repeat = 0,
     ClampToEdge = 1,
     MirroredRepeat = 2

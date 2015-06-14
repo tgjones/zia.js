@@ -1,15 +1,22 @@
 var Zia;
 (function (Zia) {
-    /**
-     * Main class in Zia. Manages the WebGL rendering context and associated state,
-     * and performs rendering.
-     */
+    (function (ClearOptions) {
+        ClearOptions[ClearOptions["DepthBuffer"] = 0] = "DepthBuffer";
+        ClearOptions[ClearOptions["StencilBuffer"] = 1] = "StencilBuffer";
+        ClearOptions[ClearOptions["ColorBuffer"] = 2] = "ColorBuffer";
+    })(Zia.ClearOptions || (Zia.ClearOptions = {}));
+    var ClearOptions = Zia.ClearOptions;
+    (function (PrimitiveType) {
+        PrimitiveType[PrimitiveType["PointList"] = 0] = "PointList";
+        PrimitiveType[PrimitiveType["LineList"] = 1] = "LineList";
+        PrimitiveType[PrimitiveType["LineStrip"] = 2] = "LineStrip";
+        PrimitiveType[PrimitiveType["LineLoop"] = 3] = "LineLoop";
+        PrimitiveType[PrimitiveType["TriangleList"] = 4] = "TriangleList";
+        PrimitiveType[PrimitiveType["TriangleStrip"] = 5] = "TriangleStrip";
+        PrimitiveType[PrimitiveType["TriangleFan"] = 6] = "TriangleFan";
+    })(Zia.PrimitiveType || (Zia.PrimitiveType = {}));
+    var PrimitiveType = Zia.PrimitiveType;
     var GraphicsDevice = (function () {
-        /**
-         * Constructs a new `GraphicsDevice` object.
-         *
-         * @param canvas - The canvas element.
-         */
         function GraphicsDevice(canvas, debug) {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
@@ -20,7 +27,6 @@ var Zia;
             if (debug) {
                 gl = this.gl = Zia.DebugUtil.makeDebugContext(gl);
             }
-            // TODO: Handle WebContextLost event.
             var viewport = this._viewport = new Zia.Viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
             viewport.onChange(function () {
                 gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
@@ -60,15 +66,15 @@ var Zia;
         });
         GraphicsDevice.prototype.clear = function (clearOptions, color, depth, stencil) {
             var clearMask = 0;
-            if (Zia.EnumUtil.hasFlag(clearOptions, 0 /* DepthBuffer */)) {
+            if (Zia.EnumUtil.hasFlag(clearOptions, Zia.ClearOptions.DepthBuffer)) {
                 clearMask |= this.gl.DEPTH_BUFFER_BIT;
                 this.gl.clearDepth(depth);
             }
-            if (Zia.EnumUtil.hasFlag(clearOptions, 1 /* StencilBuffer */)) {
+            if (Zia.EnumUtil.hasFlag(clearOptions, Zia.ClearOptions.StencilBuffer)) {
                 clearMask |= this.gl.STENCIL_BUFFER_BIT;
                 this.gl.clearStencil(stencil);
             }
-            if (Zia.EnumUtil.hasFlag(clearOptions, 2 /* ColorBuffer */)) {
+            if (Zia.EnumUtil.hasFlag(clearOptions, Zia.ClearOptions.ColorBuffer)) {
                 clearMask |= this.gl.COLOR_BUFFER_BIT;
                 this.gl.clearColor(color.r, color.g, color.b, color.a);
             }
@@ -146,13 +152,13 @@ var Zia;
         };
         GraphicsDevice.prototype._getMode = function (primitiveType) {
             switch (primitiveType) {
-                case 0 /* PointList */: return this.gl.POINTS;
-                case 1 /* LineList */: return this.gl.LINES;
-                case 2 /* LineStrip */: return this.gl.LINE_STRIP;
-                case 3 /* LineLoop */: return this.gl.LINE_LOOP;
-                case 4 /* TriangleList */: return this.gl.TRIANGLES;
-                case 5 /* TriangleStrip */: return this.gl.TRIANGLE_STRIP;
-                case 6 /* TriangleFan */: return this.gl.TRIANGLE_FAN;
+                case PrimitiveType.PointList: return this.gl.POINTS;
+                case PrimitiveType.LineList: return this.gl.LINES;
+                case PrimitiveType.LineStrip: return this.gl.LINE_STRIP;
+                case PrimitiveType.LineLoop: return this.gl.LINE_LOOP;
+                case PrimitiveType.TriangleList: return this.gl.TRIANGLES;
+                case PrimitiveType.TriangleStrip: return this.gl.TRIANGLE_STRIP;
+                case PrimitiveType.TriangleFan: return this.gl.TRIANGLE_FAN;
             }
         };
         return GraphicsDevice;

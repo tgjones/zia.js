@@ -23,7 +23,6 @@ var Zia;
                 if (value === this._program)
                     return;
                 if (this._program) {
-                    // First check to see if any other parts are using this program.
                     var removeProgram = true;
                     for (var i = 0; i < this._parent.meshParts.length; i++) {
                         var meshPart = this._parent.meshParts[i];
@@ -39,9 +38,8 @@ var Zia;
                         }
                     }
                 }
-                // Set the new program.
                 this._program = value;
-                this._parent.programs.push(value); // TODO: Check for duplicates?
+                this._parent.programs.push(value);
             },
             enumerable: true,
             configurable: true

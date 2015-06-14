@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    
+
   var canvas = document.getElementById('mainCanvas');
-  
+
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
   var program = new Zia.BasicProgram(graphicsDevice, {
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.top = '0px';
   canvas.parentElement.appendChild(stats.domElement);
-  
+
   function drawScene() {
     stats.begin();
 
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
       new Zia.Color4(0.4, 0.4, 0.4, 1), 1);
 
     Zia.Matrix4.createRotationY(
-      Zia.Math.degToRad(rotationAngle),
+      Zia.MathUtil.degToRad(rotationAngle),
       modelMatrix);
     cubeModel.draw(modelMatrix, viewMatrix, projectionMatrix);
 
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var delta = currentTime - lastCubeUpdateTime;
       rotationAngle += (10 * delta) / 1000.0;
     }
-    
+
     lastCubeUpdateTime = currentTime;
 
     stats.end();

@@ -1,17 +1,6 @@
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 4-component color with red, green, blue and alpha components.
-     */
     var Color4 = (function () {
-        /**
-         * Constructs a new `Color4` object.
-         *
-         * @param r - The value for the red component.
-         * @param g - The value for the green component.
-         * @param b - The value for the blue component.
-         * @param a - The value for the alpha component.
-         */
         function Color4(r, g, b, a) {
             this.r = r;
             this.g = g;

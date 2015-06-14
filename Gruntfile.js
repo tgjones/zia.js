@@ -281,7 +281,8 @@ module.exports = function(grunt) {
 
   grunt.loadTasks('lib/tasks');
 
-  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "jsdoc", "jsdoc-assemble", "load-api-pages", "assemble" ]);
+  //grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "jsdoc", "jsdoc-assemble", "load-api-pages", "assemble" ]);
+  grunt.registerTask("build",   [ "clean", "sass", "karma:ci", "concat", "copy", "uglify", "assemble" ]);
   grunt.registerTask("default", [ "build", "karma:dev:start", "watch" ]);
   grunt.registerTask("deploy",  [ "build", "gh-pages" ]);
 };

@@ -26,16 +26,7 @@
  */
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 2-dimensional vector.
-     */
     var Vector2 = (function () {
-        /**
-         * Constructs a new 2-dimensional vector.
-         *
-         * @param x The value for the x coordinate.
-         * @param y The value for the y coordinate.
-         */
         function Vector2(x, y) {
             if (x === void 0) { x = 0.0; }
             if (y === void 0) { y = 0.0; }
@@ -252,6 +243,9 @@ var Zia;
         };
         Vector2.prototype.toJS = function () {
             return [this._x, this._y];
+        };
+        Vector2.prototype.toArray = function () {
+            return this.toJS();
         };
         Vector2._clampScalarMinTemp = new Vector2();
         Vector2._clampScalarMaxTemp = new Vector2();

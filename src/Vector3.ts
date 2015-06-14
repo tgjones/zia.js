@@ -601,6 +601,10 @@ module Zia {
       return [ this._x, this._y, this._z ];
     }
 
+    toArray() {
+      return this.toJS();
+    }
+
     private static _distanceTemp = new Vector3();
 
     static distance(a: Vector3, b: Vector3) {

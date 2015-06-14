@@ -335,17 +335,7 @@ var Zia;
  */
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 3-dimensional vector.
-     */
     var Vector3 = (function () {
-        /**
-         * Constructs a new 3-dimensional vector.
-         *
-         * @param {Number} [x=0.0] - The value for the x coordinate.
-         * @param {Number} [y=0.0] - The value for the y coordinate.
-         * @param {Number} [z=0.0] - The value for the z coordinate.
-         */
         function Vector3(x, y, z) {
             if (x === void 0) { x = 0.0; }
             if (y === void 0) { y = 0.0; }
@@ -493,7 +483,7 @@ var Zia;
             // input: Zia.Matrix4 projection matrix
             var x = this._x, y = this._y, z = this._z;
             var e = m.elements;
-            var d = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]); // perspective divide
+            var d = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
             this._x = (e[0] * x + e[4] * y + e[8] * z + e[12]) * d;
             this._y = (e[1] * x + e[5] * y + e[9] * z + e[13]) * d;
             this._z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * d;
@@ -508,12 +498,10 @@ var Zia;
             var qy = q.y;
             var qz = q.z;
             var qw = q.w;
-            // calculate quat * vector
             var ix = qw * x + qy * z - qz * y;
             var iy = qw * y + qz * x - qx * z;
             var iz = qw * z + qx * y - qy * x;
             var iw = -qx * x - qy * y - qz * z;
-            // calculate result * inverse quat
             this._x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
             this._y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
             this._z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
@@ -690,13 +678,10 @@ var Zia;
             return this.sub(Vector3._projectOnPlaneTemp);
         };
         Vector3.prototype.reflect = function (normal) {
-            // reflect incident vector off plane orthogonal to normal
-            // normal is assumed to have unit length
             return this.sub(Vector3._reflectTemp.copy(normal).multiplyScalar(2 * this.dot(normal)));
         };
         Vector3.prototype.angleTo = function (v) {
             var theta = this.dot(v) / (this.length() * v.length());
-            // clamp, to handle numerical problems
             return Math.acos(Zia.MathUtil.clamp(theta, -1, 1));
         };
         Vector3.prototype.distanceTo = function (v) {
@@ -755,6 +740,9 @@ var Zia;
         Vector3.prototype.toJS = function () {
             return [this._x, this._y, this._z];
         };
+        Vector3.prototype.toArray = function () {
+            return this.toJS();
+        };
         Vector3.distance = function (a, b) {
             Zia.Vector3.subtract(a, b, Vector3._distanceTemp);
             return Vector3._distanceTemp.length();
@@ -810,18 +798,7 @@ var Zia;
 
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 4-component color with red, green, blue and alpha components.
-     */
     var Color4 = (function () {
-        /**
-         * Constructs a new `Color4` object.
-         *
-         * @param r - The value for the red component.
-         * @param g - The value for the green component.
-         * @param b - The value for the blue component.
-         * @param a - The value for the alpha component.
-         */
         function Color4(r, g, b, a) {
             this.r = r;
             this.g = g;
@@ -2106,16 +2083,7 @@ var Zia;
  */
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 2-dimensional vector.
-     */
     var Vector2 = (function () {
-        /**
-         * Constructs a new 2-dimensional vector.
-         *
-         * @param x The value for the x coordinate.
-         * @param y The value for the y coordinate.
-         */
         function Vector2(x, y) {
             if (x === void 0) { x = 0.0; }
             if (y === void 0) { y = 0.0; }
@@ -2332,6 +2300,9 @@ var Zia;
         };
         Vector2.prototype.toJS = function () {
             return [this._x, this._y];
+        };
+        Vector2.prototype.toArray = function () {
+            return this.toJS();
         };
         Vector2._clampScalarMinTemp = new Vector2();
         Vector2._clampScalarMaxTemp = new Vector2();
@@ -2807,7 +2778,7 @@ var Zia;
             }
             for (var i = 0; i < vertexCount; i++) {
                 for (var j = 0; j < arrays.length; j++) {
-                    Array.prototype.push.apply(vertexData, arrays[j][i].toArray());
+                    Array.prototype.push.apply(vertexData, arrays[j][i].toJS());
                 }
             }
             return vertexData;
@@ -3147,16 +3118,23 @@ var Zia;
 
 var Zia;
 (function (Zia) {
-    /**
-     * Main class in Zia. Manages the WebGL rendering context and associated state,
-     * and performs rendering.
-     */
+    (function (ClearOptions) {
+        ClearOptions[ClearOptions["DepthBuffer"] = 0] = "DepthBuffer";
+        ClearOptions[ClearOptions["StencilBuffer"] = 1] = "StencilBuffer";
+        ClearOptions[ClearOptions["ColorBuffer"] = 2] = "ColorBuffer";
+    })(Zia.ClearOptions || (Zia.ClearOptions = {}));
+    var ClearOptions = Zia.ClearOptions;
+    (function (PrimitiveType) {
+        PrimitiveType[PrimitiveType["PointList"] = 0] = "PointList";
+        PrimitiveType[PrimitiveType["LineList"] = 1] = "LineList";
+        PrimitiveType[PrimitiveType["LineStrip"] = 2] = "LineStrip";
+        PrimitiveType[PrimitiveType["LineLoop"] = 3] = "LineLoop";
+        PrimitiveType[PrimitiveType["TriangleList"] = 4] = "TriangleList";
+        PrimitiveType[PrimitiveType["TriangleStrip"] = 5] = "TriangleStrip";
+        PrimitiveType[PrimitiveType["TriangleFan"] = 6] = "TriangleFan";
+    })(Zia.PrimitiveType || (Zia.PrimitiveType = {}));
+    var PrimitiveType = Zia.PrimitiveType;
     var GraphicsDevice = (function () {
-        /**
-         * Constructs a new `GraphicsDevice` object.
-         *
-         * @param canvas - The canvas element.
-         */
         function GraphicsDevice(canvas, debug) {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
@@ -3167,7 +3145,6 @@ var Zia;
             if (debug) {
                 gl = this.gl = Zia.DebugUtil.makeDebugContext(gl);
             }
-            // TODO: Handle WebContextLost event.
             var viewport = this._viewport = new Zia.Viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
             viewport.onChange(function () {
                 gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
@@ -3207,15 +3184,15 @@ var Zia;
         });
         GraphicsDevice.prototype.clear = function (clearOptions, color, depth, stencil) {
             var clearMask = 0;
-            if (Zia.EnumUtil.hasFlag(clearOptions, 0 /* DepthBuffer */)) {
+            if (Zia.EnumUtil.hasFlag(clearOptions, Zia.ClearOptions.DepthBuffer)) {
                 clearMask |= this.gl.DEPTH_BUFFER_BIT;
                 this.gl.clearDepth(depth);
             }
-            if (Zia.EnumUtil.hasFlag(clearOptions, 1 /* StencilBuffer */)) {
+            if (Zia.EnumUtil.hasFlag(clearOptions, Zia.ClearOptions.StencilBuffer)) {
                 clearMask |= this.gl.STENCIL_BUFFER_BIT;
                 this.gl.clearStencil(stencil);
             }
-            if (Zia.EnumUtil.hasFlag(clearOptions, 2 /* ColorBuffer */)) {
+            if (Zia.EnumUtil.hasFlag(clearOptions, Zia.ClearOptions.ColorBuffer)) {
                 clearMask |= this.gl.COLOR_BUFFER_BIT;
                 this.gl.clearColor(color.r, color.g, color.b, color.a);
             }
@@ -3293,13 +3270,13 @@ var Zia;
         };
         GraphicsDevice.prototype._getMode = function (primitiveType) {
             switch (primitiveType) {
-                case 0 /* PointList */: return this.gl.POINTS;
-                case 1 /* LineList */: return this.gl.LINES;
-                case 2 /* LineStrip */: return this.gl.LINE_STRIP;
-                case 3 /* LineLoop */: return this.gl.LINE_LOOP;
-                case 4 /* TriangleList */: return this.gl.TRIANGLES;
-                case 5 /* TriangleStrip */: return this.gl.TRIANGLE_STRIP;
-                case 6 /* TriangleFan */: return this.gl.TRIANGLE_FAN;
+                case PrimitiveType.PointList: return this.gl.POINTS;
+                case PrimitiveType.LineList: return this.gl.LINES;
+                case PrimitiveType.LineStrip: return this.gl.LINE_STRIP;
+                case PrimitiveType.LineLoop: return this.gl.LINE_LOOP;
+                case PrimitiveType.TriangleList: return this.gl.TRIANGLES;
+                case PrimitiveType.TriangleStrip: return this.gl.TRIANGLE_STRIP;
+                case PrimitiveType.TriangleFan: return this.gl.TRIANGLE_FAN;
             }
         };
         return GraphicsDevice;
@@ -3412,7 +3389,6 @@ var Zia;
                 if (value === this._program)
                     return;
                 if (this._program) {
-                    // First check to see if any other parts are using this program.
                     var removeProgram = true;
                     for (var i = 0; i < this._parent.meshParts.length; i++) {
                         var meshPart = this._parent.meshParts[i];
@@ -3428,9 +3404,8 @@ var Zia;
                         }
                     }
                 }
-                // Set the new program.
                 this._program = value;
-                this._parent.programs.push(value); // TODO: Check for duplicates?
+                this._parent.programs.push(value);
             },
             enumerable: true,
             configurable: true
@@ -3737,33 +3712,47 @@ var Zia;
 
 var Zia;
 (function (Zia) {
+    (function (TextureFilter) {
+        TextureFilter[TextureFilter["MinMagMipNearest"] = 0] = "MinMagMipNearest";
+        TextureFilter[TextureFilter["MinMagNearestMipLinear"] = 1] = "MinMagNearestMipLinear";
+        TextureFilter[TextureFilter["MinNearestMagLinearMipNearest"] = 2] = "MinNearestMagLinearMipNearest";
+        TextureFilter[TextureFilter["MinNearestMagMipLinear"] = 3] = "MinNearestMagMipLinear";
+        TextureFilter[TextureFilter["MinLinearMagMipNearest"] = 4] = "MinLinearMagMipNearest";
+        TextureFilter[TextureFilter["MinLinearMagNearestMipLinear"] = 5] = "MinLinearMagNearestMipLinear";
+        TextureFilter[TextureFilter["MinMagLinearMipNearest"] = 6] = "MinMagLinearMipNearest";
+        TextureFilter[TextureFilter["MinMagMipLinear"] = 7] = "MinMagMipLinear";
+        TextureFilter[TextureFilter["MinMagNearest"] = 8] = "MinMagNearest";
+        TextureFilter[TextureFilter["MinNearestMagLinear"] = 9] = "MinNearestMagLinear";
+        TextureFilter[TextureFilter["MinLinearMagNearest"] = 10] = "MinLinearMagNearest";
+        TextureFilter[TextureFilter["MinMagLinear"] = 11] = "MinMagLinear";
+    })(Zia.TextureFilter || (Zia.TextureFilter = {}));
+    var TextureFilter = Zia.TextureFilter;
     Zia.TextureFilterUtil = {
-        // Returns an array containing [MinFilter, MagFilter]
         _map: function (gl, filter) {
             switch (filter) {
-                case 0 /* MinMagMipNearest */:
+                case TextureFilter.MinMagMipNearest:
                     return [gl.NEAREST_MIPMAP_NEAREST, gl.NEAREST];
-                case 1 /* MinMagNearestMipLinear */:
+                case TextureFilter.MinMagNearestMipLinear:
                     return [gl.NEAREST_MIPMAP_LINEAR, gl.NEAREST];
-                case 2 /* MinNearestMagLinearMipNearest */:
+                case TextureFilter.MinNearestMagLinearMipNearest:
                     return [gl.NEAREST_MIPMAP_NEAREST, gl.LINEAR];
-                case 3 /* MinNearestMagMipLinear */:
+                case TextureFilter.MinNearestMagMipLinear:
                     return [gl.NEAREST_MIPMAP_LINEAR, gl.LINEAR];
-                case 4 /* MinLinearMagMipNearest */:
+                case TextureFilter.MinLinearMagMipNearest:
                     return [gl.LINEAR_MIPMAP_NEAREST, gl.NEAREST];
-                case 5 /* MinLinearMagNearestMipLinear */:
+                case TextureFilter.MinLinearMagNearestMipLinear:
                     return [gl.LINEAR_MIPMAP_LINEAR, gl.NEAREST];
-                case 6 /* MinMagLinearMipNearest */:
+                case TextureFilter.MinMagLinearMipNearest:
                     return [gl.LINEAR_MIPMAP_NEAREST, gl.LINEAR];
-                case 7 /* MinMagMipLinear */:
+                case TextureFilter.MinMagMipLinear:
                     return [gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR];
-                case 8 /* MinMagNearest */:
+                case TextureFilter.MinMagNearest:
                     return [gl.NEAREST, gl.NEAREST];
-                case 9 /* MinNearestMagLinear */:
+                case TextureFilter.MinNearestMagLinear:
                     return [gl.NEAREST, gl.LINEAR];
-                case 10 /* MinLinearMagNearest */:
+                case TextureFilter.MinLinearMagNearest:
                     return [gl.LINEAR, gl.NEAREST];
-                case 11 /* MinMagLinear */:
+                case TextureFilter.MinMagLinear:
                     return [gl.LINEAR, gl.LINEAR];
                 default:
                     throw "Invalid value: " + filter;

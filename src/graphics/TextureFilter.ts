@@ -1,5 +1,5 @@
 module Zia {
-  export const enum TextureFilter {
+  export enum TextureFilter {
     MinMagMipNearest = 0,
     MinMagNearestMipLinear = 1,
     MinNearestMagLinearMipNearest = 2,

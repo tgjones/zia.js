@@ -1,11 +1,11 @@
 module Zia {
-  export const enum ClearOptions {
+  export enum ClearOptions {
     DepthBuffer = 0,
     StencilBuffer = 1,
     ColorBuffer = 2
   }
 
-  export const enum PrimitiveType {
+  export enum PrimitiveType {
     PointList = 0,
     LineList = 1,
     LineStrip = 2,

@@ -1,32 +1,46 @@
 var Zia;
 (function (Zia) {
+    (function (TextureFilter) {
+        TextureFilter[TextureFilter["MinMagMipNearest"] = 0] = "MinMagMipNearest";
+        TextureFilter[TextureFilter["MinMagNearestMipLinear"] = 1] = "MinMagNearestMipLinear";
+        TextureFilter[TextureFilter["MinNearestMagLinearMipNearest"] = 2] = "MinNearestMagLinearMipNearest";
+        TextureFilter[TextureFilter["MinNearestMagMipLinear"] = 3] = "MinNearestMagMipLinear";
+        TextureFilter[TextureFilter["MinLinearMagMipNearest"] = 4] = "MinLinearMagMipNearest";
+        TextureFilter[TextureFilter["MinLinearMagNearestMipLinear"] = 5] = "MinLinearMagNearestMipLinear";
+        TextureFilter[TextureFilter["MinMagLinearMipNearest"] = 6] = "MinMagLinearMipNearest";
+        TextureFilter[TextureFilter["MinMagMipLinear"] = 7] = "MinMagMipLinear";
+        TextureFilter[TextureFilter["MinMagNearest"] = 8] = "MinMagNearest";
+        TextureFilter[TextureFilter["MinNearestMagLinear"] = 9] = "MinNearestMagLinear";
+        TextureFilter[TextureFilter["MinLinearMagNearest"] = 10] = "MinLinearMagNearest";
+        TextureFilter[TextureFilter["MinMagLinear"] = 11] = "MinMagLinear";
+    })(Zia.TextureFilter || (Zia.TextureFilter = {}));
+    var TextureFilter = Zia.TextureFilter;
     Zia.TextureFilterUtil = {
-        // Returns an array containing [MinFilter, MagFilter]
         _map: function (gl, filter) {
             switch (filter) {
-                case 0 /* MinMagMipNearest */:
+                case TextureFilter.MinMagMipNearest:
                     return [gl.NEAREST_MIPMAP_NEAREST, gl.NEAREST];
-                case 1 /* MinMagNearestMipLinear */:
+                case TextureFilter.MinMagNearestMipLinear:
                     return [gl.NEAREST_MIPMAP_LINEAR, gl.NEAREST];
-                case 2 /* MinNearestMagLinearMipNearest */:
+                case TextureFilter.MinNearestMagLinearMipNearest:
                     return [gl.NEAREST_MIPMAP_NEAREST, gl.LINEAR];
-                case 3 /* MinNearestMagMipLinear */:
+                case TextureFilter.MinNearestMagMipLinear:
                     return [gl.NEAREST_MIPMAP_LINEAR, gl.LINEAR];
-                case 4 /* MinLinearMagMipNearest */:
+                case TextureFilter.MinLinearMagMipNearest:
                     return [gl.LINEAR_MIPMAP_NEAREST, gl.NEAREST];
-                case 5 /* MinLinearMagNearestMipLinear */:
+                case TextureFilter.MinLinearMagNearestMipLinear:
                     return [gl.LINEAR_MIPMAP_LINEAR, gl.NEAREST];
-                case 6 /* MinMagLinearMipNearest */:
+                case TextureFilter.MinMagLinearMipNearest:
                     return [gl.LINEAR_MIPMAP_NEAREST, gl.LINEAR];
-                case 7 /* MinMagMipLinear */:
+                case TextureFilter.MinMagMipLinear:
                     return [gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR];
-                case 8 /* MinMagNearest */:
+                case TextureFilter.MinMagNearest:
                     return [gl.NEAREST, gl.NEAREST];
-                case 9 /* MinNearestMagLinear */:
+                case TextureFilter.MinNearestMagLinear:
                     return [gl.NEAREST, gl.LINEAR];
-                case 10 /* MinLinearMagNearest */:
+                case TextureFilter.MinLinearMagNearest:
                     return [gl.LINEAR, gl.NEAREST];
-                case 11 /* MinMagLinear */:
+                case TextureFilter.MinMagLinear:
                     return [gl.LINEAR, gl.LINEAR];
                 default:
                     throw "Invalid value: " + filter;

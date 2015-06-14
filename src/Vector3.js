@@ -26,17 +26,7 @@
  */
 var Zia;
 (function (Zia) {
-    /**
-     * Represents a 3-dimensional vector.
-     */
     var Vector3 = (function () {
-        /**
-         * Constructs a new 3-dimensional vector.
-         *
-         * @param {Number} [x=0.0] - The value for the x coordinate.
-         * @param {Number} [y=0.0] - The value for the y coordinate.
-         * @param {Number} [z=0.0] - The value for the z coordinate.
-         */
         function Vector3(x, y, z) {
             if (x === void 0) { x = 0.0; }
             if (y === void 0) { y = 0.0; }
@@ -184,7 +174,7 @@ var Zia;
             // input: Zia.Matrix4 projection matrix
             var x = this._x, y = this._y, z = this._z;
             var e = m.elements;
-            var d = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]); // perspective divide
+            var d = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
             this._x = (e[0] * x + e[4] * y + e[8] * z + e[12]) * d;
             this._y = (e[1] * x + e[5] * y + e[9] * z + e[13]) * d;
             this._z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * d;
@@ -199,12 +189,10 @@ var Zia;
             var qy = q.y;
             var qz = q.z;
             var qw = q.w;
-            // calculate quat * vector
             var ix = qw * x + qy * z - qz * y;
             var iy = qw * y + qz * x - qx * z;
             var iz = qw * z + qx * y - qy * x;
             var iw = -qx * x - qy * y - qz * z;
-            // calculate result * inverse quat
             this._x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
             this._y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
             this._z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
@@ -381,13 +369,10 @@ var Zia;
             return this.sub(Vector3._projectOnPlaneTemp);
         };
         Vector3.prototype.reflect = function (normal) {
-            // reflect incident vector off plane orthogonal to normal
-            // normal is assumed to have unit length
             return this.sub(Vector3._reflectTemp.copy(normal).multiplyScalar(2 * this.dot(normal)));
         };
         Vector3.prototype.angleTo = function (v) {
             var theta = this.dot(v) / (this.length() * v.length());
-            // clamp, to handle numerical problems
             return Math.acos(Zia.MathUtil.clamp(theta, -1, 1));
         };
         Vector3.prototype.distanceTo = function (v) {
@@ -445,6 +430,9 @@ var Zia;
         };
         Vector3.prototype.toJS = function () {
             return [this._x, this._y, this._z];
+        };
+        Vector3.prototype.toArray = function () {
+            return this.toJS();
         };
         Vector3.distance = function (a, b) {
             Zia.Vector3.subtract(a, b, Vector3._distanceTemp);

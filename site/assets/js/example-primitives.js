@@ -1,7 +1,7 @@
 $(function() {
-    
+
   var canvas = document.getElementById('mainCanvas');
-  
+
   var graphicsDevice = new Zia.GraphicsDevice(canvas);
 
   var program = new Zia.BasicProgram(graphicsDevice, {
@@ -34,7 +34,7 @@ $(function() {
     Zia.MathUtil.PI_OVER_FOUR,
     graphicsDevice.viewport.aspectRatio, 0.1, 100,
     new Zia.Matrix4());
-  
+
   var viewMatrix = Zia.Matrix4.createLookAt(
     new Zia.Vector3(1, 1, -1.2),
     new Zia.Vector3(0, 0, 0),
@@ -67,7 +67,7 @@ $(function() {
       new Zia.Color4(0.7, 0.7, 0.7, 1), 1);
 
     Zia.Matrix4.createFromAxisAngle(
-      rotationAxis, Zia.Math.degToRad(rotationAngle),
+      rotationAxis, Zia.MathUtil.degToRad(rotationAngle),
       modelMatrix);
     model.draw(modelMatrix, viewMatrix, projectionMatrix);
 
